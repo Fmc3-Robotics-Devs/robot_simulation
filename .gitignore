@@ -1,0 +1,7 @@
+# Keep RViz workspace sources while ignoring colcon build artifacts.
+Rviz/*
+!Rviz/src/
+!Rviz/src/**
+
+**/__pycache__/
+*.py[cod]

@@ -1,0 +1,10 @@
+moveit_setup_assistant_config:
+  urdf:
+    package: franzi_description
+    relative_path: urdf/wheel_robot_4.0.urdf
+  srdf:
+    relative_path: config/wheel_robot_4.0.srdf
+  package_settings:
+    author_name: Hanchong Jiang
+    author_email: jiang.hanchong@fmc3-robotics.ai
+    generated_timestamp: 2026-07-26

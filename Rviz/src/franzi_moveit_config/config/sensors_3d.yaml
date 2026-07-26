@@ -1,0 +1,2 @@
+# Sensor meshes/frames exist in the URDF, but no point-cloud topics are assumed.
+sensors: []

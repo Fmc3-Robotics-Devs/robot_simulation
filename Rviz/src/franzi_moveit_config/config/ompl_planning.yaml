@@ -1,0 +1,72 @@
+planning_plugins:
+  - ompl_interface/OMPLPlanner
+request_adapters:
+  - default_planning_request_adapters/ResolveConstraintFrames
+  - default_planning_request_adapters/ValidateWorkspaceBounds
+  - default_planning_request_adapters/CheckStartStateBounds
+  - default_planning_request_adapters/CheckStartStateCollision
+response_adapters:
+  - default_planning_response_adapters/AddTimeOptimalParameterization
+  - default_planning_response_adapters/ValidateSolution
+  - default_planning_response_adapters/DisplayMotionPath
+
+## This is the complete OMPL planner set shipped by MoveIt 2 Jazzy.
+## TRRT is intentionally the default whenever the RViz planner field is left empty.
+planner_configs:
+  AnytimePathShortening: {type: geometric::AnytimePathShortening}
+  SBL: {type: geometric::SBL}
+  EST: {type: geometric::EST}
+  LBKPIECE: {type: geometric::LBKPIECE}
+  BKPIECE: {type: geometric::BKPIECE}
+  KPIECE: {type: geometric::KPIECE}
+  RRT: {type: geometric::RRT}
+  RRTConnect: {type: geometric::RRTConnect}
+  RRTstar: {type: geometric::RRTstar}
+  TRRT: {type: geometric::TRRT}
+  PRM: {type: geometric::PRM}
+  PRMstar: {type: geometric::PRMstar}
+  FMT: {type: geometric::FMT}
+  BFMT: {type: geometric::BFMT}
+  PDST: {type: geometric::PDST}
+  STRIDE: {type: geometric::STRIDE}
+  BiTRRT: {type: geometric::BiTRRT}
+  LBTRRT: {type: geometric::LBTRRT}
+  BiEST: {type: geometric::BiEST}
+  ProjEST: {type: geometric::ProjEST}
+  LazyPRM: {type: geometric::LazyPRM}
+  LazyPRMstar: {type: geometric::LazyPRMstar}
+  SPARS: {type: geometric::SPARS}
+  SPARStwo: {type: geometric::SPARStwo}
+
+body:
+  default_planner_config: TRRT
+  planner_configs: [AnytimePathShortening, SBL, EST, LBKPIECE, BKPIECE, KPIECE, RRT, RRTConnect, RRTstar, TRRT, PRM, PRMstar, FMT, BFMT, PDST, STRIDE, BiTRRT, LBTRRT, BiEST, ProjEST, LazyPRM, LazyPRMstar, SPARS, SPARStwo]
+  longest_valid_segment_fraction: 0.005
+head:
+  default_planner_config: TRRT
+  planner_configs: [AnytimePathShortening, SBL, EST, LBKPIECE, BKPIECE, KPIECE, RRT, RRTConnect, RRTstar, TRRT, PRM, PRMstar, FMT, BFMT, PDST, STRIDE, BiTRRT, LBTRRT, BiEST, ProjEST, LazyPRM, LazyPRMstar, SPARS, SPARStwo]
+  longest_valid_segment_fraction: 0.005
+body_head:
+  default_planner_config: TRRT
+  planner_configs: [AnytimePathShortening, SBL, EST, LBKPIECE, BKPIECE, KPIECE, RRT, RRTConnect, RRTstar, TRRT, PRM, PRMstar, FMT, BFMT, PDST, STRIDE, BiTRRT, LBTRRT, BiEST, ProjEST, LazyPRM, LazyPRMstar, SPARS, SPARStwo]
+  longest_valid_segment_fraction: 0.005
+left_arm:
+  default_planner_config: TRRT
+  planner_configs: [AnytimePathShortening, SBL, EST, LBKPIECE, BKPIECE, KPIECE, RRT, RRTConnect, RRTstar, TRRT, PRM, PRMstar, FMT, BFMT, PDST, STRIDE, BiTRRT, LBTRRT, BiEST, ProjEST, LazyPRM, LazyPRMstar, SPARS, SPARStwo]
+  longest_valid_segment_fraction: 0.005
+right_arm:
+  default_planner_config: TRRT
+  planner_configs: [AnytimePathShortening, SBL, EST, LBKPIECE, BKPIECE, KPIECE, RRT, RRTConnect, RRTstar, TRRT, PRM, PRMstar, FMT, BFMT, PDST, STRIDE, BiTRRT, LBTRRT, BiEST, ProjEST, LazyPRM, LazyPRMstar, SPARS, SPARStwo]
+  longest_valid_segment_fraction: 0.005
+both_arms:
+  default_planner_config: TRRT
+  planner_configs: [AnytimePathShortening, SBL, EST, LBKPIECE, BKPIECE, KPIECE, RRT, RRTConnect, RRTstar, TRRT, PRM, PRMstar, FMT, BFMT, PDST, STRIDE, BiTRRT, LBTRRT, BiEST, ProjEST, LazyPRM, LazyPRMstar, SPARS, SPARStwo]
+  longest_valid_segment_fraction: 0.005
+left_gripper:
+  default_planner_config: TRRT
+  planner_configs: [AnytimePathShortening, SBL, EST, LBKPIECE, BKPIECE, KPIECE, RRT, RRTConnect, RRTstar, TRRT, PRM, PRMstar, FMT, BFMT, PDST, STRIDE, BiTRRT, LBTRRT, BiEST, ProjEST, LazyPRM, LazyPRMstar, SPARS, SPARStwo]
+  longest_valid_segment_fraction: 0.005
+right_gripper:
+  default_planner_config: TRRT
+  planner_configs: [AnytimePathShortening, SBL, EST, LBKPIECE, BKPIECE, KPIECE, RRT, RRTConnect, RRTstar, TRRT, PRM, PRMstar, FMT, BFMT, PDST, STRIDE, BiTRRT, LBTRRT, BiEST, ProjEST, LazyPRM, LazyPRMstar, SPARS, SPARStwo]
+  longest_valid_segment_fraction: 0.005
