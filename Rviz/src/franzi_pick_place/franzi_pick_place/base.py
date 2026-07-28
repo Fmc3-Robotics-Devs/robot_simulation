@@ -18,6 +18,7 @@ purpose - that is the intended replacement.
 """
 
 import math
+import random
 import threading
 import time
 
@@ -48,6 +49,8 @@ class MobileBase:
         wheel_radius=0.0827,
         linear_speed=0.5,
         angular_speed=0.8,
+        position_error=0.0,
+        yaw_error=0.0,
         rate=50.0,
     ):
         self._node = node
@@ -57,6 +60,9 @@ class MobileBase:
         self._wheel_radius = wheel_radius
         self._linear_speed = linear_speed
         self._angular_speed = angular_speed
+        self._position_error = position_error
+        self._yaw_error = yaw_error
+        self._random = random.Random(0)
         self._period = 1.0 / rate
 
         self._lock = threading.Lock()
@@ -80,8 +86,17 @@ class MobileBase:
         self._publish()
 
     def drive_to(self, x, y, yaw, label=None):
-        """Translate and rotate to a pose, blocking until parked."""
+        """Drive to a goal and park near it. Returns where it actually stopped.
+
+        Parking is deliberately imperfect. Navigation under SLAM lands within
+        its goal tolerance, not on the goal, and that residual is the entire
+        reason the station carries a tag: a base that always arrives exactly
+        makes the tag pipeline look like it works while never asking it to do
+        anything. Callers must use the returned pose, not the goal.
+        """
         start_x, start_y, start_yaw = self.pose
+        x, y, yaw = self._arrival(x, y, yaw)
+
         delta_yaw = normalise(yaw - start_yaw)
         distance = math.hypot(x - start_x, y - start_y)
 
@@ -91,7 +106,7 @@ class MobileBase:
         )
         if duration < 1e-3:
             self.set_pose(x, y, yaw)
-            return
+            return self.pose
 
         self._logger.info(
             f"{label or 'base'}: driving {distance:.2f} m / "
@@ -126,6 +141,23 @@ class MobileBase:
             time.sleep(self._period)
 
         self.set_pose(x, y, yaw)
+        return self.pose
+
+    def _arrival(self, x, y, yaw):
+        """Scatter the goal by the navigation stack's docking error."""
+        if not self._position_error and not self._yaw_error:
+            return x, y, yaw
+        gauss = self._random.gauss
+        parked = (
+            x + gauss(0.0, self._position_error),
+            y + gauss(0.0, self._position_error),
+            normalise(yaw + gauss(0.0, self._yaw_error)),
+        )
+        self._logger.info(
+            f"parked {math.hypot(parked[0] - x, parked[1] - y) * 1000:.0f} mm / "
+            f"{math.degrees(normalise(parked[2] - yaw)):+.1f} deg off the goal"
+        )
+        return parked
 
     def _step(self, pose, world_velocity, yaw_rate, yaw, dt):
         """Advance the pose and roll the wheels to match the motion."""

@@ -123,9 +123,23 @@ DEFAULTS = {
     "base.linear_speed": 0.5,
     "base.angular_speed": 0.8,
     "base.wheel_radius": 0.0827,
+    # One sigma of the navigation stack's docking error. Zero makes the base
+    # arrive perfectly, which flatters the tag pipeline into looking correct.
+    "base.arrival_position_error": 0.03,
+    "base.arrival_yaw_error": 0.03,
     "machining.duration": 8.0,
     "machining.wait_for_trigger": False,
     "dock_poses_file": "",
+    "handeye_mount_frame": "head_pitch_Link",
+    "handeye_truth.xyz": [0.0, 0.0, 0.0],
+    "handeye_truth.rpy": [0.0, 0.0, 0.0],
+    "handeye_base_dx": [0.0, -0.15, 0.10, -0.10, 0.05, -0.05],
+    "handeye_base_dy": [0.0, 0.12, -0.12, -0.08, 0.15, -0.15],
+    "handeye_base_dyaw": [0.0, 0.15, -0.15, 0.25, -0.25, 0.10],
+    "handeye_head_yaw": [0.0, 0.25, -0.25, 0.15, -0.15, 0.0],
+    "handeye_head_pitch": [0.52, 0.30, 0.45, 0.15, 0.52, 0.35],
+    "handeye_waist_pitch": [-0.45, -0.10, -0.50, 0.20, 0.10, -0.30],
+    "handeye_settle": 0.4,
     "dock_sweep.span": 0.20,
     "dock_sweep.step": 0.05,
     "dock_sweep.yaw_errors": [0.0, 10.0],
@@ -274,24 +288,38 @@ class MachineTendingDemo:
     # -- scene -------------------------------------------------------------
 
     def setup_scene(self):
-        """Start with a floor and nothing else.
+        """Put the surveyed environment in the scene up front.
 
-        The robot has not seen a bench yet, so it does not get to have one in
-        its planning scene. Everything else is revealed by the tag that station
-        carries, which is all it will have on hardware under SLAM.
+        Benches and the fixture are static furniture: the robot knows them from
+        the map, the same way it knows a wall, and they have to be collision
+        geometry from the first plan onwards. Building them from tag detections
+        instead - as an earlier version did - meant a bench only existed once
+        the robot had looked at it, which is not how a map works.
+
+        The tag is not a mapping input. It answers one question: where exactly
+        is the part.
         """
         self._scene.wait_for_services()
         self._gripper.wait_for_controller()
-        self._scene.add_objects([build_ground(self._layout)], colors=COLORS)
-        self._logger.info("planning scene ready (floor only, benches come from tags)")
 
-    def reveal_station(self, station, label):
-        """Observe the tag and place everything that station implies."""
+        environment = [build_ground(self._layout)]
+        for station in STATIONS:
+            environment += build_station(
+                self._layout, station, self._layout.part_pose(station)
+            )
+        self._scene.add_objects(environment, colors=COLORS)
+        self._logger.info(f"planning scene ready ({len(environment)} surveyed objects)")
+
+    def locate_part(self, station, label):
+        """Where the part is, as the camera reports it.
+
+        Only the part moves with the observation. The bench it sits on stays
+        where the map put it, so a calibration error shows up here as a part
+        that has drifted off its own bench - which is exactly what it looks
+        like on the real robot.
+        """
         part_pose = self.observe_part_pose(station, label)
-        self._scene.add_objects(
-            build_station(self._layout, station, part_pose), colors=COLORS
-        )
-        if station == FEEDER and not self._workpiece_placed:
+        if not self._workpiece_placed:
             workpiece = build_workpiece(self._layout)
             workpiece.pose = part_pose
             self._scene.add_objects([workpiece], colors=COLORS)
@@ -379,8 +407,8 @@ class MachineTendingDemo:
         that starts inside a bench.
         """
         self.transit_posture(carrying)
-        self._base.drive_to(*pose, label=label)
-        if not self._arm.wait_for_base(pose[0], pose[1]):
+        parked = self._base.drive_to(*pose, label=label)
+        if not self._arm.wait_for_base(parked[0], parked[1]):
             raise PlanningFailure(
                 f"{label}: MoveIt never saw the base reach the dock pose; "
                 "is anything else publishing world -> moveit_root?"
@@ -439,7 +467,7 @@ class MachineTendingDemo:
         )
 
     def pick(self, station, label):
-        grasp, pregrasp = self._approach_states(self.reveal_station(station, label), label)
+        grasp, pregrasp = self._approach_states(self.locate_part(station, label), label)
         pairs = self._contact_pairs(station)
 
         self._logger.info(f"{label}: approaching")
@@ -458,7 +486,7 @@ class MachineTendingDemo:
 
     def place(self, station, label):
         release, prerelease = self._approach_states(
-            self.reveal_station(station, label), label
+            self.locate_part(station, label), label
         )
         pairs = self._contact_pairs(station)
 
@@ -546,6 +574,8 @@ def main():
             wheel_radius=node.get("base.wheel_radius"),
             linear_speed=node.get("base.linear_speed"),
             angular_speed=node.get("base.angular_speed"),
+            position_error=node.get("base.arrival_position_error"),
+            yaw_error=node.get("base.arrival_yaw_error"),
         )
         base.set_pose(*node.layout().dock_pose(FEEDER))
 
