@@ -34,6 +34,23 @@ def tag_id(station):
     return f"apriltag_{station}"
 
 
+def tag_code_id(station):
+    return f"apriltag_{station}_code"
+
+
+# A 6x6 payload, drawn only so the marker reads as a tag in RViz rather than as
+# a black slab. Detection is simulated geometrically, so the pattern carries no
+# information - do not print this and expect a decoder to like it.
+TAG_PAYLOAD = (
+    (1, 1, 0, 1, 0, 0),
+    (0, 1, 1, 0, 1, 1),
+    (1, 0, 1, 1, 0, 1),
+    (1, 1, 0, 0, 1, 0),
+    (0, 1, 1, 0, 1, 1),
+    (1, 0, 0, 1, 1, 0),
+)
+
+
 COLORS = {
     GROUND: (0.35, 0.35, 0.38, 1.0),
     bench_id(FEEDER): (0.72, 0.60, 0.44, 1.0),
@@ -41,7 +58,8 @@ COLORS = {
     bench_id(OUTFEED): (0.72, 0.60, 0.44, 1.0),
     FIXTURE: (0.35, 0.42, 0.55, 1.0),
     WORKPIECE: (0.90, 0.45, 0.15, 1.0),
-    **{tag_id(station): (0.05, 0.05, 0.05, 1.0) for station in (FEEDER, MACHINE, OUTFEED)},
+    **{tag_id(station): (0.95, 0.95, 0.95, 1.0) for station in (FEEDER, MACHINE, OUTFEED)},
+    **{tag_code_id(station): (0.04, 0.04, 0.04, 1.0) for station in (FEEDER, MACHINE, OUTFEED)},
 }
 
 
@@ -202,18 +220,61 @@ def build_workpiece(layout):
     )
 
 
+def _tag_centre(layout):
+    return (
+        -layout.tag_to_part_xy[0],
+        -layout.tag_to_part_xy[1],
+        -layout.workpiece_size[2] / 2.0 + layout.tag_thickness / 2.0,
+    )
+
+
 def build_tag(layout, station, part_pose):
-    """The marker itself, so it is visible in RViz and gets planned around."""
+    """The white backing plate. This is the collision volume for the marker."""
     builder = CollisionObjectBuilder(tag_id(station), layout.frame_id)
     builder.set_pose(part_pose)
     return builder.add_box(
-        (layout.tag_size, layout.tag_size, layout.tag_thickness),
-        (
-            -layout.tag_to_part_xy[0],
-            -layout.tag_to_part_xy[1],
-            -layout.workpiece_size[2] / 2.0 + layout.tag_thickness / 2.0,
-        ),
+        (layout.tag_size, layout.tag_size, layout.tag_thickness), _tag_centre(layout)
     ).build()
+
+
+def build_tag_code(layout, station, part_pose):
+    """The black pattern, as a second object purely so it can be a second colour.
+
+    A planning-scene object carries one colour for all of its primitives, which
+    is why the marker cannot be drawn as a single textured plate.
+    """
+    size = layout.tag_size
+    cell = size / 8.0
+    cx, cy, cz = _tag_centre(layout)
+    # Sits a hair above the plate so it is not z-fighting with it.
+    z = cz + layout.tag_thickness
+    height = layout.tag_thickness / 2.0
+
+    builder = CollisionObjectBuilder(tag_code_id(station), layout.frame_id)
+    builder.set_pose(part_pose)
+
+    # Black border, one cell wide, on all four sides.
+    for dx, dy, sx, sy in (
+        (-3.5 * cell, 0.0, cell, 8.0 * cell),
+        (3.5 * cell, 0.0, cell, 8.0 * cell),
+        (0.0, -3.5 * cell, 6.0 * cell, cell),
+        (0.0, 3.5 * cell, 6.0 * cell, cell),
+    ):
+        builder.add_box((sx, sy, height), (cx + dx, cy + dy, z))
+
+    for row, cells in enumerate(TAG_PAYLOAD):
+        for column, filled in enumerate(cells):
+            if not filled:
+                continue
+            builder.add_box(
+                (cell, cell, height),
+                (
+                    cx + (column - 2.5) * cell,
+                    cy + (row - 2.5) * cell,
+                    z,
+                ),
+            )
+    return builder.build()
 
 
 def build_station(layout, station, part_pose):
@@ -221,6 +282,7 @@ def build_station(layout, station, part_pose):
     objects = [
         build_bench(layout, station, part_pose),
         build_tag(layout, station, part_pose),
+        build_tag_code(layout, station, part_pose),
     ]
     if station == MACHINE:
         objects.append(build_fixture(layout, part_pose))
