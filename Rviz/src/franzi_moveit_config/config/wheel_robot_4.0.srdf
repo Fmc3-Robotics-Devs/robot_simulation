@@ -55,6 +55,12 @@
     <joint name="head_yaw_joint" value="0"/>
     <joint name="head_pitch_joint" value="0"/>
   </group_state>
+  <!-- Head down far enough for the head D435 to see a bench top in front of
+       the robot; the pitch joint bottoms out at 0.5235. -->
+  <group_state name="look_down" group="head">
+    <joint name="head_yaw_joint" value="0"/>
+    <joint name="head_pitch_joint" value="0.5235"/>
+  </group_state>
   <group_state name="off_arms" group="both_arms">
     <joint name="left_shoulder_pitch_joint" value="0"/>
     <joint name="left_shoulder_roll_joint" value="0"/>

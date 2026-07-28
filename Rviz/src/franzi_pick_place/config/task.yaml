@@ -54,10 +54,46 @@ pick_place_task:
 
     # World positions of the part on each bench. They are laid out along y, so
     # the omnidirectional chassis strafes between them without turning.
+    #
+    # These are SIMULATED TRUTH, not knowledge the robot has. They build the
+    # world and feed the mock detector. Manipulation poses come from the tag.
     station:
       feeder_xy: [1.00, -1.50]
       machine_xy: [1.00, 0.00]
       outfeed_xy: [1.00, 1.50]
+
+    # --- AprilTags -------------------------------------------------------
+    # One tag per bench, lying flat on the bench top. `to_part_xy` is the
+    # surveyed offset from the tag to where the part rests - measured once per
+    # bench design, and the thing that turns a detection into a grasp pose.
+    # Negative x puts the tag further from the robot than the part, where the
+    # downward-looking head camera actually points.
+    tag:
+      feeder_id: 0
+      machine_id: 1
+      outfeed_id: 2
+      size: 0.08
+      thickness: 0.002
+      to_part_xy: [-0.16, 0.0]
+
+    tag_timeout: 5.0
+    camera_frame: "head_d435_Link"
+    look_posture: "look_down"
+
+    # Hand-eye calibration result, published as a correction on top of the URDF
+    # nominal extrinsic. Zero means a perfect calibration; dial in an error here
+    # to watch the grasp drift by exactly that much.
+    handeye_correction:
+      xyz: [0.0, 0.0, 0.0]
+      rpy: [0.0, 0.0, 0.0]
+
+    # Stands in for apriltag_ros. FOV is approximated as a symmetric cone.
+    tag_detection:
+      max_range: 3.0
+      min_range: 0.25
+      fov: 1.047
+      position_noise: 0.0
+      rotation_noise: 0.0
 
     bench:
       size_xy: [0.50, 0.70]

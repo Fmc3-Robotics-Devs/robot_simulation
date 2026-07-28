@@ -22,6 +22,8 @@ from moveit.planning import MoveItPy
 from moveit_configs_utils import MoveItConfigsBuilder
 from rclpy.executors import MultiThreadedExecutor
 from rclpy.node import Node
+from tf2_ros import TransformListener
+from tf2_ros.buffer import Buffer
 
 from .base import MobileBase
 from .geometry import (
@@ -35,6 +37,8 @@ from .gripper import Gripper
 from .machining import MachiningStation
 from .motion import ArmMotion, PlanningFailure
 from .planning_scene import PlanningSceneClient
+from .tags import HandEyeCorrection, MockTagDetector, TagObserver, pose_from_tag
+from .transforms import from_pose
 from .scene import (
     COLORS,
     FEEDER,
@@ -84,6 +88,22 @@ DEFAULTS = {
     "station.feeder_xy": [1.00, -1.50],
     "station.machine_xy": [1.00, 0.00],
     "station.outfeed_xy": [1.00, 1.50],
+    "tag.feeder_id": 0,
+    "tag.machine_id": 1,
+    "tag.outfeed_id": 2,
+    "tag.size": 0.08,
+    "tag.thickness": 0.002,
+    "tag.to_part_xy": [-0.16, 0.0],
+    "tag_timeout": 5.0,
+    "camera_frame": "head_d435_Link",
+    "look_posture": "look_down",
+    "handeye_correction.xyz": [0.0, 0.0, 0.0],
+    "handeye_correction.rpy": [0.0, 0.0, 0.0],
+    "tag_detection.max_range": 3.0,
+    "tag_detection.min_range": 0.25,
+    "tag_detection.fov": 1.047,
+    "tag_detection.position_noise": 0.0,
+    "tag_detection.rotation_noise": 0.0,
     "bench.size_xy": [0.50, 0.70],
     "bench.top_z": 0.80,
     "bench.thickness": 0.03,
@@ -126,6 +146,14 @@ class PickPlaceTask(Node):
                 MACHINE: tuple(self.get("station.machine_xy")),
                 OUTFEED: tuple(self.get("station.outfeed_xy")),
             },
+            tag_ids={
+                FEEDER: self.get("tag.feeder_id"),
+                MACHINE: self.get("tag.machine_id"),
+                OUTFEED: self.get("tag.outfeed_id"),
+            },
+            tag_size=self.get("tag.size"),
+            tag_thickness=self.get("tag.thickness"),
+            tag_to_part_xy=tuple(self.get("tag.to_part_xy")),
             bench_size_xy=tuple(self.get("bench.size_xy")),
             bench_top_z=self.get("bench.top_z"),
             bench_thickness=self.get("bench.thickness"),
@@ -172,6 +200,35 @@ class MachineTendingDemo:
             ik_attempts=node.get("ik_attempts"),
             ik_timeout=node.get("ik_timeout"),
         )
+        # The tag pipeline: a hand-eye correction frame on top of the URDF
+        # nominal extrinsic, a detector publishing into it, and a reader that
+        # lets tf2 chain the whole thing back to the planning frame.
+        self._tf_buffer = Buffer()
+        self._tf_listener = TransformListener(self._tf_buffer, node)
+        correction = HandEyeCorrection(
+            node,
+            camera_frame=node.get("camera_frame"),
+            translation=node.get("handeye_correction.xyz"),
+            rpy=node.get("handeye_correction.rpy"),
+        )
+        self._detector = MockTagDetector(
+            node,
+            self._tf_buffer,
+            camera_frame=node.get("camera_frame"),
+            detection_parent=correction.frame,
+            tag_poses={
+                self._layout.tag_ids[station]: from_pose(self._layout.tag_pose(station))
+                for station in STATIONS
+            },
+            planning_frame=self._layout.frame_id,
+            max_range=node.get("tag_detection.max_range"),
+            min_range=node.get("tag_detection.min_range"),
+            fov=node.get("tag_detection.fov"),
+            position_noise=node.get("tag_detection.position_noise"),
+            rotation_noise=node.get("tag_detection.rotation_noise"),
+        )
+        self._tags = TagObserver(node, self._tf_buffer, self._layout.frame_id)
+
         self._tcp_offset = tuple(node.get("tcp_offset"))
         self._grasp_orientation = quaternion_from_rpy(0.0, 0.0, node.get("grasp_yaw"))
         self._approach = (0.0, 0.0, node.get("approach_height"))
@@ -301,6 +358,30 @@ class MachineTendingDemo:
             self._layout.dock_pose(station), f"drive to {station}", carrying=carrying
         )
 
+    def observe_part_pose(self, station, label):
+        """Where the part is, according to the camera - never according to the map.
+
+        This is the whole point of the tag: on hardware the station's world pose
+        is unknown, and the only thing tying the arm to the bench is a detection
+        plus the surveyed tag-to-part offset.
+        """
+        self._arm.move_named(self._node.get("head_group"), self._node.get("look_posture"))
+        tag = self._tags.wait_for(
+            self._layout.tag_ids[station], timeout=self._node.get("tag_timeout")
+        )
+        pose = pose_from_tag(tag, self._layout.part_offset_in_tag)
+        truth = self._layout.part_pose(station)
+        error = math.dist(
+            (pose.position.x, pose.position.y, pose.position.z),
+            (truth.position.x, truth.position.y, truth.position.z),
+        )
+        self._logger.info(
+            f"{label}: tag {self._layout.tag_ids[station]} gives the part at "
+            f"({pose.position.x:.3f}, {pose.position.y:.3f}, {pose.position.z:.3f}), "
+            f"{error * 1000:.1f} mm from truth"
+        )
+        return pose
+
     def _approach_states(self, resting_pose, label):
         """IK for the contact pose and the pose straight above it."""
         contact = self._grasp_tcp(resting_pose)
@@ -316,7 +397,9 @@ class MachineTendingDemo:
         )
 
     def pick(self, station, label):
-        grasp, pregrasp = self._approach_states(self._layout.part_pose(station), label)
+        grasp, pregrasp = self._approach_states(
+            self.observe_part_pose(station, label), label
+        )
         pairs = self._contact_pairs(station)
 
         self._logger.info(f"{label}: approaching")
@@ -334,7 +417,9 @@ class MachineTendingDemo:
         self._scene.set_collisions(pairs, False)
 
     def place(self, station, label):
-        release, prerelease = self._approach_states(self._layout.part_pose(station), label)
+        release, prerelease = self._approach_states(
+            self.observe_part_pose(station, label), label
+        )
         pairs = self._contact_pairs(station)
 
         self._logger.info(f"{label}: approaching")

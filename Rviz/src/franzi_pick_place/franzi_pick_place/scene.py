@@ -30,6 +30,10 @@ def bench_id(station):
     return f"bench_{station}"
 
 
+def tag_id(station):
+    return f"apriltag_{station}"
+
+
 COLORS = {
     GROUND: (0.35, 0.35, 0.38, 1.0),
     bench_id(FEEDER): (0.72, 0.60, 0.44, 1.0),
@@ -37,6 +41,7 @@ COLORS = {
     bench_id(OUTFEED): (0.72, 0.60, 0.44, 1.0),
     FIXTURE: (0.35, 0.42, 0.55, 1.0),
     WORKPIECE: (0.90, 0.45, 0.15, 1.0),
+    **{tag_id(station): (0.05, 0.05, 0.05, 1.0) for station in (FEEDER, MACHINE, OUTFEED)},
 }
 
 
@@ -44,7 +49,14 @@ COLORS = {
 class CellLayout:
     frame_id: str
     ground_z: float
+    # World positions are the simulated truth: they build the world and feed the
+    # mock detector. The task is not allowed to read them - it works from what
+    # the camera reports about the tag.
     station_xy: dict
+    tag_ids: dict
+    tag_size: float
+    tag_thickness: float
+    tag_to_part_xy: tuple
     bench_size_xy: tuple
     bench_top_z: float
     bench_thickness: float
@@ -67,6 +79,30 @@ class CellLayout:
     def part_pose(self, station):
         x, y = self.station_xy[station]
         return make_pose((x, y, self.workpiece_centre_z))
+
+    @property
+    def tag_z(self):
+        return self.bench_top_z + self.tag_thickness / 2.0
+
+    def tag_pose(self, station):
+        """Ground truth: the tag lies flat on the bench, facing up."""
+        x, y = self.station_xy[station]
+        return make_pose(
+            (x - self.tag_to_part_xy[0], y - self.tag_to_part_xy[1], self.tag_z)
+        )
+
+    @property
+    def part_offset_in_tag(self):
+        """Where the part sits relative to the tag - the surveyed constant.
+
+        On hardware this is the number you measure once per bench design; it is
+        what turns a tag detection into a grasp pose.
+        """
+        return (
+            self.tag_to_part_xy[0],
+            self.tag_to_part_xy[1],
+            self.workpiece_centre_z - self.tag_z,
+        )
 
     def bench_centre(self, station):
         """Benches sit back from their part, which rests near the near edge."""
@@ -164,6 +200,19 @@ def build_workpiece(layout):
     )
 
 
+def build_tag(layout, station):
+    """The physical marker, so it is visible in RViz and gets planned around."""
+    pose = layout.tag_pose(station)
+    return (
+        CollisionObjectBuilder(tag_id(station), layout.frame_id)
+        .add_box(
+            (layout.tag_size, layout.tag_size, layout.tag_thickness),
+            (pose.position.x, pose.position.y, pose.position.z),
+        )
+        .build()
+    )
+
+
 def build_cell(layout):
     """Every static collision object plus the workpiece on the feeder bench."""
     workpiece = build_workpiece(layout)
@@ -171,5 +220,6 @@ def build_cell(layout):
     return (
         [build_ground(layout)]
         + [build_bench(layout, station) for station in STATIONS]
+        + [build_tag(layout, station) for station in STATIONS]
         + [build_fixture(layout), workpiece]
     )
