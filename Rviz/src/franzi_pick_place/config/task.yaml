@@ -39,6 +39,11 @@ pick_place_task:
     # Grasp above the workpiece centre so the fingers clear the pocket walls.
     grasp_height_offset: 0.02
     grasp_yaw: 0.0
+    # Where the part is held while driving, in the base frame. Held up in front
+    # rather than hanging: a dangling arm swings the part down past bench edges.
+    # Keep it inside the reach_map envelope - too close to the shoulder is just
+    # as unreachable as too far, because the elbow has to fold into the torso.
+    carry_tcp: [0.36, 0.24, 0.985]
     approach_height: 0.12
     approach_velocity_scaling: 0.15
     ik_attempts: 25

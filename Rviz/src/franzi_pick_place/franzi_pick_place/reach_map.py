@@ -126,7 +126,10 @@ def main():
         # rather than at its world pose.
         probe = replace(layout, station_xy={FEEDER: layout.dock_offset})
 
-        scene = PlanningSceneClient(node)
+        # MoveItPy first: its monitor is the one the probes plan against, and
+        # the scene client waits for diffs to land there.
+        moveit = build_moveit()
+        scene = PlanningSceneClient(node, monitor=moveit.get_planning_scene_monitor())
         scene.wait_for_services()
         # A previous demo run may have left the real cell in the scene at its
         # world poses, which would sit nowhere near the probe.
@@ -137,7 +140,6 @@ def main():
             [build_ground(probe), build_bench(probe, FEEDER)], colors=COLORS
         )
 
-        moveit = build_moveit()
         grasp_z = layout.workpiece_centre_z + node.get("grasp_height_offset")
         print(f"\nbase-frame reachability; dock.offset = {tuple(layout.dock_offset)}")
         ReachMap(node, moveit).print_map(

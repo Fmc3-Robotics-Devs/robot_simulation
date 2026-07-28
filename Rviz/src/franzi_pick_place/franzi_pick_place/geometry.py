@@ -38,6 +38,16 @@ def rotate_vector(quaternion, vector):
     )
 
 
+def quaternion_product(first, second):
+    """Return the rotation ``first`` followed by ``second`` applied first."""
+    return Quaternion(
+        x=first.w * second.x + first.x * second.w + first.y * second.z - first.z * second.y,
+        y=first.w * second.y - first.x * second.z + first.y * second.w + first.z * second.x,
+        z=first.w * second.z + first.x * second.y - first.y * second.x + first.z * second.w,
+        w=first.w * second.w - first.x * second.x - first.y * second.y - first.z * second.z,
+    )
+
+
 def make_pose(position, orientation=None):
     """Build a Pose from a 3-tuple position and an optional Quaternion."""
     pose = Pose()

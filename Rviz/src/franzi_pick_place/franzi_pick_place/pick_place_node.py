@@ -8,6 +8,7 @@ insertion tolerance are out of scope here - that is what the physics-based
 stage is for.
 """
 
+import math
 import os
 import sys
 import threading
@@ -23,7 +24,13 @@ from rclpy.executors import MultiThreadedExecutor
 from rclpy.node import Node
 
 from .base import MobileBase
-from .geometry import make_pose, offset_pose, quaternion_from_rpy, tcp_to_tip
+from .geometry import (
+    make_pose,
+    offset_pose,
+    quaternion_from_rpy,
+    quaternion_product,
+    tcp_to_tip,
+)
 from .gripper import Gripper
 from .machining import MachiningStation
 from .motion import ArmMotion, PlanningFailure
@@ -67,6 +74,7 @@ DEFAULTS = {
     "tcp_offset": [-0.0305, -0.0018, -0.2414],
     "grasp_height_offset": 0.02,
     "grasp_yaw": 0.0,
+    "carry_tcp": [0.36, 0.24, 0.985],
     "approach_height": 0.12,
     "approach_velocity_scaling": 0.15,
     "ik_attempts": 25,
@@ -140,7 +148,9 @@ class MachineTendingDemo:
         self._logger = node.get_logger()
         self._layout = node.layout()
         self._base = base
-        self._scene = PlanningSceneClient(node)
+        # The scene client has to know the monitor that plans, so it can wait
+        # for its own diffs to land there rather than in move_group only.
+        self._scene = PlanningSceneClient(node, monitor=moveit.get_planning_scene_monitor())
         self._station = MachiningStation(
             node,
             self._layout,
@@ -196,14 +206,20 @@ class MachineTendingDemo:
         self._scene.wait_for_services()
         self._gripper.wait_for_controller()
         self._scene.add_objects(build_cell(self._layout), colors=COLORS)
-        # The workpiece rests on a bench and is inserted between the fixture
-        # walls, so those contacts are expected rather than faults. Robot links
-        # are still checked against both.
-        self._scene.allow_collisions(
-            [(WORKPIECE, bench_id(station)) for station in STATIONS]
-            + [(WORKPIECE, FIXTURE)]
-        )
         self._logger.info("planning scene ready")
+
+    def _contact_pairs(self, station):
+        """What the held workpiece is allowed to touch while working a station.
+
+        Resting a part on a bench, or seating it in the pocket, is contact by
+        definition. Whitelisting it permanently is what let an earlier version
+        sweep the carried part straight through a bench top, so the allowance
+        only exists between the descent and the retreat.
+        """
+        pairs = [(WORKPIECE, bench_id(station))]
+        if station == MACHINE:
+            pairs.append((WORKPIECE, FIXTURE))
+        return pairs
 
     def reset_workpiece(self):
         self._scene.move_object(
@@ -214,32 +230,76 @@ class MachineTendingDemo:
     # -- task steps --------------------------------------------------------
 
     def prepare(self):
+        base_x, base_y, _ = self._base.pose
+        if not self._arm.wait_for_base(base_x, base_y):
+            raise PlanningFailure("MoveIt never picked up the initial base pose from TF")
+
         self._arm.move_named(self._node.get("body_group"), self._node.get("body_posture"))
         self._arm.move_named(self._node.get("head_group"), self._node.get("head_posture"))
         self._open_gripper()
 
+        # A posture is a joint configuration, so solving it once against the
+        # current base pose makes it valid wherever the robot later stands.
+        carry = make_pose(self._node.get("carry_tcp"), self._grasp_orientation)
+        self._carry_state = self._arm.solve_ik(self._base_to_world(self._tip_pose(carry)))
+        if self._carry_state is None:
+            self._logger.warning(
+                "carry_tcp is not reachable, transiting with the arms down instead; "
+                "check it against reach_map"
+            )
+
+    def _base_to_world(self, pose):
+        """Re-express a base-frame pose in the world, at the current base pose."""
+        x, y, yaw = self._base.pose
+        px, py, pz = pose.position.x, pose.position.y, pose.position.z
+        turn = quaternion_from_rpy(0.0, 0.0, yaw)
+        return make_pose(
+            (
+                x + math.cos(yaw) * px - math.sin(yaw) * py,
+                y + math.sin(yaw) * px + math.cos(yaw) * py,
+                pz,
+            ),
+            quaternion_product(turn, pose.orientation),
+        )
+
     def park_arms(self):
         self._arm.move_named(self._node.get("park_group"), self._node.get("park_posture"))
 
-    def drive_to(self, pose, label):
-        """Fold the arms away, drive, then confirm nothing ended up in collision.
+    def transit_posture(self, carrying):
+        """Arms down when empty, held up in front when loaded.
+
+        Letting the arm hang while holding a part swings it down past the bench
+        edge, which is both wrong-looking and the shape of a real collision.
+        """
+        if carrying and self._carry_state is not None:
+            self._arm.move_to_state(self._carry_state, "carry")
+        else:
+            self.park_arms()
+
+    def drive_to(self, pose, label, carrying=False):
+        """Tuck the arms, drive, then confirm nothing ended up in collision.
 
         Base motion is not planned - there is no navigation here - so this check
         is the only thing standing between a bad dock offset and an arm plan
         that starts inside a bench.
         """
-        self.park_arms()
+        self.transit_posture(carrying)
         self._base.drive_to(*pose, label=label)
-        # Give the state monitor a moment to catch up with the new transform.
-        time.sleep(0.5)
+        if not self._arm.wait_for_base(pose[0], pose[1]):
+            raise PlanningFailure(
+                f"{label}: MoveIt never saw the base reach the dock pose; "
+                "is anything else publishing world -> moveit_root?"
+            )
         if self._arm.in_collision():
             raise PlanningFailure(
                 f"{label}: robot is in collision after docking at "
                 f"({pose[0]:.2f}, {pose[1]:.2f}); check dock.offset against the bench"
             )
 
-    def drive_to_station(self, station):
-        self.drive_to(self._layout.dock_pose(station), f"drive to {station}")
+    def drive_to_station(self, station, carrying=False):
+        self.drive_to(
+            self._layout.dock_pose(station), f"drive to {station}", carrying=carrying
+        )
 
     def _approach_states(self, resting_pose, label):
         """IK for the contact pose and the pose straight above it."""
@@ -255,11 +315,13 @@ class MachineTendingDemo:
             state, label, linear=True, velocity_scaling=self._approach_scaling
         )
 
-    def pick(self, resting_pose, label):
-        grasp, pregrasp = self._approach_states(resting_pose, label)
+    def pick(self, station, label):
+        grasp, pregrasp = self._approach_states(self._layout.part_pose(station), label)
+        pairs = self._contact_pairs(station)
 
         self._logger.info(f"{label}: approaching")
         self._arm.move_to_state(pregrasp, f"{label} pre-grasp")
+        self._scene.set_collisions(pairs, True)
         self._descend(grasp, f"{label} grasp")
 
         self._close_on_workpiece()
@@ -269,12 +331,15 @@ class MachineTendingDemo:
         self._logger.info(f"{label}: workpiece attached")
 
         self._descend(pregrasp, f"{label} lift")
+        self._scene.set_collisions(pairs, False)
 
-    def place(self, resting_pose, label):
-        release, prerelease = self._approach_states(resting_pose, label)
+    def place(self, station, label):
+        release, prerelease = self._approach_states(self._layout.part_pose(station), label)
+        pairs = self._contact_pairs(station)
 
         self._logger.info(f"{label}: approaching")
         self._arm.move_to_state(prerelease, f"{label} pre-place")
+        self._scene.set_collisions(pairs, True)
         self._descend(release, f"{label} insert")
 
         self._open_gripper()
@@ -282,24 +347,25 @@ class MachineTendingDemo:
         self._logger.info(f"{label}: workpiece released")
 
         self._descend(prerelease, f"{label} retreat")
+        self._scene.set_collisions(pairs, False)
 
     def run_once(self):
         self.prepare()
 
         self.drive_to_station(FEEDER)
-        self.pick(self._layout.part_pose(FEEDER), "load: pick from feeder")
+        self.pick(FEEDER, "load: pick from feeder")
 
-        self.drive_to_station(MACHINE)
-        self.place(self._layout.part_pose(MACHINE), "load: insert into pocket")
+        self.drive_to_station(MACHINE, carrying=True)
+        self.place(MACHINE, "load: insert into pocket")
 
         self.drive_to(self._layout.standby_pose(), "back off from machine")
         self._station.run_cycle()
 
         self.drive_to_station(MACHINE)
-        self.pick(self._layout.part_pose(MACHINE), "unload: pick from pocket")
+        self.pick(MACHINE, "unload: pick from pocket")
 
-        self.drive_to_station(OUTFEED)
-        self.place(self._layout.part_pose(OUTFEED), "unload: put down finished part")
+        self.drive_to_station(OUTFEED, carrying=True)
+        self.place(OUTFEED, "unload: put down finished part")
         self.park_arms()
 
     def run(self):
