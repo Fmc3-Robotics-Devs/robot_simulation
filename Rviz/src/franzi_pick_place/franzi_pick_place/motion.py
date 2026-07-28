@@ -85,6 +85,14 @@ class ArmMotion:
         with self._psm.read_only() as scene:
             return scene.is_state_valid(state, self._arm_group, False)
 
+    def in_collision(self):
+        """Whether the robot as it stands right now is touching anything.
+
+        Collision checking is whole-robot; the group only selects which
+        constraints are evaluated, so this covers the chassis too.
+        """
+        return not self._state_is_valid(self.current_state())
+
     # -- planning ----------------------------------------------------------
 
     def _parameters(self, namespace, velocity_scaling=None):

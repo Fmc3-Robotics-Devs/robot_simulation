@@ -1,7 +1,11 @@
 <?xml version="1.0"?>
 <robot name="wheel_robot_4.0">
   <!-- Fixed-base configuration for RViz and manipulation planning. -->
-  <virtual_joint name="world_joint" type="fixed" parent_frame="world" child_link="moveit_root"/>
+  <!-- The chassis is a driven three-wheel omnidirectional platform, so the
+       robot root floats in the world plane. Its pose has to be supplied as a
+       world -> moveit_root TF by whatever owns the base (a base driver in
+       simulation, localisation on hardware). -->
+  <virtual_joint name="world_joint" type="planar" parent_frame="world" child_link="moveit_root"/>
 
   <group name="body">
     <chain base_link="base_link" tip_link="torso_Link"/>

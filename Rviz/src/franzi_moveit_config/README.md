@@ -1,7 +1,15 @@
 # Franzi MoveIt configuration
 
-This package provides fixed-base, planning-only MoveIt 2 configuration for the
-Franzi robot on ROS 2 Jazzy.
+This package provides planning-only MoveIt 2 configuration for the Franzi robot
+on ROS 2 Jazzy.
+
+The chassis is a three-wheel omnidirectional platform, so `world_joint` is a
+**planar** virtual joint: the robot's pose in the world is a state variable, not
+a constant, and something has to publish it as a `world -> moveit_root`
+transform. The demo publishes an identity transform, which pins the robot at the
+origin. Turn that off with `publish_virtual_joint_tf:=false` when a base driver
+or localisation owns the base pose, and `publish_chassis_joints:=false` when it
+also owns the steering and wheel joints.
 
 Configured planning groups:
 
@@ -40,3 +48,6 @@ driver. It would otherwise publish duplicate joint states and action servers:
 ```bash
 ros2 launch franzi_moveit_config demo.launch.py publish_demo_joint_states:=false
 ```
+
+See `franzi_pick_place` for a worked example that keeps the demo controllers but
+hands the chassis over to its own base driver.

@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
-"""Print where the arm can actually reach a top-down grasp over the table.
+"""Print where the arm can reach a top-down grasp, in the base frame.
 
-Run this before moving a station in `task.yaml`. Endpoint reachability alone is
-not enough - a pose near the edge of the envelope is reachable but the straight
-approach to it often is not - so keep stations away from the boundary.
+The grid is relative to the chassis, so it is the envelope the robot carries
+around with it. What has to land inside it is `dock.offset` - the position a
+station occupies in the base frame once the robot has parked. Station world
+poses themselves are irrelevant here; only the offset is.
+
+Endpoint reachability alone is not enough - a pose near the edge of the
+envelope is reachable but the straight approach to it often is not - so keep
+`dock.offset` away from the boundary.
 
 Needs a running move_group (`ros2 launch franzi_moveit_config demo.launch.py`).
 """
@@ -12,6 +17,7 @@ import os
 import random
 import sys
 import threading
+from dataclasses import replace
 
 import rclpy
 from moveit.core.robot_state import RobotState
@@ -20,7 +26,16 @@ from rclpy.executors import MultiThreadedExecutor
 from .geometry import make_pose, quaternion_from_rpy, tcp_to_tip
 from .pick_place_node import PickPlaceTask, build_moveit
 from .planning_scene import PlanningSceneClient
-from .scene import COLORS, WORKPIECE, build_cell
+from .scene import (
+    COLORS,
+    FEEDER,
+    FIXTURE,
+    STATIONS,
+    WORKPIECE,
+    bench_id,
+    build_bench,
+    build_ground,
+)
 
 
 class ReachMap:
@@ -106,16 +121,25 @@ def main():
     exit_code = 0
     try:
         layout = node.layout()
+        # Probing happens with the chassis at the origin, so the bench has to be
+        # placed where a station sits in the base frame - that is dock.offset -
+        # rather than at its world pose.
+        probe = replace(layout, station_xy={FEEDER: layout.dock_offset})
+
         scene = PlanningSceneClient(node)
         scene.wait_for_services()
-        # Probe against the furniture only; the workpiece would sit under every
-        # sample at its own station.
+        # A previous demo run may have left the real cell in the scene at its
+        # world poses, which would sit nowhere near the probe.
+        scene.remove_objects(
+            [bench_id(station) for station in STATIONS] + [FIXTURE, WORKPIECE]
+        )
         scene.add_objects(
-            [obj for obj in build_cell(layout) if obj.id != WORKPIECE], colors=COLORS
+            [build_ground(probe), build_bench(probe, FEEDER)], colors=COLORS
         )
 
         moveit = build_moveit()
         grasp_z = layout.workpiece_centre_z + node.get("grasp_height_offset")
+        print(f"\nbase-frame reachability; dock.offset = {tuple(layout.dock_offset)}")
         ReachMap(node, moveit).print_map(
             [
                 ("grasp height", grasp_z),

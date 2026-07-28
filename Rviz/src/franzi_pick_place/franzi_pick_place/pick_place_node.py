@@ -11,6 +11,7 @@ stage is for.
 import os
 import sys
 import threading
+import time
 from pathlib import Path
 
 import rclpy
@@ -21,12 +22,24 @@ from moveit_configs_utils import MoveItConfigsBuilder
 from rclpy.executors import MultiThreadedExecutor
 from rclpy.node import Node
 
+from .base import MobileBase
 from .geometry import make_pose, offset_pose, quaternion_from_rpy, tcp_to_tip
 from .gripper import Gripper
 from .machining import MachiningStation
 from .motion import ArmMotion, PlanningFailure
 from .planning_scene import PlanningSceneClient
-from .scene import COLORS, FIXTURE, WORK_TABLE, WORKPIECE, CellLayout, build_cell
+from .scene import (
+    COLORS,
+    FEEDER,
+    FIXTURE,
+    MACHINE,
+    OUTFEED,
+    STATIONS,
+    WORKPIECE,
+    CellLayout,
+    bench_id,
+    build_cell,
+)
 
 DEFAULTS = {
     "frame_id": "world",
@@ -60,19 +73,25 @@ DEFAULTS = {
     "ik_timeout": 0.05,
     "repeat": 1,
     "ground_z": -0.0873,
-    "table.center_xy": [0.48, 0.16],
-    "table.size_xy": [0.40, 0.60],
-    "table.top_z": 0.80,
-    "table.thickness": 0.03,
-    "table.leg_size": 0.05,
-    "table.leg_inset": 0.02,
+    "station.feeder_xy": [1.00, -1.50],
+    "station.machine_xy": [1.00, 0.00],
+    "station.outfeed_xy": [1.00, 1.50],
+    "bench.size_xy": [0.50, 0.70],
+    "bench.top_z": 0.80,
+    "bench.thickness": 0.03,
+    "bench.part_inset": 0.12,
+    "bench.leg_size": 0.05,
+    "bench.leg_inset": 0.03,
     "workpiece.size": [0.05, 0.05, 0.09],
-    "workpiece.pick_xy": [0.38, 0.34],
-    "pocket.center_xy": [0.42, 0.16],
     "pocket.clearance": 0.012,
     "pocket.wall_thickness": 0.015,
     "pocket.wall_height": 0.03,
-    "unload.center_xy": [0.38, -0.02],
+    "dock.offset": [0.44, 0.16],
+    "dock.yaw": 0.0,
+    "dock.standby_retreat": 0.9,
+    "base.linear_speed": 0.5,
+    "base.angular_speed": 0.8,
+    "base.wheel_radius": 0.0827,
     "machining.duration": 8.0,
     "machining.wait_for_trigger": False,
     "reach_map.x_range": [0.28, 0.60],
@@ -94,27 +113,33 @@ class PickPlaceTask(Node):
         return CellLayout(
             frame_id=self.get("frame_id"),
             ground_z=self.get("ground_z"),
-            table_center_xy=tuple(self.get("table.center_xy")),
-            table_size_xy=tuple(self.get("table.size_xy")),
-            table_top_z=self.get("table.top_z"),
-            table_thickness=self.get("table.thickness"),
-            leg_size=self.get("table.leg_size"),
-            leg_inset=self.get("table.leg_inset"),
+            station_xy={
+                FEEDER: tuple(self.get("station.feeder_xy")),
+                MACHINE: tuple(self.get("station.machine_xy")),
+                OUTFEED: tuple(self.get("station.outfeed_xy")),
+            },
+            bench_size_xy=tuple(self.get("bench.size_xy")),
+            bench_top_z=self.get("bench.top_z"),
+            bench_thickness=self.get("bench.thickness"),
+            bench_part_inset=self.get("bench.part_inset"),
+            leg_size=self.get("bench.leg_size"),
+            leg_inset=self.get("bench.leg_inset"),
             workpiece_size=tuple(self.get("workpiece.size")),
-            pick_xy=tuple(self.get("workpiece.pick_xy")),
-            pocket_xy=tuple(self.get("pocket.center_xy")),
             pocket_clearance=self.get("pocket.clearance"),
             pocket_wall_thickness=self.get("pocket.wall_thickness"),
             pocket_wall_height=self.get("pocket.wall_height"),
-            unload_xy=tuple(self.get("unload.center_xy")),
+            dock_offset=tuple(self.get("dock.offset")),
+            dock_yaw=self.get("dock.yaw"),
+            standby_retreat=self.get("dock.standby_retreat"),
         )
 
 
 class MachineTendingDemo:
-    def __init__(self, node: PickPlaceTask, moveit: MoveItPy):
+    def __init__(self, node: PickPlaceTask, moveit: MoveItPy, base: MobileBase):
         self._node = node
         self._logger = node.get_logger()
         self._layout = node.layout()
+        self._base = base
         self._scene = PlanningSceneClient(node)
         self._station = MachiningStation(
             node,
@@ -171,16 +196,19 @@ class MachineTendingDemo:
         self._scene.wait_for_services()
         self._gripper.wait_for_controller()
         self._scene.add_objects(build_cell(self._layout), colors=COLORS)
-        # The workpiece rests on the table and is inserted between the fixture
+        # The workpiece rests on a bench and is inserted between the fixture
         # walls, so those contacts are expected rather than faults. Robot links
         # are still checked against both.
         self._scene.allow_collisions(
-            [(WORKPIECE, WORK_TABLE), (WORKPIECE, FIXTURE)]
+            [(WORKPIECE, bench_id(station)) for station in STATIONS]
+            + [(WORKPIECE, FIXTURE)]
         )
         self._logger.info("planning scene ready")
 
     def reset_workpiece(self):
-        self._scene.move_object(WORKPIECE, self._layout.frame_id, self._layout.pick_pose)
+        self._scene.move_object(
+            WORKPIECE, self._layout.frame_id, self._layout.part_pose(FEEDER)
+        )
         self._station.reset()
 
     # -- task steps --------------------------------------------------------
@@ -190,8 +218,28 @@ class MachineTendingDemo:
         self._arm.move_named(self._node.get("head_group"), self._node.get("head_posture"))
         self._open_gripper()
 
-    def park(self):
+    def park_arms(self):
         self._arm.move_named(self._node.get("park_group"), self._node.get("park_posture"))
+
+    def drive_to(self, pose, label):
+        """Fold the arms away, drive, then confirm nothing ended up in collision.
+
+        Base motion is not planned - there is no navigation here - so this check
+        is the only thing standing between a bad dock offset and an arm plan
+        that starts inside a bench.
+        """
+        self.park_arms()
+        self._base.drive_to(*pose, label=label)
+        # Give the state monitor a moment to catch up with the new transform.
+        time.sleep(0.5)
+        if self._arm.in_collision():
+            raise PlanningFailure(
+                f"{label}: robot is in collision after docking at "
+                f"({pose[0]:.2f}, {pose[1]:.2f}); check dock.offset against the bench"
+            )
+
+    def drive_to_station(self, station):
+        self.drive_to(self._layout.dock_pose(station), f"drive to {station}")
 
     def _approach_states(self, resting_pose, label):
         """IK for the contact pose and the pose straight above it."""
@@ -237,15 +285,22 @@ class MachineTendingDemo:
 
     def run_once(self):
         self.prepare()
-        self.pick(self._layout.pick_pose, "load: pick from feeder")
-        self.place(self._layout.place_pose, "load: insert into pocket")
-        self.park()
 
+        self.drive_to_station(FEEDER)
+        self.pick(self._layout.part_pose(FEEDER), "load: pick from feeder")
+
+        self.drive_to_station(MACHINE)
+        self.place(self._layout.part_pose(MACHINE), "load: insert into pocket")
+
+        self.drive_to(self._layout.standby_pose(), "back off from machine")
         self._station.run_cycle()
 
-        self.pick(self._layout.place_pose, "unload: pick from pocket")
-        self.place(self._layout.unload_pose, "unload: put down finished part")
-        self.park()
+        self.drive_to_station(MACHINE)
+        self.pick(self._layout.part_pose(MACHINE), "unload: pick from pocket")
+
+        self.drive_to_station(OUTFEED)
+        self.place(self._layout.part_pose(OUTFEED), "unload: put down finished part")
+        self.park_arms()
 
     def run(self):
         self.setup_scene()
@@ -291,10 +346,22 @@ def main():
 
     exit_code = 0
     try:
+        # The base has to publish world -> moveit_root before MoveIt starts
+        # monitoring state, otherwise the planar virtual joint has no value and
+        # the current state never completes.
+        base = MobileBase(
+            node,
+            frame_id=node.get("frame_id"),
+            wheel_radius=node.get("base.wheel_radius"),
+            linear_speed=node.get("base.linear_speed"),
+            angular_speed=node.get("base.angular_speed"),
+        )
+        base.set_pose(*node.layout().dock_pose(FEEDER))
+
         # Keep a strong reference: MoveItCpp crashes if it is collected while
         # the process is still running.
         moveit = build_moveit()
-        MachineTendingDemo(node, moveit).run()
+        MachineTendingDemo(node, moveit, base).run()
     except (PlanningFailure, RuntimeError) as error:
         node.get_logger().error(str(error))
         exit_code = 1

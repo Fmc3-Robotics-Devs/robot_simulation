@@ -1,17 +1,19 @@
 # Franzi pick-and-place (machine tending)
 
-Kinematic machine-tending demo for the Franzi robot on ROS 2 Jazzy:
+Kinematic machine-tending demo for the Franzi robot on ROS 2 Jazzy. Three benches
+stand 1.5 m apart, so the mobile base is part of the job:
 
-1. pick a workpiece off the feeder position on the table,
-2. insert it into the pocket of the machine fixture,
-3. retreat and wait for the machining cycle (status light in RViz),
-4. pick the finished part back out and set it down on the unload position.
+1. dock at the feeder bench and pick the workpiece,
+2. drive to the machine and insert it into the fixture pocket,
+3. back off, wait for the machining cycle (status light in RViz),
+4. drive back in, pick the finished part out,
+5. drive to the outfeed bench and set it down.
 
-Everything runs inside MoveIt: motion is planned against a collision world made
-of boxes, and grasping is modelled by attaching the workpiece to the wrist in
-the planning scene. No physics engine is involved, so contact forces and real
-insertion tolerances are explicitly **not** validated here — see
-[Limitations](#limitations).
+Arm motion is planned by MoveIt against a collision world made of boxes;
+grasping is modelled by attaching the workpiece to the wrist in the planning
+scene. The chassis pose is integrated, not planned. No physics engine is
+involved, so contact forces and real insertion tolerances are explicitly
+**not** validated here — see [Limitations](#limitations).
 
 ## Build
 
@@ -77,21 +79,51 @@ first and its approach pose is then seeded from it, which keeps both on the same
 IK branch. Solving them independently produces postures 12 cm apart that the arm
 cannot travel between in a straight line, and Pilz rejects the segment.
 
+## The mobile base
+
+The chassis is a three-wheel platform with all three wheels independently
+steered, so it is holonomic — it strafes between benches without turning. The
+SRDF's `world_joint` is therefore **`planar`**, not fixed, and the base pose
+arrives as a `world -> moveit_root` transform. Nothing else works without it:
+with no transform the planar joint has no value and MoveIt's current state
+never completes; with a stale one it plans as though the robot were still
+parked at the origin.
+
+`base.py` owns both halves of that: the transform, and the six steering/wheel
+joint states (it solves the swerve kinematics, so the wheels in RViz point where
+the platform is actually going). `franzi_moveit_config`'s demo driver therefore
+has to give those up — `demo.launch.py` grew `publish_virtual_joint_tf` and
+`publish_chassis_joints` arguments, both defaulting to the old behaviour, and
+this package's launch file sets both to `false`.
+
+On hardware the same two arguments are what you turn off to let localisation and
+the real chassis driver take over.
+
 ## Cell layout
 
-All poses are in the `world` frame, which coincides with `base_link`. The floor
-(wheel contact) is at `z = -0.0873`, so the default table top at `z = 0.80` is
-0.887 m above the ground. Retune everything in `config/task.yaml`; nothing in
-the code hardcodes a pose.
+All poses are in the `world` frame. The floor (wheel contact) is at
+`z = -0.0873`, so the default bench top at `z = 0.80` is 0.887 m above the
+ground. Retune everything in `config/task.yaml`; nothing in the code hardcodes
+a pose.
 
-Default stations, all served by the left arm with the body in its `work`
-posture:
+Stations are laid out along `y` so the base strafes between them:
 
-| Station | x, y | Role |
+| Station | world x, y | Role |
 | --- | --- | --- |
-| feeder | 0.38, 0.34 | where the raw workpiece starts |
-| pocket | 0.42, 0.16 | fixture the part is inserted into |
-| unload | 0.38, -0.02 | where the finished part is set down |
+| feeder | 1.00, -1.50 | where the raw workpiece starts |
+| machine | 1.00, 0.00 | fixture the part is inserted into |
+| outfeed | 1.00, 1.50 | where the finished part is set down |
+
+The station world poses and the arm envelope are tied together by one number,
+`dock.offset` (default `[0.44, 0.16]`): where a station has to sit **in the base
+frame** once parked. The dock pose is derived from it, so moving a bench never
+invalidates the arm plans — only changing `dock.offset` does.
+
+Two constraints pull `dock.offset` in opposite directions: too large and the
+station falls outside the arm envelope; too small and the chassis (which reaches
+to `x = +0.24`) parks inside the bench. The demo checks the second case for you —
+after every dock it verifies the robot is not in collision and fails loudly if
+it is.
 
 ## Checking reachability before moving a station
 
@@ -110,10 +142,12 @@ ros2 run franzi_pick_place reach_map --ros-args \
   --params-file install/franzi_pick_place/share/franzi_pick_place/config/task.yaml
 ```
 
-It prints a `+` / `.` grid of collision-free top-down grasps at the grasp and
-approach heights. Keep stations away from the boundary of the `+` region: an
-endpoint near the edge is still reachable, but the straight-line approach to it
-often is not, and the segment silently degrades to a free-space detour.
+It prints a `+` / `.` grid of collision-free top-down grasps **in the base
+frame**, at the grasp and approach heights, with a bench placed where
+`dock.offset` says a station will be. Keep `dock.offset` away from the boundary
+of the `+` region: a pose near the edge is still reachable, but the straight-line
+approach to it often is not, and the segment silently degrades to a free-space
+detour.
 
 ## Gripper geometry
 
@@ -140,7 +174,13 @@ is the tip link's `-z`, so a zero-rotation goal means a top-down grasp.
   per side. Tightening it makes planning brittle without telling you anything
   about the real assembly — that belongs in the physics stage.
 - **Workpiece contacts are whitelisted.** Collisions between the workpiece and
-  the table / fixture are allowed in the ACM, because a part resting on a
+  the benches / fixture are allowed in the ACM, because a part resting on a
   surface is contact by definition. Robot links are still checked against both.
-- **Fixed base.** The `body` group is posed once and the chassis does not move;
-  every station has to be within arm's reach.
+- **The base is driven, not navigated.** Docking is a straight line in the world
+  plane with no path planning, no obstacle avoidance and no localisation error;
+  the route between benches is never collision-checked, only the parked pose is.
+  Anything put in the aisle will be driven straight through. Nav2 is the
+  replacement when that matters.
+- **The chassis is assumed holonomic.** If the real platform turns out to be
+  non-holonomic, `MobileBase.drive_to` is where that changes — the docking poses
+  and the task sequence stay as they are.

@@ -15,6 +15,8 @@ def generate_launch_description():
     use_rviz = LaunchConfiguration("use_rviz")
     allow_execution = LaunchConfiguration("allow_trajectory_execution")
     publish_demo_joint_states = LaunchConfiguration("publish_demo_joint_states")
+    publish_chassis_joints = LaunchConfiguration("publish_chassis_joints")
+    publish_virtual_joint_tf = LaunchConfiguration("publish_virtual_joint_tf")
 
     return LaunchDescription(
         [
@@ -32,17 +34,36 @@ def generate_launch_description():
                     "Set false when a controller or simulator publishes /joint_states."
                 ),
             ),
+            DeclareLaunchArgument(
+                "publish_chassis_joints",
+                default_value="true",
+                description=(
+                    "Include the steering and wheel joints in the demo joint states. "
+                    "Set false when a base driver owns them."
+                ),
+            ),
+            DeclareLaunchArgument(
+                "publish_virtual_joint_tf",
+                default_value="true",
+                description=(
+                    "Publish an identity world -> moveit_root transform, which pins "
+                    "the chassis at the origin. Set false when a base driver "
+                    "publishes the base pose."
+                ),
+            ),
             Node(
                 package="franzi_moveit_config",
                 executable="demo_joint_state_publisher.py",
                 name="demo_robot_driver",
                 output="screen",
+                parameters=[{"publish_chassis_joints": publish_chassis_joints}],
                 condition=IfCondition(publish_demo_joint_states),
             ),
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
                     str(launch_dir / "static_virtual_joint_tfs.launch.py")
-                )
+                ),
+                condition=IfCondition(publish_virtual_joint_tf),
             ),
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(str(launch_dir / "rsp.launch.py"))

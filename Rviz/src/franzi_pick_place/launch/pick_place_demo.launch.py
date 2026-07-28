@@ -51,7 +51,14 @@ def generate_launch_description():
             ),
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(str(moveit_launch / "demo.launch.py")),
-                launch_arguments={"use_rviz": "false"}.items(),
+                launch_arguments={
+                    "use_rviz": "false",
+                    # The task node's base driver owns the chassis pose and the
+                    # wheel joints; the demo defaults would pin the robot at the
+                    # origin and fight it.
+                    "publish_virtual_joint_tf": "false",
+                    "publish_chassis_joints": "false",
+                }.items(),
             ),
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(str(moveit_launch / "moveit_rviz.launch.py")),

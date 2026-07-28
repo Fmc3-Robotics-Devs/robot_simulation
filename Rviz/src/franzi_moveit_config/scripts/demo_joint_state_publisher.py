@@ -48,7 +48,17 @@ CONTROLLERS = {
 }
 
 
-def load_initial_joint_state():
+CHASSIS_JOINTS = (
+    "left_front_steering_joint",
+    "left_front_wheel_joint",
+    "right_front_steering_joint",
+    "right_front_wheel_joint",
+    "rear_steering_joint",
+    "rear_wheel_joint",
+)
+
+
+def load_initial_joint_state(skip=()):
     """Return movable, non-mimic joints and a valid zero-biased position."""
     urdf_path = (
         Path(get_package_share_directory("franzi_description"))
@@ -61,6 +71,8 @@ def load_initial_joint_state():
     positions = []
     for joint in root.findall("joint"):
         if joint.get("type") == "fixed" or joint.find("mimic") is not None:
+            continue
+        if joint.get("name") in skip:
             continue
 
         limit = joint.find("limit")
@@ -79,7 +91,11 @@ def duration_seconds(duration):
 class DemoRobotDriver(Node):
     def __init__(self):
         super().__init__("demo_robot_driver")
-        names, positions = load_initial_joint_state()
+        # A base driver publishes the chassis joints together with the base
+        # pose; publishing them here as well would fight it at 20 Hz.
+        self.declare_parameter("publish_chassis_joints", True)
+        skip = () if self.get_parameter("publish_chassis_joints").value else CHASSIS_JOINTS
+        names, positions = load_initial_joint_state(skip=skip)
         self._names = names
         self._state = dict(zip(names, positions))
         self._state_lock = threading.Lock()

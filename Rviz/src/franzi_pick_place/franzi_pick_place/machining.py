@@ -13,6 +13,7 @@ from std_srvs.srv import Trigger
 from visualization_msgs.msg import Marker, MarkerArray
 
 from .geometry import make_pose
+from .scene import MACHINE
 
 IDLE = "idle"
 BUSY = "machining"
@@ -91,8 +92,8 @@ class MachiningStation:
         if state == BUSY and self._blink:
             red, green, blue = red * 0.35, green * 0.35, blue * 0.35
 
-        x, y = self._layout.pocket_xy
-        base_z = self._layout.table_top_z
+        x, y = self._layout.station_xy[MACHINE]
+        base_z = self._layout.bench_top_z
 
         light = Marker()
         light.header.frame_id = self._layout.frame_id

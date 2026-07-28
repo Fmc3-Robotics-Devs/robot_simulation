@@ -84,13 +84,37 @@ class PlanningSceneClient:
             )
         self._apply_diff(scene)
 
-    def remove_object(self, object_id):
-        removal = CollisionObject()
-        removal.id = object_id
-        removal.operation = CollisionObject.REMOVE
+    def object_ids(self):
+        """Names of the collision objects currently in the world."""
+        request = GetPlanningScene.Request()
+        request.components = PlanningSceneComponents(
+            components=PlanningSceneComponents.WORLD_OBJECT_NAMES
+        )
+        response = self._get.call(request)
+        if response is None:
+            raise RuntimeError("get_planning_scene did not answer")
+        return {obj.id for obj in response.scene.world.collision_objects}
+
+    def remove_objects(self, object_ids):
+        """Remove objects, ignoring the ones that are not there.
+
+        move_group rejects the whole diff if it is asked to remove an unknown
+        object, so the caller cannot just fire and forget.
+        """
+        present = [name for name in object_ids if name in self.object_ids()]
+        if not present:
+            return
+
         scene = PlanningScene()
-        scene.world.collision_objects = [removal]
+        for name in present:
+            removal = CollisionObject()
+            removal.id = name
+            removal.operation = CollisionObject.REMOVE
+            scene.world.collision_objects.append(removal)
         self._apply_diff(scene)
+
+    def remove_object(self, object_id):
+        self.remove_objects([object_id])
 
     def attach(self, object_id, link_name, touch_links):
         """Move a world object onto a robot link.

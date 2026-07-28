@@ -45,33 +45,50 @@ pick_place_task:
     ik_timeout: 0.05
 
     # --- cell ------------------------------------------------------------
-    # Station positions come from the reachability map (`ros2 run
-    # franzi_pick_place reach_map`) and sit well inside the left arm's
-    # collision-free envelope. Reaching across the body midline makes the upper
-    # arm hit the torso, so everything stays at y >= -0.02.
     ground_z: -0.0873
-    table:
-      center_xy: [0.48, 0.16]
-      size_xy: [0.40, 0.60]
+
+    # World positions of the part on each bench. They are laid out along y, so
+    # the omnidirectional chassis strafes between them without turning.
+    station:
+      feeder_xy: [1.00, -1.50]
+      machine_xy: [1.00, 0.00]
+      outfeed_xy: [1.00, 1.50]
+
+    bench:
+      size_xy: [0.50, 0.70]
       top_z: 0.80
       thickness: 0.03
+      # How far in from the near edge the part sits, so the chassis can get
+      # close enough without the arm having to reach over the whole bench.
+      part_inset: 0.12
       leg_size: 0.05
-      leg_inset: 0.02
+      leg_inset: 0.03
 
     workpiece:
       size: [0.05, 0.05, 0.09]
-      pick_xy: [0.38, 0.34]
 
     pocket:
-      center_xy: [0.42, 0.16]
       # Half-gap between the workpiece and each wall. Tight tolerances belong
       # in the physics stage; here they only make planning brittle.
       clearance: 0.012
       wall_thickness: 0.015
       wall_height: 0.03
 
-    unload:
-      center_xy: [0.38, -0.02]
+    # --- docking ---------------------------------------------------------
+    dock:
+      # Where a station sits in the base frame once parked. This is the number
+      # that has to stay inside the arm envelope - check it with `reach_map`,
+      # and mind that the chassis reaches to x = +0.24, so too small a value
+      # parks the robot inside the bench.
+      offset: [0.44, 0.16]
+      yaw: 0.0
+      # How far to back off from the machine while it runs.
+      standby_retreat: 0.9
+
+    base:
+      linear_speed: 0.5
+      angular_speed: 0.8
+      wheel_radius: 0.0827
 
     # --- machining cycle -------------------------------------------------
     machining:
