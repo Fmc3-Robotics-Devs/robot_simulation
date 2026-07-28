@@ -49,7 +49,9 @@ from .scene import (
     WORKPIECE,
     CellLayout,
     bench_id,
-    build_cell,
+    build_ground,
+    build_station,
+    build_workpiece,
 )
 
 DEFAULTS = {
@@ -229,6 +231,7 @@ class MachineTendingDemo:
         )
         self._tags = TagObserver(node, self._tf_buffer, self._layout.frame_id)
 
+        self._workpiece_placed = False
         self._tcp_offset = tuple(node.get("tcp_offset"))
         self._grasp_orientation = quaternion_from_rpy(0.0, 0.0, node.get("grasp_yaw"))
         self._approach = (0.0, 0.0, node.get("approach_height"))
@@ -260,10 +263,29 @@ class MachineTendingDemo:
     # -- scene -------------------------------------------------------------
 
     def setup_scene(self):
+        """Start with a floor and nothing else.
+
+        The robot has not seen a bench yet, so it does not get to have one in
+        its planning scene. Everything else is revealed by the tag that station
+        carries, which is all it will have on hardware under SLAM.
+        """
         self._scene.wait_for_services()
         self._gripper.wait_for_controller()
-        self._scene.add_objects(build_cell(self._layout), colors=COLORS)
-        self._logger.info("planning scene ready")
+        self._scene.add_objects([build_ground(self._layout)], colors=COLORS)
+        self._logger.info("planning scene ready (floor only, benches come from tags)")
+
+    def reveal_station(self, station, label):
+        """Observe the tag and place everything that station implies."""
+        part_pose = self.observe_part_pose(station, label)
+        self._scene.add_objects(
+            build_station(self._layout, station, part_pose), colors=COLORS
+        )
+        if station == FEEDER and not self._workpiece_placed:
+            workpiece = build_workpiece(self._layout)
+            workpiece.pose = part_pose
+            self._scene.add_objects([workpiece], colors=COLORS)
+            self._workpiece_placed = True
+        return part_pose
 
     def _contact_pairs(self, station):
         """What the held workpiece is allowed to touch while working a station.
@@ -279,9 +301,8 @@ class MachineTendingDemo:
         return pairs
 
     def reset_workpiece(self):
-        self._scene.move_object(
-            WORKPIECE, self._layout.frame_id, self._layout.part_pose(FEEDER)
-        )
+        self._scene.remove_objects([WORKPIECE])
+        self._workpiece_placed = False
         self._station.reset()
 
     # -- task steps --------------------------------------------------------
@@ -397,9 +418,7 @@ class MachineTendingDemo:
         )
 
     def pick(self, station, label):
-        grasp, pregrasp = self._approach_states(
-            self.observe_part_pose(station, label), label
-        )
+        grasp, pregrasp = self._approach_states(self.reveal_station(station, label), label)
         pairs = self._contact_pairs(station)
 
         self._logger.info(f"{label}: approaching")
@@ -418,7 +437,7 @@ class MachineTendingDemo:
 
     def place(self, station, label):
         release, prerelease = self._approach_states(
-            self.observe_part_pose(station, label), label
+            self.reveal_station(station, label), label
         )
         pairs = self._contact_pairs(station)
 

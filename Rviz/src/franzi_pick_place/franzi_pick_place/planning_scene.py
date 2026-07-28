@@ -48,6 +48,11 @@ class CollisionObjectBuilder:
         self._object.pose = make_pose((0.0, 0.0, 0.0))
         self._object.operation = CollisionObject.ADD
 
+    def set_pose(self, pose):
+        """Anchor the object; primitive poses are then relative to it."""
+        self._object.pose = pose
+        return self
+
     def add_box(self, size, position, orientation=None):
         self._object.primitives.append(box(size))
         self._object.primitive_poses.append(make_pose(position, orientation))

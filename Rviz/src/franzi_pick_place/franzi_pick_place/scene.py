@@ -146,48 +146,57 @@ def build_ground(layout):
     )
 
 
-def build_bench(layout, station):
-    cx, cy = layout.bench_centre(station)
+def build_bench(layout, station, part_pose):
+    """A bench, positioned by where the robot believes the part rests.
+
+    Everything is built relative to that anchor rather than to a world pose:
+    with SLAM there is no world pose to build against, and anchoring the
+    furniture to the same observation as the part keeps the relative geometry
+    right even when the observation itself is off.
+    """
     sx, sy = layout.bench_size_xy
-    top = layout.bench_top_z
     thickness = layout.bench_thickness
     leg = layout.leg_size
     inset = layout.leg_inset
 
+    top = -layout.workpiece_size[2] / 2.0
+    centre_x = sx / 2.0 - layout.bench_part_inset
+
     builder = CollisionObjectBuilder(bench_id(station), layout.frame_id)
-    builder.add_box((sx, sy, thickness), (cx, cy, top - thickness / 2.0))
+    builder.set_pose(part_pose)
+    builder.add_box((sx, sy, thickness), (centre_x, 0.0, top - thickness / 2.0))
 
     leg_top = top - thickness
-    leg_height = leg_top - layout.ground_z
+    leg_height = layout.bench_top_z - layout.bench_thickness - layout.ground_z
     for dx in (-1.0, 1.0):
         for dy in (-1.0, 1.0):
             builder.add_box(
                 (leg, leg, leg_height),
                 (
-                    cx + dx * (sx / 2.0 - inset - leg / 2.0),
-                    cy + dy * (sy / 2.0 - inset - leg / 2.0),
+                    centre_x + dx * (sx / 2.0 - inset - leg / 2.0),
+                    dy * (sy / 2.0 - inset - leg / 2.0),
                     leg_top - leg_height / 2.0,
                 ),
             )
     return builder.build()
 
 
-def build_fixture(layout):
-    """Four walls forming the pocket the workpiece is inserted into."""
-    cx, cy = layout.station_xy[MACHINE]
+def build_fixture(layout, part_pose):
+    """Four walls forming the pocket, around the believed part position."""
     opening = layout.workpiece_size[0] + 2.0 * layout.pocket_clearance
     thickness = layout.pocket_wall_thickness
     height = layout.pocket_wall_height
-    z = layout.bench_top_z + height / 2.0
+    z = -layout.workpiece_size[2] / 2.0 + height / 2.0
     span = opening + 2.0 * thickness
     arm = opening / 2.0 + thickness / 2.0
 
+    builder = CollisionObjectBuilder(FIXTURE, layout.frame_id)
+    builder.set_pose(part_pose)
     return (
-        CollisionObjectBuilder(FIXTURE, layout.frame_id)
-        .add_box((thickness, span, height), (cx + arm, cy, z))
-        .add_box((thickness, span, height), (cx - arm, cy, z))
-        .add_box((opening, thickness, height), (cx, cy + arm, z))
-        .add_box((opening, thickness, height), (cx, cy - arm, z))
+        builder.add_box((thickness, span, height), (arm, 0.0, z))
+        .add_box((thickness, span, height), (-arm, 0.0, z))
+        .add_box((opening, thickness, height), (0.0, arm, z))
+        .add_box((opening, thickness, height), (0.0, -arm, z))
         .build()
     )
 
@@ -200,26 +209,26 @@ def build_workpiece(layout):
     )
 
 
-def build_tag(layout, station):
-    """The physical marker, so it is visible in RViz and gets planned around."""
-    pose = layout.tag_pose(station)
-    return (
-        CollisionObjectBuilder(tag_id(station), layout.frame_id)
-        .add_box(
-            (layout.tag_size, layout.tag_size, layout.tag_thickness),
-            (pose.position.x, pose.position.y, pose.position.z),
-        )
-        .build()
-    )
+def build_tag(layout, station, part_pose):
+    """The marker itself, so it is visible in RViz and gets planned around."""
+    builder = CollisionObjectBuilder(tag_id(station), layout.frame_id)
+    builder.set_pose(part_pose)
+    return builder.add_box(
+        (layout.tag_size, layout.tag_size, layout.tag_thickness),
+        (
+            -layout.tag_to_part_xy[0],
+            -layout.tag_to_part_xy[1],
+            -layout.workpiece_size[2] / 2.0 + layout.tag_thickness / 2.0,
+        ),
+    ).build()
 
 
-def build_cell(layout):
-    """Every static collision object plus the workpiece on the feeder bench."""
-    workpiece = build_workpiece(layout)
-    workpiece.pose = layout.part_pose(FEEDER)
-    return (
-        [build_ground(layout)]
-        + [build_bench(layout, station) for station in STATIONS]
-        + [build_tag(layout, station) for station in STATIONS]
-        + [build_fixture(layout), workpiece]
-    )
+def build_station(layout, station, part_pose):
+    """What the robot believes stands at a station, given one tag detection."""
+    objects = [
+        build_bench(layout, station, part_pose),
+        build_tag(layout, station, part_pose),
+    ]
+    if station == MACHINE:
+        objects.append(build_fixture(layout, part_pose))
+    return objects
