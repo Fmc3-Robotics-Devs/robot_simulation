@@ -26,6 +26,7 @@ from tf2_ros import TransformListener
 from tf2_ros.buffer import Buffer
 
 from .base import MobileBase
+from .docks import DockBook
 from .geometry import (
     make_pose,
     offset_pose,
@@ -124,6 +125,7 @@ DEFAULTS = {
     "base.wheel_radius": 0.0827,
     "machining.duration": 8.0,
     "machining.wait_for_trigger": False,
+    "dock_poses_file": "",
     "dock_sweep.span": 0.20,
     "dock_sweep.step": 0.05,
     "dock_sweep.yaw_errors": [0.0, 10.0],
@@ -234,6 +236,12 @@ class MachineTendingDemo:
         )
         self._tags = TagObserver(node, self._tf_buffer, self._layout.frame_id)
 
+        self._docks = DockBook.load(
+            node.get("dock_poses_file")
+            or Path(get_package_share_directory("franzi_pick_place"))
+            / "config"
+            / "dock_poses.yaml"
+        )
         self._workpiece_placed = False
         self._tcp_offset = tuple(node.get("tcp_offset"))
         self._grasp_orientation = quaternion_from_rpy(0.0, 0.0, node.get("grasp_yaw"))
@@ -305,6 +313,12 @@ class MachineTendingDemo:
 
     def reset_workpiece(self):
         self._scene.remove_objects([WORKPIECE])
+        self._docks = DockBook.load(
+            node.get("dock_poses_file")
+            or Path(get_package_share_directory("franzi_pick_place"))
+            / "config"
+            / "dock_poses.yaml"
+        )
         self._workpiece_placed = False
         self._station.reset()
 
@@ -377,10 +391,14 @@ class MachineTendingDemo:
                 f"({pose[0]:.2f}, {pose[1]:.2f}); check dock.offset against the bench"
             )
 
+    def standby_pose(self):
+        """Backed straight off the taught machine dock so the cycle can run."""
+        x, y, yaw = self._docks.pose(MACHINE)
+        retreat = self._layout.standby_retreat
+        return (x - math.cos(yaw) * retreat, y - math.sin(yaw) * retreat, yaw)
+
     def drive_to_station(self, station, carrying=False):
-        self.drive_to(
-            self._layout.dock_pose(station), f"drive to {station}", carrying=carrying
-        )
+        self.drive_to(self._docks.pose(station), f"drive to {station}", carrying=carrying)
 
     def observe_part_pose(self, station, label):
         """Where the part is, according to the camera - never according to the map.
@@ -465,7 +483,7 @@ class MachineTendingDemo:
         self.drive_to_station(MACHINE, carrying=True)
         self.place(MACHINE, "load: insert into pocket")
 
-        self.drive_to(self._layout.standby_pose(), "back off from machine")
+        self.drive_to(self.standby_pose(), "back off from machine")
         self._station.run_cycle()
 
         self.drive_to_station(MACHINE)

@@ -141,6 +141,10 @@ pick_place_task:
 
     repeat: 1
 
+    # Taught by `ros2 run franzi_pick_place teach_docks`. Empty falls back to
+    # config/dock_poses.yaml in the package share.
+    dock_poses_file: ""
+
     # --- tuning tools ----------------------------------------------------
     # How far off the nominal dock the sweep probes, and which yaw errors.
     dock_sweep:

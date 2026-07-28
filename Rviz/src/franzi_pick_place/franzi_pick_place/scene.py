@@ -123,13 +123,6 @@ class CellLayout:
             yaw,
         )
 
-    def standby_pose(self):
-        """Backed off from the machine so the cycle can run."""
-        x, y, yaw = self.dock_pose(MACHINE)
-        return (x - math.cos(yaw) * self.standby_retreat,
-                y - math.sin(yaw) * self.standby_retreat,
-                yaw)
-
 
 def build_ground(layout):
     """A floor slab, kept just below the wheel contact point.
