@@ -67,21 +67,24 @@
     <joint name="right_wrist_pitch_joint" value="0"/>
     <joint name="right_wrist_roll_joint" value="0"/>
   </group_state>
+  <!-- The finger joint origins are 95 mm apart in x and both fingers travel
+       towards that midpoint, so joint zero is fully open and the travel limits
+       are fully closed:  gap = 0.095 - (finger1 - finger2). -->
   <group_state name="open" group="left_gripper">
-    <joint name="leftfinger1_joint" value="0.0475"/>
-    <joint name="leftfinger2_joint" value="-0.0475"/>
-  </group_state>
-  <group_state name="closed" group="left_gripper">
     <joint name="leftfinger1_joint" value="0"/>
     <joint name="leftfinger2_joint" value="0"/>
   </group_state>
-  <group_state name="open" group="right_gripper">
-    <joint name="rightfinger1_joint" value="0.0475"/>
-    <joint name="rightfinger2_joint" value="-0.0475"/>
+  <group_state name="closed" group="left_gripper">
+    <joint name="leftfinger1_joint" value="0.0475"/>
+    <joint name="leftfinger2_joint" value="-0.0475"/>
   </group_state>
-  <group_state name="closed" group="right_gripper">
+  <group_state name="open" group="right_gripper">
     <joint name="rightfinger1_joint" value="0"/>
     <joint name="rightfinger2_joint" value="0"/>
+  </group_state>
+  <group_state name="closed" group="right_gripper">
+    <joint name="rightfinger1_joint" value="0.0475"/>
+    <joint name="rightfinger2_joint" value="-0.0475"/>
   </group_state>
 
   <end_effector name="left_gripper" parent_link="left_wrist_roll_Link"
