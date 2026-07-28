@@ -108,6 +108,7 @@ class MockTagDetector:
         max_view_angle=math.radians(70.0),
         position_noise=0.0,
         rotation_noise=0.0,
+        mounting_error=None,
         rate=10.0,
     ):
         self._node = node
@@ -127,6 +128,10 @@ class MockTagDetector:
         self._max_view_angle = max_view_angle
         self._position_noise = position_noise
         self._rotation_noise = rotation_noise
+        # Where the camera physically is, as opposed to where the URDF says.
+        # This is the thing hand-eye calibration exists to measure, so the
+        # robot must not be able to see it - only its consequences.
+        self._mounting_error = np.eye(4) if mounting_error is None else mounting_error
         self._random = random.Random(0)
 
         self._tf = TransformBroadcaster(node)
@@ -140,7 +145,7 @@ class MockTagDetector:
             )
         except TransformException:
             return None
-        return from_transform_msg(message.transform)
+        return from_transform_msg(message.transform) @ self._mounting_error
 
     def _observation(self, world_to_camera, world_to_tag):
         """What the camera sees, or None when the tag is not observable."""

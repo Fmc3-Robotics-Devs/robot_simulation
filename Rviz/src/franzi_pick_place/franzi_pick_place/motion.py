@@ -136,7 +136,9 @@ class ArmMotion:
         self._moveit.execute(result.trajectory, controllers=[])
         return True
 
-    def move_to_state(self, goal_state, label, linear=False, velocity_scaling=None):
+    def move_to_state(
+        self, goal_state, label, linear=False, velocity_scaling=None, group=None
+    ):
         """Move the arm to a joint configuration.
 
         ``linear`` asks Pilz for a straight-line Cartesian motion, which is what
@@ -144,8 +146,13 @@ class ArmMotion:
         be unreachable in a straight line) and then falls back to a free-space
         plan, because a demo that stops moving is harder to debug than one that
         takes a detour.
+
+        ``group`` defaults to the arm. Passing a goal state whose joints belong
+        to some other group without saying so plans the arm to its current
+        position and moves nothing - which is how a calibration run once
+        collected thirty samples with a head that never turned.
         """
-        component = self._moveit.get_planning_component(self._arm_group)
+        component = self._moveit.get_planning_component(group or self._arm_group)
         component.set_start_state_to_current_state()
         component.set_goal_state(robot_state=goal_state)
 

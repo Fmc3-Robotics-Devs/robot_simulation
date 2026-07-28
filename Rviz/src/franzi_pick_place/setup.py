@@ -26,6 +26,7 @@ setup(
             "reach_map = franzi_pick_place.reach_map:main",
             "dock_tolerance = franzi_pick_place.dock_tolerance:main",
             "teach_docks = franzi_pick_place.teach_docks:main",
+            "handeye_calibrate = franzi_pick_place.handeye:main",
         ],
     },
 )
