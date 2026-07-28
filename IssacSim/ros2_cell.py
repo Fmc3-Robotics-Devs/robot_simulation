@@ -19,6 +19,15 @@ RealSense driver instead. Nothing downstream needs to know which one it is.
 Frame ids are the URDF link names. Note that those are not optical frames in
 the RealSense sense - the real driver publishes `*_color_optical_frame`, which
 the URDF does not currently contain. That has to be reconciled before hardware.
+
+STATUS: cameras, clock, joint states and the chassis transform are verified
+publishing. The two lidars are not. They are created at the right prims now -
+the config name is case-sensitive and takes the USD asset's spelling, and the
+command returns the OmniLidar nested inside the referenced asset rather than
+the path it was handed - but ROS2RtxLidarHelper still reports "Render product
+not attached to RTX Lidar (Camera or OmniLidar prims are required)". The next
+thing to check is the type of the prim the command hands back: the helper wants
+a Camera or OmniLidar and is evidently getting something else.
 """
 
 import argparse
@@ -48,6 +57,35 @@ CAMERAS = {
 # break the tree.
 ODOM_FRAME = "odom"
 ROBOT_ROOT_FRAME = "moveit_root"
+
+# The warehouse gives SLAM something to close a loop on. The simple shell is
+# used rather than the fully stocked one: its racking sits where the cell does.
+WAREHOUSE_USD = "Isaac/Environments/Simple_Warehouse/warehouse.usd"
+
+# Config names come from the USD asset stems in SUPPORTED_LIDAR_CONFIGS, and
+# the match is case-sensitive. The JSON files under isaacsim.sensors.rtx/data
+# are spelled differently - SICK_tim781.json against the asset's SICK_TIM781 -
+# and using the JSON spelling fails with "config not found", after which the
+# sensor prim never exists and the render product reports the far less helpful
+# "No valid sensor paths provided".
+#
+# No Livox profile ships with Isaac, so the MID360 borrows a comparable 32-beam
+# spinner. The 2D unit is what drives Nav2, so its profile matters more: the
+# TIM781 is a real 2D safety scanner and behaves like one.
+LIDARS = {
+    "scan_2d": (
+        "lidar_2Dlidar_Link",
+        "SICK_TIM781",
+        "laser_scan",
+        "scan",
+    ),
+    "mid360": (
+        "MID360_Link",
+        "HESAI_XT32_SD10",
+        "point_cloud",
+        "mid360/points",
+    ),
+}
 
 
 def build_camera_graph(camera_name, camera_prim, width, height, frame_id):
@@ -104,6 +142,44 @@ def build_camera_graph(camera_name, camera_prim, width, height, frame_id):
     )
 
 
+def build_lidar_graph(name, lidar_prim, publish_type, topic, frame_id):
+    """Publish one RTX lidar. Same render-product pattern as the cameras."""
+    import omni.graph.core as og
+    import omni.usd
+    from isaacsim.core.utils.prims import set_targets
+
+    graph_path = f"/ROS2/{name}"
+    keys = og.Controller.Keys
+    og.Controller.edit(
+        {"graph_path": graph_path, "evaluator_name": "execution"},
+        {
+            keys.CREATE_NODES: [
+                ("Tick", "omni.graph.action.OnPlaybackTick"),
+                ("Context", "isaacsim.ros2.bridge.ROS2Context"),
+                ("RenderProduct", "isaacsim.core.nodes.IsaacCreateRenderProduct"),
+                ("Publish", "isaacsim.ros2.bridge.ROS2RtxLidarHelper"),
+            ],
+            keys.CONNECT: [
+                ("Tick.outputs:tick", "RenderProduct.inputs:execIn"),
+                ("RenderProduct.outputs:execOut", "Publish.inputs:execIn"),
+                ("RenderProduct.outputs:renderProductPath", "Publish.inputs:renderProductPath"),
+                ("Context.outputs:context", "Publish.inputs:context"),
+            ],
+            keys.SET_VALUES: [
+                ("Publish.inputs:type", publish_type),
+                ("Publish.inputs:topicName", topic),
+                ("Publish.inputs:frameId", frame_id),
+            ],
+        },
+    )
+    stage = omni.usd.get_context().get_stage()
+    set_targets(
+        prim=stage.GetPrimAtPath(f"{graph_path}/RenderProduct"),
+        attribute="inputs:cameraPrim",
+        target_prim_paths=[lidar_prim],
+    )
+
+
 def build_robot_graph(robot_prim):
     """Clock, joint states and the chassis transform - the demo driver's job."""
     import omni.graph.core as og
@@ -154,6 +230,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--gui", action="store_true", help="Open the Isaac window.")
     parser.add_argument("--dock", default="feeder", choices=STATIONS)
+    parser.add_argument(
+        "--no-warehouse", action="store_true", help="Bare ground plane instead."
+    )
     args = parser.parse_args()
 
     from isaaclab.app import AppLauncher
@@ -179,8 +258,19 @@ def main():
         sim_utils.SimulationCfg(dt=1.0 / 60.0, device="cuda:0", gravity=(0.0, 0.0, 0.0))
     )
 
-    ground = sim_utils.GroundPlaneCfg()
-    ground.func("/World/ground", ground, translation=(0.0, 0.0, cell["ground_z"]))
+    # The floor has to land on the wheel contact plane, not on z = 0: the world
+    # frame here is the ROS odom frame, whose origin is base_link.
+    floor_z = cell["ground_z"]
+    if args.no_warehouse:
+        ground = sim_utils.GroundPlaneCfg()
+        ground.func("/World/ground", ground, translation=(0.0, 0.0, floor_z))
+    else:
+        from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR
+
+        warehouse = sim_utils.UsdFileCfg(
+            usd_path=f"{ISAAC_NUCLEUS_DIR}/{WAREHOUSE_USD.split('Isaac/', 1)[1]}"
+        )
+        warehouse.func("/World/warehouse", warehouse, translation=(0.0, 0.0, floor_z))
     dome = sim_utils.DomeLightCfg(intensity=1200.0, color=(0.95, 0.95, 1.0))
     dome.func("/World/dome", dome)
     key = sim_utils.DistantLightCfg(intensity=2500.0, angle=1.0)
@@ -244,6 +334,22 @@ def main():
         near, far = intrinsics["clipping_range"]
         camera.CreateClippingRangeAttr((near, far))
 
+    # RTX lidars are created through the sensor command, not a spawner config.
+    import omni.kit.commands
+
+    for name, (link, config, _, _) in LIDARS.items():
+        # path is a leaf name; passing a full path flattens its slashes into
+        # underscores and the sensor lands at the stage root.
+        ok, sensor = omni.kit.commands.execute(
+            "IsaacSensorCreateRtxLidar",
+            path=name,
+            parent=f"/World/Robot/{link}",
+            config=config,
+            translation=(0.0, 0.0, 0.0),
+        )
+        print(f"lidar {name}: {'created ' + str(sensor.GetPath()) if ok else 'FAILED'}",
+              flush=True)
+
     sim.reset()
     root = robot.data.default_root_state.clone()
     robot.write_root_pose_to_sim(root[:, :7])
@@ -256,6 +362,10 @@ def main():
     build_robot_graph("/World/Robot")
     for name, (link, _, (width, height)) in CAMERAS.items():
         build_camera_graph(name, f"/World/Robot/{link}/{name}", width, height, link)
+    for name, (link, _, publish_type, topic) in LIDARS.items():
+        build_lidar_graph(
+            name, f"/World/Robot/{link}/{name}", publish_type, topic, link
+        )
 
     print("publishing:", flush=True)
     print(f"  /clock  /joint_states  tf {ODOM_FRAME} -> {ROBOT_ROOT_FRAME}", flush=True)
@@ -265,6 +375,8 @@ def main():
             f"/{name}/depth/image_rect_raw",
             flush=True,
         )
+    for name, (_, config, publish_type, topic) in LIDARS.items():
+        print(f"  /{topic}  ({publish_type}, {config})", flush=True)
     print("\nrunning - Ctrl-C to stop", flush=True)
 
     try:
