@@ -4,15 +4,17 @@ The three wheels are steered independently, so the platform is holonomic: it
 can translate in any direction while rotating. This module owns two things the
 rest of the stack reads:
 
-* the ``world -> moveit_root`` transform, which is what the planar virtual
+* the ``odom -> moveit_root`` transform, which is what the planar virtual
   joint in the SRDF resolves to - move a robot without it and MoveIt keeps
-  planning as if the chassis were still parked at the origin;
+  planning as if the chassis were still parked at the origin. On hardware this
+  is wheel odometry's job, and Nav2 publishes ``map -> odom`` above it;
 * the steering and wheel joint states, so the wheels in RViz actually point
   where the platform is going.
 
 Motion is integrated, not simulated: no slip, no dynamics, no path planning
-around obstacles. Driving is a straight line in the world plane with the
-heading interpolated alongside it.
+around obstacles. Driving is a straight line with the heading interpolated
+alongside it. ``drive_to`` has the shape of a Nav2 ``NavigateToPose`` goal on
+purpose - that is the intended replacement.
 """
 
 import math
@@ -41,7 +43,7 @@ class MobileBase:
     def __init__(
         self,
         node,
-        frame_id="world",
+        frame_id="odom",
         child_frame="moveit_root",
         wheel_radius=0.0827,
         linear_speed=0.5,
@@ -78,7 +80,7 @@ class MobileBase:
         self._publish()
 
     def drive_to(self, x, y, yaw, label=None):
-        """Translate and rotate to a world pose, blocking until parked."""
+        """Translate and rotate to a pose, blocking until parked."""
         start_x, start_y, start_yaw = self.pose
         delta_yaw = normalise(yaw - start_yaw)
         distance = math.hypot(x - start_x, y - start_y)

@@ -55,7 +55,7 @@ from .scene import (
 )
 
 DEFAULTS = {
-    "frame_id": "world",
+    "frame_id": "odom",
     "arm_group": "left_arm",
     "body_group": "body",
     "head_group": "head",
@@ -124,6 +124,9 @@ DEFAULTS = {
     "base.wheel_radius": 0.0827,
     "machining.duration": 8.0,
     "machining.wait_for_trigger": False,
+    "dock_sweep.span": 0.20,
+    "dock_sweep.step": 0.05,
+    "dock_sweep.yaw_errors": [0.0, 10.0],
     "reach_map.x_range": [0.28, 0.60],
     "reach_map.y_range": [-0.24, 0.42],
     "reach_map.step": 0.04,

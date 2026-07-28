@@ -2,10 +2,21 @@
 <robot name="wheel_robot_4.0">
   <!-- Fixed-base configuration for RViz and manipulation planning. -->
   <!-- The chassis is a driven three-wheel omnidirectional platform, so the
-       robot root floats in the world plane. Its pose has to be supplied as a
-       world -> moveit_root TF by whatever owns the base (a base driver in
-       simulation, localisation on hardware). -->
-  <virtual_joint name="world_joint" type="planar" parent_frame="world" child_link="moveit_root"/>
+       robot root floats in the plane. Its pose has to be supplied as an
+       odom -> moveit_root TF by whatever owns the base (a base driver in
+       simulation, wheel odometry on hardware).
+
+       The parent is `odom`, not `map`, on purpose. Navigation belongs in
+       `map`, but SLAM moves that frame under the robot at every loop closure,
+       which would invalidate a trajectory MoveIt is midway through executing.
+       `odom` drifts but never jumps, and a manipulation lasts seconds.
+
+       Note for hardware: `moveit_root` is a massless root the xacro adds
+       because KDL cannot carry inertia on the root link. It is rigidly
+       identical to `base_link`, so the odometry source must publish
+       `odom -> moveit_root`; publishing `odom -> base_link` instead gives
+       base_link two parents and breaks the TF tree. -->
+  <virtual_joint name="world_joint" type="planar" parent_frame="odom" child_link="moveit_root"/>
 
   <group name="body">
     <chain base_link="base_link" tip_link="torso_Link"/>

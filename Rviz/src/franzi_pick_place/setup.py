@@ -24,6 +24,7 @@ setup(
         "console_scripts": [
             "pick_place_task = franzi_pick_place.pick_place_node:main",
             "reach_map = franzi_pick_place.reach_map:main",
+            "dock_tolerance = franzi_pick_place.dock_tolerance:main",
         ],
     },
 )

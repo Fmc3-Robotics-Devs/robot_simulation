@@ -1,12 +1,13 @@
 # Machine-tending cell layout and task parameters.
 #
-# All lengths are metres in the `world` frame, which coincides with `base_link`.
+# All lengths are metres in the `odom` frame. Navigation happens in `map`;
+# manipulation stays in `odom`, which drifts but never jumps on loop closure.
 # The floor sits at z = -0.0873 (wheel contact), so a table top at z = 0.80 is
 # 0.887 m above the ground.
 
 pick_place_task:
   ros__parameters:
-    frame_id: "world"
+    frame_id: "odom"
 
     # --- robot interfaces ------------------------------------------------
     arm_group: "left_arm"
@@ -140,7 +141,13 @@ pick_place_task:
 
     repeat: 1
 
-    # --- reachability tool -----------------------------------------------
+    # --- tuning tools ----------------------------------------------------
+    # How far off the nominal dock the sweep probes, and which yaw errors.
+    dock_sweep:
+      span: 0.20
+      step: 0.05
+      yaw_errors: [0.0, 10.0]
+
     reach_map:
       x_range: [0.28, 0.60]
       y_range: [-0.24, 0.42]

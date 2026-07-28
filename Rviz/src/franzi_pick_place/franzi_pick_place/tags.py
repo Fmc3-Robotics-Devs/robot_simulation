@@ -101,7 +101,7 @@ class MockTagDetector:
         camera_frame,
         detection_parent,
         tag_poses,
-        planning_frame="world",
+        planning_frame="odom",
         max_range=3.0,
         min_range=0.25,
         fov=math.radians(60.0),
@@ -199,7 +199,7 @@ class MockTagDetector:
 class TagObserver:
     """Reads tag detections back out of TF, in the planning frame."""
 
-    def __init__(self, node, tf_buffer, planning_frame="world", settle=0.5):
+    def __init__(self, node, tf_buffer, planning_frame="odom", settle=0.5):
         self._node = node
         self._buffer = tf_buffer
         self._planning_frame = planning_frame
