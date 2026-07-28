@@ -15,17 +15,26 @@ Visualization Manager:
       Value: true
     - Class: moveit_rviz_plugin/MotionPlanning
       Name: MotionPlanning
+      # Only one robot should be on screen: the one actually executing. The
+      # interactive query states park at the last goal and the planned-path
+      # animation races ahead of execution - both read as ghosts.
       Planned Path:
         Loop Animation: false
-        State Display Time: 0.05 s
+        Show Robot Visual: false
+        Show Robot Collision: false
         Show Trail: false
+        State Display Time: 0.05 s
         Trajectory Topic: display_planned_path
+      Planning Request:
+        Query Start State: false
+        Query Goal State: false
       Planning Scene Topic: monitored_planning_scene
       Robot Description: robot_description
       Scene Geometry:
         Scene Alpha: 1
       Scene Robot:
-        Robot Alpha: 0.5
+        Robot Alpha: 1
+        Show Robot Visual: true
       Value: true
     - Class: rviz_default_plugins/MarkerArray
       Name: Machining Station
