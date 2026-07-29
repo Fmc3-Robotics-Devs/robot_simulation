@@ -24,6 +24,8 @@ uv run python scripts/preflight_assets.py --mount
 
 本机官方资产根必须包含 `Isaac/` 和 `NVIDIA/`。预检会创建仓库内的 `vendor/isaac_assets` 相对挂载；官方资产不提交进 Git。
 
+可选的 Hugging Face Isaac Sim/Isaac Lab 数据只用于资产、轨迹结构和多相机记录参考，不是正式场景依赖。已核对许可证并固定版本的候选见 [技术参考登记](docs/references.md)，缓存、审核与离线规则见 [资产约定](docs/assets.md)；大文件与审核快照放入项目自定义的 `HF_ASSET_ROOT`（本机建议 `/home/fmc3/FermiBotNas/SIM_ASSETS/huggingface`），仓库只通过忽略提交的 `vendor/huggingface` 相对挂载访问，正式场景不在启动时联网拉取。
+
 确认项目解释器与锁定的运行时版本：
 
 ```bash

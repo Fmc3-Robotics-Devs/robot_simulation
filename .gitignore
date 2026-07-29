@@ -2,6 +2,8 @@
 .venv/
 vendor/isaac_assets
 vendor/isaac_assets/
+vendor/huggingface
+vendor/huggingface/
 *.usd.tmp
 __pycache__/
 .pytest_cache/

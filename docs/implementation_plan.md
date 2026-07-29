@@ -9,6 +9,7 @@
 - 交付代码、项目自有的完整 USD 组合层、README 和本实施计划；代码保持简洁、可扩展，并为每个功能提供必要的责任说明和“为什么”注释。
 - NVIDIA 官方素材不复制进 Git：通过 `vendor/isaac_assets` 的相对挂载引用。项目自己的机器人、货箱、泡沫箱、手机、传感器和场景 USD 全部提交到仓库，保证在按 README 挂载官方素材后可以直接打开顶层场景。
 - 场景优先使用本地 Isaac 5.1 官方仓库/周转箱资产；官方文档与社区仓库只作为有版本记录的参考，不整仓复制第三方工程。
+- 资料优先级为 NVIDIA 5.1 官方文档与本地资产、NVIDIA Hugging Face 固定版本数据、许可证清楚的社区 Hugging Face/GitHub 仓库。HF 用于资产候选、轨迹/数据结构和相机/随机化参考，不直接替代本项目 USD、关节映射或实测验收。
 - 手机和泡沫箱的最终尺寸、碰撞几何以提供的 STL 为准；`report/手机放置槽.STL` 就是泡沫箱，当前模型为 3 列 × 6 行、共 18 槽；手机模型来自 `report/i17_AIR_DUMMY_stls/`。
 - 机器人须提供头部、胸部、左腕、右腕四路相机，并能取得实际渲染画面；仅在 USD/URDF 中存在 prim 或 frame 不算通过。
 - 项目采用 **subagent 驱动实施**：环境配置、版本核对、资产预检、重复性测试等边界清楚的任务优先交给并行 subagent；主任务负责接口决策、结果集成和最终验收。
@@ -130,6 +131,28 @@ URDF 已提供四个相机外壳 link 和 fixed joint；USD 在对应真实 link
 
 任何一路只有黑屏、错误相机视角、无 render product、未挂接真实 link，或无法留存截图，均不能通过相机验收。
 
+### 4.3 Hugging Face 数据采用流程
+
+Hugging Face 候选及固定 commit 统一登记在 `docs/references.md`。当前优先评估 NVIDIA G1 locomanipulation 的“抓取—导航—放置”阶段与成功定义、SimReady Warehouse 的 OpenUSD 资产，以及 Isaac Lab Mimic/LeRobot 的示范与多相机数据结构。手机阶段可参考 Unitree 的 Object Placement 与 Camera Packaging 数据，但手机、泡沫箱、槽位和 Wheel Bot 动作仍以本项目模型与实测为准。
+
+```text
+数据卡/许可证审查
+    → 固定 Hub commit
+    → 只下载 README、元数据或最小样本
+    → 隔离检查格式、单位、坐标系、关节和 Isaac 版本
+    → 转换为 Wheel Bot 项目接口
+    → 单测 + Isaac GUI/物理/截图复验
+    → 决定采用、仅参考或拒绝
+```
+
+HF 数据不得成为正式 USD 的隐式在线依赖。大文件与审核快照存放在 `HF_ASSET_ROOT`，仓库内 `vendor/huggingface/` 只提供忽略提交的相对挂载；正式运行设置离线模式。需要交付的派生 USD、配置或小型测试样本必须有许可证允许、来源说明、固定 revision 和文件哈希。其他机器人动作不能直接发送给 Wheel Bot，必须经过语义阶段提取、关节重定向、限位检查和仿真回归。
+
+| 阶段 | 优先参考 | 只迁移的内容 |
+|---|---|---|
+| P2/P3 固定底盘搬箱 | G1 Locomanipulation、OpenArm Pick、Franka Mimic | 任务阶段、示范/相机 schema、成功条件 |
+| P4 移动搬箱 | G1 Locomanipulation、Synthetic Warehouse Operations | 导航与操作段拼接、随机种子、多视角与场景随机化 |
+| P5 手机扫码装箱 | Unitree Object Placement、Camera Packaging | 双臂装盒阶段、头/腕相机组织、LeRobot 元数据 |
+
 ## 5. 分阶段实施与质量门
 
 ### 5.1 正式场景的可复制验收命令
@@ -201,6 +224,7 @@ python3 scripts/verify_ros2_camera_topics.py \
 |---|---|---|---|
 | **环境配置**：创建 `.venv`、锁版本、配置 NVIDIA 索引、`uv sync --frozen` | `gpt-5.6-terra` medium | 修改文件、完整命令、版本输出、失败日志 | Python/Isaac 版本、锁文件差异、是否修改安装包源码 |
 | 本地资产预检：`ISAAC_ASSET_ROOT`、Warehouse、AprilTag、磁盘与相对挂载 | `gpt-5.6-terra` medium | 资产路径清单、预检日志、缺失项 | 随机抽查路径并重新运行预检 |
+| Hugging Face 候选筛选：数据卡、许可证、固定 revision、最小样本与格式清单 | `gpt-5.6-terra` medium | 候选表、用途、大小、commit、许可证和拒绝原因 | 核对 Hub API/数据卡，确认未下载大仓库或执行远程代码 |
 | ROS/Isaac 冒烟测试：Jazzy、DDS、Bridge、CameraInfo、MoveIt topic | `gpt-5.6-terra` medium | 启动命令、topic/type/frame 输出、日志位置 | 独立订阅一次并比对 frame/topic |
 | 场景/代码：资产导入、状态机、执行器、单测 | `gpt-5.6-terra` medium | 边界内代码、测试、说明 | 接口、单位、注释、回归测试 |
 | 跨模块审查与调度：USD/URDF/ROS 一致性、架构、物理/相机证据和阶段门 | `gpt-5.6-sol` ultra | 按严重度排序的问题清单、复查结论与下一步调度 | 主任务逐项修复或登记决策 |
@@ -244,3 +268,4 @@ python3 scripts/verify_ros2_camera_topics.py \
 | 2026-07-29 | 创建实施基线：搬箱优先、四相机真实画面验收、18槽手机后续规划 | 已确认交付方向 | 全项目 | 项目负责人 |
 | 2026-07-29 | subagent 驱动升级为正式执行制度，环境配置优先由 Terra medium 并行完成，Sol ultra 审查阶段门 | 负责人明确要求 | 环境、实现、测试与验收 | 项目负责人 |
 | 2026-07-29 | 正式场景升级为多工位 Warehouse，蓝箱附 Tag 0；物理 smoke 和正式 RTX 证据归档 | 先建立可见、可验证的搬箱工位基线 | USD、相机、物理、PPT | 项目负责人 |
+| 2026-07-29 | 将 Hugging Face 固定版本数据加入第三层参考源，建立最小下载、许可证与兼容性门 | 负责人补充可用的 Isaac Lab/Isaac Sim 数据来源 | 资料、资产、数据结构与 subagent 调研 | 项目负责人 |
