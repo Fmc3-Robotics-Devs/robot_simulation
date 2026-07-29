@@ -1,0 +1,16 @@
+[package]
+version = "0.1.0"
+category = "isaaclab"
+readme = "README.md"
+title = "Wheel Bot franzi_sim"
+author = "Wheel Bot Simulation Team"
+maintainer = "Wheel Bot Simulation Team"
+description = "Wheel Bot scenario contracts, camera configuration, and Isaac Sim adapters."
+repository = ""
+keywords = ["isaaclab", "isaacsim", "wheel-bot", "mobile-manipulation"]
+
+[dependencies]
+"isaaclab" = {}
+
+[[python.module]]
+name = "franzi_sim"

@@ -1,0 +1,15 @@
+# Local environments and NVIDIA assets are machine-specific and are never vendored.
+.venv/
+vendor/isaac_assets
+vendor/isaac_assets/
+*.usd.tmp
+__pycache__/
+.pytest_cache/
+.ppt_refresh_*/
+tmp/
+report/*.inspect.ndjson
+.coverage
+dist/
+build/
+node_modules/
+.codex-tmp/

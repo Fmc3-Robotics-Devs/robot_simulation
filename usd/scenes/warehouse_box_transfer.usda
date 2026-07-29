@@ -1,0 +1,60 @@
+#usda 1.0
+(
+    defaultPrim = "WheelBotBoxTransfer"
+    doc = "Project composition layer for the Wheel Bot warehouse box-transfer scene."
+    metersPerUnit = 1
+    subLayers = [
+        @warehouse_box_transfer_workcell.usda@,
+        @warehouse_box_transfer_apriltags.usda@,
+        @warehouse_box_transfer_physics.usda@
+    ]
+    upAxis = "Z"
+)
+
+def Xform "WheelBotBoxTransfer" (
+    kind = "assembly"
+    prepend references = @../../vendor/isaac_assets/Isaac/Environments/Simple_Warehouse/full_warehouse.usd@
+)
+{
+    custom string scenario:name = "warehouse_box_transfer"
+    custom string scenario:status = "workcell_visual_validation"
+    custom string scenario:assetMount = "../../vendor/isaac_assets"
+    custom string scenario:nextGate = "AprilTag live detection and fixed-base box-transfer executor"
+
+    # The ignored vendor mount keeps official dependencies outside Git while
+    # the project-owned robot and scene composition remain portable.
+    def Xform "WheelBot" (
+        prepend references = @../assets/robots/wheel_bot/wheel_bot_with_cameras.usda@
+    )
+    {
+        double3 xformOp:translate = (0, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    # The project-owned metre wrapper keeps NVIDIA's crate visuals separate
+    # from project physics and lets AprilTag remain a correctly scaled child.
+    def Xform "BlueTransportBox" (
+        prepend references = @../assets/props/blue_transport_box.usda@
+    )
+    {
+        double3 xformOp:translate = (1.05, 0.38, 0.995)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        custom string scenario:role = "pick_object"
+        custom string scenario:status = "official_asset_with_project_wrapper"
+    }
+
+    # The delivery marker now sits on a real packing table, not on the floor.
+    def Xform "DropZone"
+    {
+        double3 xformOp:translate = (3.65, -1.65, 1.001)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+
+        def Cube "Marker"
+        {
+            color3f[] primvars:displayColor = [(0.05, 0.55, 0.18)]
+            double size = 1
+            double3 xformOp:scale = (0.48, 0.32, 0.006)
+            uniform token[] xformOpOrder = ["xformOp:scale"]
+        }
+    }
+}

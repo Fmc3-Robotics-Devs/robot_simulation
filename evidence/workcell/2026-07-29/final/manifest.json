@@ -1,0 +1,155 @@
+{
+  "ok": true,
+  "captured_at": "2026-07-29T17:58:27+08:00",
+  "renderer": "Isaac Sim 5.1 RTX Real-Time",
+  "formal_scene": "usd/scenes/warehouse_box_transfer.usda",
+  "formal_scene_sha256": "b5ba14e89a4c18dc9a9fae2f9029d92afe0541f2e17470dbae6d5eb4b6d1b959",
+  "project_source_sha256": {
+    "usd/scenes/warehouse_box_transfer.usda": "b5ba14e89a4c18dc9a9fae2f9029d92afe0541f2e17470dbae6d5eb4b6d1b959",
+    "usd/scenes/warehouse_box_transfer_workcell.usda": "abb7bc43dfaf412cfe01f28f0af594b2fd8e3340062eda0cc4a469b87b8e84cf",
+    "usd/scenes/warehouse_box_transfer_apriltags.usda": "56418d48697aceba2c8933c368272c65dc065ffe2d468067a9138320946ce60f",
+    "usd/scenes/warehouse_box_transfer_physics.usda": "db61f1c0ca53d6bcd886981cdc0be2ed01e1ad80dcd6345ab3e62a2930d928b0",
+    "usd/assets/robots/wheel_bot/wheel_bot.usd": "04eb7d092a822773e3b6f1745196a5aa94d1a76ba9ca26c3fbe41cda92480d69",
+    "usd/assets/robots/wheel_bot/wheel_bot_with_cameras.usda": "d67de31271798ef683b2bb19d4b7f410f0007c62f7c72c68487fb3a931de8207",
+    "usd/assets/robots/wheel_bot/camera_sensors.usda": "11ad56660814a707e8f3c83e4c472b2e89f8a9ddfb1b6f53dd0b8931fcb96c05",
+    "usd/assets/props/packing_table.usda": "2154d83206cd2af0642c5c9e3aee64d2d8a724d804526898b18df6fa4cbc8ed4",
+    "usd/assets/props/blue_transport_box.usda": "8ab5c43e25872a5a50d9abb0e2212d8a6a93c4f6a2d3978aa9b9a7d4e93727f7",
+    "usd/assets/tags/apriltag_36h11.usda": "c87b949882587c24dbe706ce6a6083df70d5bafb94f4322e61b2ba1246a64a50"
+  },
+  "project_source_bundle_sha256": "917cea5b3c5e7a73783fac03cf13bad0dd247211bce1caaefde80258ef3a0821",
+  "stage_meters_per_unit": 1.0,
+  "stage_up_axis": "Z",
+  "apriltag": {
+    "family": "tag36h11",
+    "id": 0,
+    "decoded_ids_in_box_closeup": [
+      0
+    ],
+    "robot_camera_detection_required": true,
+    "robot_cameras_decoding_tag_0": [
+      "head_d435"
+    ],
+    "size_m": 0.1,
+    "parent_prim": "/WheelBotBoxTransfer/BlueTransportBox",
+    "face_prim": "/WheelBotBoxTransfer/BlueTransportBox/AprilTag_0/Face"
+  },
+  "views": [
+    {
+      "name": "overview",
+      "file": "overview.png",
+      "resolution": [
+        1600,
+        900
+      ],
+      "sha256": "c09d12babab947c31581eb115466fbcd78890266e5b4733df7b5c81aedc7db11",
+      "pixel_metrics": {
+        "minimum": 0,
+        "maximum": 250,
+        "mean": 96.319,
+        "standard_deviation": 52.876
+      }
+    },
+    {
+      "name": "apriltag_box_closeup",
+      "file": "apriltag_box_closeup.png",
+      "resolution": [
+        1280,
+        720
+      ],
+      "sha256": "0f87a295a848973fb6b5aa1cbdae694c1b762c319464adce93c89483b1746de4",
+      "pixel_metrics": {
+        "minimum": 0,
+        "maximum": 240,
+        "mean": 100.784,
+        "standard_deviation": 69.618
+      },
+      "decoded_apriltag_ids": [
+        0
+      ]
+    },
+    {
+      "name": "head_d435",
+      "file": "head_d435.png",
+      "resolution": [
+        1280,
+        720
+      ],
+      "sha256": "f9e447f6fe9a9448e905c3028936ab551da7ee74b273bcf7b714771cd9e3aa80",
+      "pixel_metrics": {
+        "minimum": 0,
+        "maximum": 238,
+        "mean": 132.356,
+        "standard_deviation": 52.905
+      },
+      "decoded_apriltag_ids": [
+        0
+      ]
+    },
+    {
+      "name": "chest_d435",
+      "file": "chest_d435.png",
+      "resolution": [
+        1280,
+        720
+      ],
+      "sha256": "2a6d6ef606d67445515855af99c0988c903ceac046f8ba7cc449413809e9bb19",
+      "pixel_metrics": {
+        "minimum": 3,
+        "maximum": 239,
+        "mean": 67.028,
+        "standard_deviation": 36.722
+      },
+      "decoded_apriltag_ids": []
+    },
+    {
+      "name": "left_wrist_d405",
+      "file": "left_wrist_d405.png",
+      "resolution": [
+        1280,
+        720
+      ],
+      "sha256": "be726be2e0370cab602d3c13507968f10e43b74bb28d77db99d96018a1aa6024",
+      "pixel_metrics": {
+        "minimum": 0,
+        "maximum": 253,
+        "mean": 80.284,
+        "standard_deviation": 58.339
+      },
+      "decoded_apriltag_ids": []
+    },
+    {
+      "name": "right_wrist_d405",
+      "file": "right_wrist_d405.png",
+      "resolution": [
+        1280,
+        720
+      ],
+      "sha256": "386a08e40b26d75a26146c4bab156c4415ce2d1e24d59cca7a740f475ea89686",
+      "pixel_metrics": {
+        "minimum": 0,
+        "maximum": 251,
+        "mean": 87.723,
+        "standard_deviation": 60.186
+      },
+      "decoded_apriltag_ids": []
+    }
+  ],
+  "camera_contract": {
+    "required_cameras": [
+      "head_d435",
+      "chest_d435",
+      "left_wrist_d405",
+      "right_wrist_d405"
+    ],
+    "all_four_rgb_frames_valid": true,
+    "clipping_range_m": [
+      0.05,
+      100.0
+    ],
+    "tag_0_detected_by_robot_camera": true
+  },
+  "review_board": "workcell_review_board.png",
+  "review_board_sha256": "5bb5825384a54547de9052c33388494907324254cc93b794369f7979c5846baa",
+  "four_camera_contact_sheet": "four_camera_contact_sheet.png",
+  "four_camera_contact_sheet_sha256": "8f6a9979d88d17e5a5fa29c733e889c6917fb61859c715e24aed1624b93722f5"
+}

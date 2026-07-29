@@ -1,0 +1,96 @@
+{
+  "apriltag_prim": "/WheelBotBoxTransfer/BlueTransportBox/AprilTag_0",
+  "box_prim": "/WheelBotBoxTransfer/BlueTransportBox",
+  "checks": {
+    "angular_velocity_settled": true,
+    "apriltag_followed_box": true,
+    "finite_state": true,
+    "gravity_motion_observed": true,
+    "horizontal_drift_bounded": true,
+    "landed_at_table_height": true,
+    "linear_velocity_settled": true,
+    "raised_by_command": true,
+    "reset_restored_initial_pose": true
+  },
+  "measurements": {
+    "angular_speed_rad_s": 0.00025305908638983965,
+    "angular_velocity_rad_s": [
+      0.00013407204824034125,
+      0.00021462244330905378,
+      8.954851864473312e-07
+    ],
+    "downward_travel_m": 0.05026590824127197,
+    "horizontal_drift_m": 0.0,
+    "initial_position_m": [
+      1.0499999523162842,
+      0.3799999952316284,
+      0.9950000047683716
+    ],
+    "initial_tag_to_box_distance_m": 0.3155799046511054,
+    "landing_height_error_m": 0.000948786735534668,
+    "landing_position_m": [
+      1.0499999523162842,
+      0.3799999952316284,
+      0.9940512180328369
+    ],
+    "landing_tag_to_box_distance_m": 0.31576334780206844,
+    "linear_speed_m_s": 6.84752594679594e-05,
+    "linear_velocity_m_s": [
+      7.592084330099169e-06,
+      -4.036321115563624e-06,
+      -6.793327338527888e-05
+    ],
+    "raised_position_m": [
+      1.0499999523162842,
+      0.3799999952316284,
+      1.0443171262741089
+    ],
+    "reset_error_m": 0.0,
+    "reset_position_m": [
+      1.0499999523162842,
+      0.3799999952316284,
+      0.9950000047683716
+    ],
+    "sampled_box_z_m": [
+      1.0429552793502808,
+      0.9940512180328369,
+      0.9940512180328369,
+      0.9940512180328369,
+      0.9940512180328369,
+      0.9940512180328369,
+      0.9940512180328369,
+      0.9940512180328369,
+      0.9940512180328369,
+      0.9940512180328369,
+      0.9940512180328369,
+      0.9940512180328369,
+      0.9940512180328369,
+      0.9940512180328369,
+      0.9940512180328369,
+      0.9940512180328369,
+      0.9940512180328369,
+      0.9940512180328369,
+      0.9940512180328369,
+      0.9940512180328369,
+      0.9940512180328369,
+      0.9940512180328369,
+      0.9940512180328369,
+      0.9940512180328369,
+      0.9940512180328369
+    ],
+    "tag_distance_error_m": 0.00018344315096302521
+  },
+  "ok": true,
+  "physics_dt_s": 0.008333333333333333,
+  "physics_steps": 480,
+  "project_source_bundle_sha256": "40b35107d115df359f710c6e0326978fa2badfd59c5a207fc44cea14e1a0e1aa",
+  "project_source_sha256": {
+    "usd/assets/props/blue_transport_box.usda": "8ab5c43e25872a5a50d9abb0e2212d8a6a93c4f6a2d3978aa9b9a7d4e93727f7",
+    "usd/assets/tags/apriltag_36h11.usda": "c87b949882587c24dbe706ce6a6083df70d5bafb94f4322e61b2ba1246a64a50",
+    "usd/scenes/warehouse_box_transfer.usda": "b5ba14e89a4c18dc9a9fae2f9029d92afe0541f2e17470dbae6d5eb4b6d1b959",
+    "usd/scenes/warehouse_box_transfer_apriltags.usda": "56418d48697aceba2c8933c368272c65dc065ffe2d468067a9138320946ce60f",
+    "usd/scenes/warehouse_box_transfer_physics.usda": "db61f1c0ca53d6bcd886981cdc0be2ed01e1ad80dcd6345ab3e62a2930d928b0"
+  },
+  "scene": "usd/scenes/warehouse_box_transfer.usda",
+  "scene_sha256": "b5ba14e89a4c18dc9a9fae2f9029d92afe0541f2e17470dbae6d5eb4b6d1b959"
+}

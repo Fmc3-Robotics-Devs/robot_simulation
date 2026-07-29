@@ -1,0 +1,283 @@
+{
+  "validated_at": "2026-07-29T14:07:31+0800",
+  "ros_distro": "jazzy",
+  "expected_topic_count": 8,
+  "received_topic_count": 8,
+  "missing_topics": [],
+  "invalid_topics": [],
+  "topics": {
+    "/franzi/camera/chest_d435/color/camera_info": {
+      "type": "sensor_msgs/msg/CameraInfo",
+      "frame_id": "chest_d435_optical_frame",
+      "stamp": {
+        "sec": 0,
+        "nanosec": 133333340
+      },
+      "width": 1280,
+      "height": 720,
+      "distortion_model": "plumb_bob",
+      "k": [
+        799.9999682108573,
+        0.0,
+        640.0,
+        0.0,
+        799.9999682108573,
+        360.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "d": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "r": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "p": [
+        799.9999682108573,
+        0.0,
+        640.0,
+        0.0,
+        0.0,
+        799.9999682108573,
+        360.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      "valid": true
+    },
+    "/franzi/camera/chest_d435/color/image_raw": {
+      "type": "sensor_msgs/msg/Image",
+      "frame_id": "chest_d435_optical_frame",
+      "stamp": {
+        "sec": 0,
+        "nanosec": 166666675
+      },
+      "width": 1280,
+      "height": 720,
+      "encoding": "rgb8",
+      "step": 3840,
+      "valid": true
+    },
+    "/franzi/camera/head_d435/color/camera_info": {
+      "type": "sensor_msgs/msg/CameraInfo",
+      "frame_id": "head_d435_optical_frame",
+      "stamp": {
+        "sec": 0,
+        "nanosec": 133333340
+      },
+      "width": 1280,
+      "height": 720,
+      "distortion_model": "plumb_bob",
+      "k": [
+        799.9999682108573,
+        0.0,
+        640.0,
+        0.0,
+        799.9999682108573,
+        360.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "d": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "r": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "p": [
+        799.9999682108573,
+        0.0,
+        640.0,
+        0.0,
+        0.0,
+        799.9999682108573,
+        360.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      "valid": true
+    },
+    "/franzi/camera/head_d435/color/image_raw": {
+      "type": "sensor_msgs/msg/Image",
+      "frame_id": "head_d435_optical_frame",
+      "stamp": {
+        "sec": 0,
+        "nanosec": 166666675
+      },
+      "width": 1280,
+      "height": 720,
+      "encoding": "rgb8",
+      "step": 3840,
+      "valid": true
+    },
+    "/franzi/camera/left_wrist_d405/color/camera_info": {
+      "type": "sensor_msgs/msg/CameraInfo",
+      "frame_id": "left_wrist_d405_optical_frame",
+      "stamp": {
+        "sec": 0,
+        "nanosec": 133333340
+      },
+      "width": 1280,
+      "height": 720,
+      "distortion_model": "plumb_bob",
+      "k": [
+        746.6666242811432,
+        0.0,
+        640.0,
+        0.0,
+        746.6666242811432,
+        360.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "d": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "r": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "p": [
+        746.6666242811432,
+        0.0,
+        640.0,
+        0.0,
+        0.0,
+        746.6666242811432,
+        360.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      "valid": true
+    },
+    "/franzi/camera/left_wrist_d405/color/image_raw": {
+      "type": "sensor_msgs/msg/Image",
+      "frame_id": "left_wrist_d405_optical_frame",
+      "stamp": {
+        "sec": 0,
+        "nanosec": 150000007
+      },
+      "width": 1280,
+      "height": 720,
+      "encoding": "rgb8",
+      "step": 3840,
+      "valid": true
+    },
+    "/franzi/camera/right_wrist_d405/color/camera_info": {
+      "type": "sensor_msgs/msg/CameraInfo",
+      "frame_id": "right_wrist_d405_optical_frame",
+      "stamp": {
+        "sec": 0,
+        "nanosec": 133333340
+      },
+      "width": 1280,
+      "height": 720,
+      "distortion_model": "plumb_bob",
+      "k": [
+        746.6666242811432,
+        0.0,
+        640.0,
+        0.0,
+        746.6666242811432,
+        360.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "d": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "r": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "p": [
+        746.6666242811432,
+        0.0,
+        640.0,
+        0.0,
+        0.0,
+        746.6666242811432,
+        360.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      "valid": true
+    },
+    "/franzi/camera/right_wrist_d405/color/image_raw": {
+      "type": "sensor_msgs/msg/Image",
+      "frame_id": "right_wrist_d405_optical_frame",
+      "stamp": {
+        "sec": 0,
+        "nanosec": 166666675
+      },
+      "width": 1280,
+      "height": 720,
+      "encoding": "rgb8",
+      "step": 3840,
+      "valid": true
+    }
+  },
+  "passed": true
+}

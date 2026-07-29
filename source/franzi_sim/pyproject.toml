@@ -1,0 +1,9 @@
+[project]
+name = "franzi-sim"
+version = "0.1.0"
+description = "Wheel Bot Isaac Lab external project extension."
+requires-python = ">=3.11,<3.12"
+
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"

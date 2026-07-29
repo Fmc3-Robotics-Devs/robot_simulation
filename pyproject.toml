@@ -1,0 +1,59 @@
+[project]
+name = "wheelbot-isaacsim"
+version = "0.1.0"
+description = "Reproducible Isaac Sim task scaffolding for Wheel Bot."
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    # NVIDIA's 5.1 core wheel requires these exact versions. Declaring the
+    # pins here prevents universal locking from selecting newer Torch-compatible
+    # versions that pass resolution but fail `uv pip check` on Linux x86_64.
+    "filelock==3.13.1",
+    "fsspec==2024.6.1",
+    "isaaclab==2.3.2",
+    "isaacsim[all,extscache]==5.1.0.0",
+    "networkx==3.3",
+]
+
+[dependency-groups]
+dev = ["pytest>=8.3,<9"]
+
+[tool.uv]
+default-groups = ["dev"]
+environments = ["sys_platform == 'linux' and platform_machine == 'x86_64'"]
+required-environments = ["sys_platform == 'linux' and platform_machine == 'x86_64'"]
+# NVIDIA's index metadata and the installed Linux wheel disagree for three
+# transitive versions. The installed x86_64 wheel is authoritative here; these
+# overrides make uv resolve the versions that `uv pip check` validates.
+override-dependencies = [
+    "filelock==3.13.1",
+    "fsspec==2024.6.1",
+    "networkx==3.3",
+]
+
+[[tool.uv.index]]
+name = "nvidia"
+url = "https://pypi.nvidia.com"
+explicit = false
+
+[tool.uv.extra-build-dependencies]
+# Isaac Lab 2.3.2 pins legacy flatdict 4.0.1, whose setup.py imports
+# pkg_resources without declaring setuptools. Keep the compatibility shim
+# isolated to that source build instead of adding it to the runtime.
+flatdict = ["setuptools<81"]
+
+[tool.wheelbot.runtime]
+isaac_sim = "5.1.0.0"
+isaac_lab = "2.3.2"
+python = "3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = [".", "source/franzi_sim"]
+
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["source/franzi_sim/franzi_sim"]

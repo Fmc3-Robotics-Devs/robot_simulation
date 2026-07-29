@@ -1,0 +1,71 @@
+{
+  "captured_at": "2026-07-29T14:07:48+08:00",
+  "git_revision": "c6c77fac68f7a73a59e1cc86a7b62884ed8f997d",
+  "git_dirty": true,
+  "robot_usd": "usd/assets/robots/wheel_bot/wheel_bot_with_cameras.usda",
+  "robot_usd_sha256": "f076d0bdfb090ee4a3d1462112999f6b73971a6d83aa490f1534bca07f91763e",
+  "stage": "camera_validation.usda",
+  "ros2_graph_authored": true,
+  "ros2_message_validation": "passed",
+  "ros2_evidence": "ros2_topics.json",
+  "ros2_frames": 600,
+  "simulation_time_s": 10.000000521540642,
+  "cameras": [
+    {
+      "name": "head_d435",
+      "model": "Intel RealSense D435",
+      "parent_link": "head_d435_Link",
+      "prim_path": "/World/WheelBot/head_d435_Link/head_d435_optical_frame/camera",
+      "frame_id": "head_d435_optical_frame",
+      "topic": "/franzi/camera/head_d435/color/image_raw",
+      "camera_info_topic": "/franzi/camera/head_d435/color/camera_info",
+      "resolution": [
+        1280,
+        720
+      ],
+      "file": "head_d435.png"
+    },
+    {
+      "name": "chest_d435",
+      "model": "Intel RealSense D435",
+      "parent_link": "body_d435_Link",
+      "prim_path": "/World/WheelBot/body_d435_Link/chest_d435_optical_frame/camera",
+      "frame_id": "chest_d435_optical_frame",
+      "topic": "/franzi/camera/chest_d435/color/image_raw",
+      "camera_info_topic": "/franzi/camera/chest_d435/color/camera_info",
+      "resolution": [
+        1280,
+        720
+      ],
+      "file": "chest_d435.png"
+    },
+    {
+      "name": "left_wrist_d405",
+      "model": "Intel RealSense D405",
+      "parent_link": "left_wrist_d405_Link",
+      "prim_path": "/World/WheelBot/left_wrist_d405_Link/left_wrist_d405_optical_frame/camera",
+      "frame_id": "left_wrist_d405_optical_frame",
+      "topic": "/franzi/camera/left_wrist_d405/color/image_raw",
+      "camera_info_topic": "/franzi/camera/left_wrist_d405/color/camera_info",
+      "resolution": [
+        1280,
+        720
+      ],
+      "file": "left_wrist_d405.png"
+    },
+    {
+      "name": "right_wrist_d405",
+      "model": "Intel RealSense D405",
+      "parent_link": "right_wrist_d405_Link",
+      "prim_path": "/World/WheelBot/right_wrist_d405_Link/right_wrist_d405_optical_frame/camera",
+      "frame_id": "right_wrist_d405_optical_frame",
+      "topic": "/franzi/camera/right_wrist_d405/color/image_raw",
+      "camera_info_topic": "/franzi/camera/right_wrist_d405/color/camera_info",
+      "resolution": [
+        1280,
+        720
+      ],
+      "file": "right_wrist_d405.png"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "tag_family": "tag36h11",
+  "tag_ids": [
+    0,
+    1
+  ],
+  "decoded_tag_ids": [
+    0,
+    1
+  ],
+  "tag_size_m": 0.1,
+  "tag_usd": "usd/assets/tags/apriltag_36h11.usda",
+  "image": "tag36h11_ids_0_1.png",
+  "image_sha256": "88a16e3f3a8390b6db40eab248d1cad6eaccc49f86de50f29725764f20e8b779",
+  "resolution": [
+    1280,
+    720
+  ],
+  "renderer": "Isaac Sim 5.1 RTX",
+  "pixel_metrics": {
+    "minimum": 0,
+    "maximum": 253,
+    "mean": 229.831,
+    "standard_deviation": 62.22
+  }
+}

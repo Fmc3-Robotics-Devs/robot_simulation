@@ -1,0 +1,86 @@
+#usda 1.0
+(
+    defaultPrim = "WheelBotBoxTransfer"
+    doc = "Warehouse workcell layout inspired by Unitree Isaac Lab pick-place scenes: multiple packing stations, clear robot aisle, and table-height pick/drop zones."
+    metersPerUnit = 1
+    upAxis = "Z"
+)
+
+over "WheelBotBoxTransfer"
+{
+    def Xform "Workcell"
+    {
+        custom string layout:reference = "unitreerobotics/unitree_sim_isaaclab"
+        custom string layout:style = "multi_station_warehouse"
+
+        # The near table is rotated so its long edge spans the robot's two-arm
+        # workspace.  Its 0.994 m tabletop matches the official asset bounds.
+        def Xform "PickTable" (
+            prepend references = @../assets/props/packing_table.usda@
+        )
+        {
+            double3 xformOp:translate = (1.25, 0, 0)
+            double3 xformOp:rotateXYZ = (0, 0, 90)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+            custom string scenario:role = "fixed_base_pick_station"
+        }
+
+        # The delivery table creates a real whole-body transport destination,
+        # replacing the former marker placed directly on the warehouse floor.
+        def Xform "DeliveryTable" (
+            prepend references = @../assets/props/packing_table.usda@
+        )
+        {
+            double3 xformOp:translate = (3.65, -1.65, 0)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+            custom string scenario:role = "mobile_drop_station"
+        }
+
+        # Context stations use NVIDIA's complete packing-table prop (table,
+        # coloured bins, cartons, and tray).  Their visual layout is inspired
+        # by the Unitree reference; task logic is implemented separately.
+        def Xform "ContextStation_NorthWest" (
+            prepend references = @../../vendor/isaac_assets/Isaac/Props/PackingTable/packing_table.usd@
+        )
+        {
+            double3 xformOp:translate = (-2.2, 2.65, 0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Xform "ContextStation_NorthEast" (
+            prepend references = @../../vendor/isaac_assets/Isaac/Props/PackingTable/packing_table.usd@
+        )
+        {
+            double3 xformOp:translate = (2.3, 3.15, 0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Xform "ContextStation_East" (
+            prepend references = @../../vendor/isaac_assets/Isaac/Props/PackingTable/packing_table.usd@
+        )
+        {
+            double3 xformOp:translate = (5.1, 0.9, 0)
+            double3 xformOp:rotateXYZ = (0, 0, 90)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+    }
+
+    def Xform "Lighting"
+    {
+        def DomeLight "WarehouseFill"
+        {
+            color3f color = (0.78, 0.82, 0.9)
+            float intensity = 1400
+        }
+
+        def DistantLight "TaskKey"
+        {
+            float angle = 0.75
+            color3f color = (1, 0.94, 0.84)
+            float intensity = 1200
+            double3 xformOp:rotateXYZ = (35, -25, 20)
+            uniform token[] xformOpOrder = ["xformOp:rotateXYZ"]
+        }
+    }
+}

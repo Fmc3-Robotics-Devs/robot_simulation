@@ -1,0 +1,58 @@
+#usda 1.0
+(
+    defaultPrim = "WheelBotBoxTransfer"
+    doc = "Project-owned physics overlay for the dynamic blue transport box."
+    metersPerUnit = 1
+    upAxis = "Z"
+)
+
+# Keep physics authoring separate from the visual workcell and AprilTag layers.
+# This lets task-specific mass/contact tuning change without editing NVIDIA's
+# source asset or breaking the box-local AprilTag parent relationship.
+over "WheelBotBoxTransfer"
+{
+    def PhysicsScene "PhysicsScene"
+    {
+        vector3f physics:gravityDirection = (0, 0, -1)
+        float physics:gravityMagnitude = 9.81
+    }
+
+    def Scope "PhysicsMaterials"
+    {
+        def Material "BlueTransportBoxMaterial" (
+            prepend apiSchemas = ["PhysicsMaterialAPI"]
+        )
+        {
+            # A loaded plastic tote should resist sliding on the packing-table
+            # surface without behaving like a glued or bouncy object.
+            float physics:staticFriction = 0.65
+            float physics:dynamicFriction = 0.50
+            float physics:restitution = 0.05
+        }
+    }
+
+    over "BlueTransportBox" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+    )
+    {
+        bool physics:rigidBodyEnabled = 1
+        bool physics:kinematicEnabled = 0
+        float physics:mass = 3.5
+
+        # The NVIDIA child is visual-only.  This single metre-scale project
+        # proxy keeps contact stable and independent of vendor prim internals.
+        # A future phone-in-box task should replace it with an explicit thin-wall
+        # compound collider rather than adding a second overlapping collider.
+        def Cube "PhysicsCollision" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            rel physics:material:binding = </WheelBotBoxTransfer/PhysicsMaterials/BlueTransportBoxMaterial>
+            token visibility = "invisible"
+            double size = 1
+            double3 xformOp:translate = (0, 0, 0.0851469)
+            double3 xformOp:scale = (0.6051333, 0.4051332, 0.1702938)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+    }
+}

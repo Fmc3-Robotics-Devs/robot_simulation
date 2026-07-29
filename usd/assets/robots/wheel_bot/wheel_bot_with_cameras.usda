@@ -1,0 +1,16 @@
+#usda 1.0
+(
+    defaultPrim = "WheelBot"
+    doc = "Complete Wheel Bot asset: imported articulation plus four nominally oriented RTX RGB cameras."
+    metersPerUnit = 1
+    subLayers = [
+        @camera_sensors.usda@
+    ]
+    upAxis = "Z"
+)
+
+def Xform "WheelBot" (
+    prepend references = @wheel_bot.usd@
+)
+{
+}

@@ -1,0 +1,88 @@
+#usda 1.0
+(
+    doc = "Camera overlay for the Wheel Bot asset. Sublayer after wheel_bot.usd under the asset-local /WheelBot prim."
+)
+
+over "WheelBot"
+{
+    over "head_d435_Link"
+    {
+        def Xform "head_d435_optical_frame"
+        {
+            double3 xformOp:translate = (0, 0, 0)
+            float3 xformOp:rotateXYZ = (180, 0, -90)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+            def Camera "camera"
+            {
+                float2 clippingRange = (0.05, 100)
+                float focalLength = 3
+                float horizontalAperture = 4.8
+                float verticalAperture = 2.7
+                custom string ros:frame_id = "head_d435_optical_frame"
+                custom string ros:image_topic = "/franzi/camera/head_d435/color/image_raw"
+                custom string ros:camera_info_topic = "/franzi/camera/head_d435/color/camera_info"
+                custom int[] render:resolution = [1280, 720]
+            }
+        }
+    }
+    over "body_d435_Link"
+    {
+        def Xform "chest_d435_optical_frame"
+        {
+            double3 xformOp:translate = (0, 0, 0)
+            float3 xformOp:rotateXYZ = (180, 0, -90)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+            def Camera "camera"
+            {
+                float2 clippingRange = (0.05, 100)
+                float focalLength = 3
+                float horizontalAperture = 4.8
+                float verticalAperture = 2.7
+                custom string ros:frame_id = "chest_d435_optical_frame"
+                custom string ros:image_topic = "/franzi/camera/chest_d435/color/image_raw"
+                custom string ros:camera_info_topic = "/franzi/camera/chest_d435/color/camera_info"
+                custom int[] render:resolution = [1280, 720]
+            }
+        }
+    }
+    over "left_wrist_d405_Link"
+    {
+        def Xform "left_wrist_d405_optical_frame"
+        {
+            double3 xformOp:translate = (0, 0, 0)
+            float3 xformOp:rotateXYZ = (-90, 0, 90)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+            def Camera "camera"
+            {
+                float2 clippingRange = (0.05, 100)
+                float focalLength = 2.8
+                float horizontalAperture = 4.8
+                float verticalAperture = 2.7
+                custom string ros:frame_id = "left_wrist_d405_optical_frame"
+                custom string ros:image_topic = "/franzi/camera/left_wrist_d405/color/image_raw"
+                custom string ros:camera_info_topic = "/franzi/camera/left_wrist_d405/color/camera_info"
+                custom int[] render:resolution = [1280, 720]
+            }
+        }
+    }
+    over "right_wrist_d405_Link"
+    {
+        def Xform "right_wrist_d405_optical_frame"
+        {
+            double3 xformOp:translate = (0, 0, 0)
+            float3 xformOp:rotateXYZ = (-90, 0, 90)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+            def Camera "camera"
+            {
+                float2 clippingRange = (0.05, 100)
+                float focalLength = 2.8
+                float horizontalAperture = 4.8
+                float verticalAperture = 2.7
+                custom string ros:frame_id = "right_wrist_d405_optical_frame"
+                custom string ros:image_topic = "/franzi/camera/right_wrist_d405/color/image_raw"
+                custom string ros:camera_info_topic = "/franzi/camera/right_wrist_d405/color/camera_info"
+                custom int[] render:resolution = [1280, 720]
+            }
+        }
+    }
+}

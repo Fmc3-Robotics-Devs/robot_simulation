@@ -1,0 +1,1185 @@
+#usda 1.0
+(
+    endTimeCode = 1000000
+    metersPerUnit = 1
+    startTimeCode = 0
+    timeCodesPerSecond = 60
+    upAxis = "Z"
+)
+
+def "Render" (
+    hide_in_stage_window = true
+    no_delete = true
+)
+{
+    def "OmniverseKit"
+    {
+        def "HydraTextures" (
+            hide_in_stage_window = true
+            no_delete = true
+        )
+        {
+            def RenderProduct "omni_kit_widget_viewport_ViewportTexture_0" (
+                prepend apiSchemas = ["OmniRtxSettingsCommonAdvancedAPI_1", "OmniRtxSettingsRtAdvancedAPI_1", "OmniRtxSettingsPtAdvancedAPI_1", "OmniRtxPostColorGradingAPI_1", "OmniRtxPostChromaticAberrationAPI_1", "OmniRtxPostBloomPhysicalAPI_1", "OmniRtxPostMatteObjectAPI_1", "OmniRtxPostCompositingAPI_1", "OmniRtxPostDofAPI_1", "OmniRtxPostMotionBlurAPI_1", "OmniRtxPostTvNoiseAPI_1", "OmniRtxPostTonemapIrayReinhardAPI_1", "OmniRtxPostDebugSettingsAPI_1", "OmniRtxDebugSettingsAPI_1"]
+                hide_in_stage_window = true
+                no_delete = true
+            )
+            {
+                rel camera = </OmniverseKit_Persp>
+                token omni:rtx:background:source:texture:textureMode = "repeatMirrored"
+                token omni:rtx:background:source:type = "domeLight"
+                bool omni:rtx:dlss:frameGeneration = 0
+                bool omni:rtx:material:db:nonVisualMaterialCSV:enabled = 0
+                bool omni:rtx:material:db:syncLoads = 1
+                token omni:rtx:post:dlss:execMode = "performance"
+                bool omni:rtx:post:registeredCompositing:invertColorCorrection = 1
+                bool omni:rtx:post:registeredCompositing:invertToneMap = 1
+                int omni:rtx:pt:clampSpp = 64
+                bool omni:rtx:pt:lightcache:cached:dontResolveConflicts = 1
+                int omni:rtx:pt:maxSamplesPerLaunch = 2073600
+                int omni:rtx:pt:maxVolumeBounces = 4
+                int omni:rtx:pt:mgpu:maxPixelsPerRegionExponent = 12
+                int omni:rtx:pt:samplesPerIteration = 64
+                int omni:rtx:pt:samplesPerPixel = 64
+                color3f omni:rtx:rt:ambientLight:color = (0.1, 0.1, 0.1)
+                bool omni:rtx:rt:demoire = 0
+                bool omni:rtx:rt:ecoMode:enabled = 0
+                bool omni:rtx:rt:lightcache:spatialCache:dontResolveConflicts = 1
+                bool omni:rtx:scene:hydra:materialSyncLoads = 1
+                bool omni:rtx:scene:hydra:mdlMaterialWarmup = 1
+                uint omni:rtx:viewTile:limit = 4294967295
+                rel orderedVars = </Render/Vars/LdrColor>
+                custom bool overrideClipRange = 0
+                uniform int2 resolution = (1280, 720)
+            }
+
+            def RenderProduct "Replicator" (
+                prepend apiSchemas = ["OmniRtxSettingsCommonAdvancedAPI_1", "OmniRtxSettingsRtAdvancedAPI_1", "OmniRtxSettingsPtAdvancedAPI_1", "OmniRtxPostColorGradingAPI_1", "OmniRtxPostChromaticAberrationAPI_1", "OmniRtxPostBloomPhysicalAPI_1", "OmniRtxPostMatteObjectAPI_1", "OmniRtxPostCompositingAPI_1", "OmniRtxPostDofAPI_1", "OmniRtxPostMotionBlurAPI_1", "OmniRtxPostTvNoiseAPI_1", "OmniRtxPostTonemapIrayReinhardAPI_1", "OmniRtxPostDebugSettingsAPI_1", "OmniRtxDebugSettingsAPI_1"]
+                hide_in_stage_window = true
+                no_delete = true
+            )
+            {
+                rel camera = </World/WheelBot/head_d435_Link/head_d435_optical_frame/camera>
+                token omni:rtx:background:source:texture:textureMode = "repeatMirrored"
+                token omni:rtx:background:source:type = "domeLight"
+                bool omni:rtx:dlss:frameGeneration = 0
+                bool omni:rtx:material:db:nonVisualMaterialCSV:enabled = 0
+                bool omni:rtx:material:db:syncLoads = 1
+                token omni:rtx:post:dlss:execMode = "performance"
+                bool omni:rtx:post:registeredCompositing:invertColorCorrection = 1
+                bool omni:rtx:post:registeredCompositing:invertToneMap = 1
+                int omni:rtx:pt:clampSpp = 64
+                bool omni:rtx:pt:lightcache:cached:dontResolveConflicts = 1
+                int omni:rtx:pt:maxSamplesPerLaunch = 2073600
+                int omni:rtx:pt:maxVolumeBounces = 4
+                int omni:rtx:pt:mgpu:maxPixelsPerRegionExponent = 12
+                int omni:rtx:pt:samplesPerIteration = 64
+                int omni:rtx:pt:samplesPerPixel = 64
+                color3f omni:rtx:rt:ambientLight:color = (0.1, 0.1, 0.1)
+                bool omni:rtx:rt:demoire = 0
+                bool omni:rtx:rt:ecoMode:enabled = 0
+                bool omni:rtx:rt:lightcache:spatialCache:dontResolveConflicts = 1
+                bool omni:rtx:scene:hydra:materialSyncLoads = 1
+                bool omni:rtx:scene:hydra:mdlMaterialWarmup = 1
+                uint omni:rtx:viewTile:limit = 4294967295
+                rel orderedVars = </Render/Vars/LdrColor>
+                custom bool overrideClipRange = 0
+                uniform int2 resolution = (1280, 720)
+            }
+
+            def RenderProduct "Replicator_01" (
+                prepend apiSchemas = ["OmniRtxSettingsCommonAdvancedAPI_1", "OmniRtxSettingsRtAdvancedAPI_1", "OmniRtxSettingsPtAdvancedAPI_1", "OmniRtxPostColorGradingAPI_1", "OmniRtxPostChromaticAberrationAPI_1", "OmniRtxPostBloomPhysicalAPI_1", "OmniRtxPostMatteObjectAPI_1", "OmniRtxPostCompositingAPI_1", "OmniRtxPostDofAPI_1", "OmniRtxPostMotionBlurAPI_1", "OmniRtxPostTvNoiseAPI_1", "OmniRtxPostTonemapIrayReinhardAPI_1", "OmniRtxPostDebugSettingsAPI_1", "OmniRtxDebugSettingsAPI_1"]
+                hide_in_stage_window = true
+                no_delete = true
+            )
+            {
+                rel camera = </World/WheelBot/body_d435_Link/chest_d435_optical_frame/camera>
+                token omni:rtx:background:source:texture:textureMode = "repeatMirrored"
+                token omni:rtx:background:source:type = "domeLight"
+                bool omni:rtx:dlss:frameGeneration = 0
+                bool omni:rtx:material:db:nonVisualMaterialCSV:enabled = 0
+                bool omni:rtx:material:db:syncLoads = 1
+                token omni:rtx:post:dlss:execMode = "performance"
+                bool omni:rtx:post:registeredCompositing:invertColorCorrection = 1
+                bool omni:rtx:post:registeredCompositing:invertToneMap = 1
+                int omni:rtx:pt:clampSpp = 64
+                bool omni:rtx:pt:lightcache:cached:dontResolveConflicts = 1
+                int omni:rtx:pt:maxSamplesPerLaunch = 2073600
+                int omni:rtx:pt:maxVolumeBounces = 4
+                int omni:rtx:pt:mgpu:maxPixelsPerRegionExponent = 12
+                int omni:rtx:pt:samplesPerIteration = 64
+                int omni:rtx:pt:samplesPerPixel = 64
+                color3f omni:rtx:rt:ambientLight:color = (0.1, 0.1, 0.1)
+                bool omni:rtx:rt:demoire = 0
+                bool omni:rtx:rt:ecoMode:enabled = 0
+                bool omni:rtx:rt:lightcache:spatialCache:dontResolveConflicts = 1
+                bool omni:rtx:scene:hydra:materialSyncLoads = 1
+                bool omni:rtx:scene:hydra:mdlMaterialWarmup = 1
+                uint omni:rtx:viewTile:limit = 4294967295
+                rel orderedVars = </Render/Vars/LdrColor>
+                custom bool overrideClipRange = 0
+                uniform int2 resolution = (1280, 720)
+            }
+
+            def RenderProduct "Replicator_02" (
+                prepend apiSchemas = ["OmniRtxSettingsCommonAdvancedAPI_1", "OmniRtxSettingsRtAdvancedAPI_1", "OmniRtxSettingsPtAdvancedAPI_1", "OmniRtxPostColorGradingAPI_1", "OmniRtxPostChromaticAberrationAPI_1", "OmniRtxPostBloomPhysicalAPI_1", "OmniRtxPostMatteObjectAPI_1", "OmniRtxPostCompositingAPI_1", "OmniRtxPostDofAPI_1", "OmniRtxPostMotionBlurAPI_1", "OmniRtxPostTvNoiseAPI_1", "OmniRtxPostTonemapIrayReinhardAPI_1", "OmniRtxPostDebugSettingsAPI_1", "OmniRtxDebugSettingsAPI_1"]
+                hide_in_stage_window = true
+                no_delete = true
+            )
+            {
+                rel camera = </World/WheelBot/left_wrist_d405_Link/left_wrist_d405_optical_frame/camera>
+                token omni:rtx:background:source:texture:textureMode = "repeatMirrored"
+                token omni:rtx:background:source:type = "domeLight"
+                bool omni:rtx:dlss:frameGeneration = 0
+                bool omni:rtx:material:db:nonVisualMaterialCSV:enabled = 0
+                bool omni:rtx:material:db:syncLoads = 1
+                token omni:rtx:post:dlss:execMode = "performance"
+                bool omni:rtx:post:registeredCompositing:invertColorCorrection = 1
+                bool omni:rtx:post:registeredCompositing:invertToneMap = 1
+                int omni:rtx:pt:clampSpp = 64
+                bool omni:rtx:pt:lightcache:cached:dontResolveConflicts = 1
+                int omni:rtx:pt:maxSamplesPerLaunch = 2073600
+                int omni:rtx:pt:maxVolumeBounces = 4
+                int omni:rtx:pt:mgpu:maxPixelsPerRegionExponent = 12
+                int omni:rtx:pt:samplesPerIteration = 64
+                int omni:rtx:pt:samplesPerPixel = 64
+                color3f omni:rtx:rt:ambientLight:color = (0.1, 0.1, 0.1)
+                bool omni:rtx:rt:demoire = 0
+                bool omni:rtx:rt:ecoMode:enabled = 0
+                bool omni:rtx:rt:lightcache:spatialCache:dontResolveConflicts = 1
+                bool omni:rtx:scene:hydra:materialSyncLoads = 1
+                bool omni:rtx:scene:hydra:mdlMaterialWarmup = 1
+                uint omni:rtx:viewTile:limit = 4294967295
+                rel orderedVars = </Render/Vars/LdrColor>
+                custom bool overrideClipRange = 0
+                uniform int2 resolution = (1280, 720)
+            }
+
+            def RenderProduct "Replicator_03" (
+                prepend apiSchemas = ["OmniRtxSettingsCommonAdvancedAPI_1", "OmniRtxSettingsRtAdvancedAPI_1", "OmniRtxSettingsPtAdvancedAPI_1", "OmniRtxPostColorGradingAPI_1", "OmniRtxPostChromaticAberrationAPI_1", "OmniRtxPostBloomPhysicalAPI_1", "OmniRtxPostMatteObjectAPI_1", "OmniRtxPostCompositingAPI_1", "OmniRtxPostDofAPI_1", "OmniRtxPostMotionBlurAPI_1", "OmniRtxPostTvNoiseAPI_1", "OmniRtxPostTonemapIrayReinhardAPI_1", "OmniRtxPostDebugSettingsAPI_1", "OmniRtxDebugSettingsAPI_1"]
+                hide_in_stage_window = true
+                no_delete = true
+            )
+            {
+                rel camera = </World/WheelBot/right_wrist_d405_Link/right_wrist_d405_optical_frame/camera>
+                token omni:rtx:background:source:texture:textureMode = "repeatMirrored"
+                token omni:rtx:background:source:type = "domeLight"
+                bool omni:rtx:dlss:frameGeneration = 0
+                bool omni:rtx:material:db:nonVisualMaterialCSV:enabled = 0
+                bool omni:rtx:material:db:syncLoads = 1
+                token omni:rtx:post:dlss:execMode = "performance"
+                bool omni:rtx:post:registeredCompositing:invertColorCorrection = 1
+                bool omni:rtx:post:registeredCompositing:invertToneMap = 1
+                int omni:rtx:pt:clampSpp = 64
+                bool omni:rtx:pt:lightcache:cached:dontResolveConflicts = 1
+                int omni:rtx:pt:maxSamplesPerLaunch = 2073600
+                int omni:rtx:pt:maxVolumeBounces = 4
+                int omni:rtx:pt:mgpu:maxPixelsPerRegionExponent = 12
+                int omni:rtx:pt:samplesPerIteration = 64
+                int omni:rtx:pt:samplesPerPixel = 64
+                color3f omni:rtx:rt:ambientLight:color = (0.1, 0.1, 0.1)
+                bool omni:rtx:rt:demoire = 0
+                bool omni:rtx:rt:ecoMode:enabled = 0
+                bool omni:rtx:rt:lightcache:spatialCache:dontResolveConflicts = 1
+                bool omni:rtx:scene:hydra:materialSyncLoads = 1
+                bool omni:rtx:scene:hydra:mdlMaterialWarmup = 1
+                uint omni:rtx:viewTile:limit = 4294967295
+                rel orderedVars = </Render/Vars/LdrColor>
+                custom bool overrideClipRange = 0
+                uniform int2 resolution = (1280, 720)
+            }
+
+            def RenderProduct "Replicator_04" (
+                prepend apiSchemas = ["OmniRtxSettingsCommonAdvancedAPI_1", "OmniRtxSettingsRtAdvancedAPI_1", "OmniRtxSettingsPtAdvancedAPI_1", "OmniRtxPostColorGradingAPI_1", "OmniRtxPostChromaticAberrationAPI_1", "OmniRtxPostBloomPhysicalAPI_1", "OmniRtxPostMatteObjectAPI_1", "OmniRtxPostCompositingAPI_1", "OmniRtxPostDofAPI_1", "OmniRtxPostMotionBlurAPI_1", "OmniRtxPostTvNoiseAPI_1", "OmniRtxPostTonemapIrayReinhardAPI_1", "OmniRtxPostDebugSettingsAPI_1", "OmniRtxDebugSettingsAPI_1"]
+                hide_in_stage_window = true
+                no_delete = true
+            )
+            {
+                rel camera = </World/WheelBot/body_d435_Link/chest_d435_optical_frame/camera>
+                bool omni:rtx:material:db:syncLoads = 1
+                bool omni:rtx:rt:ecoMode:enabled = 0
+                bool omni:rtx:scene:hydra:materialSyncLoads = 1
+                rel orderedVars = </Render/Vars/LdrColor>
+                custom bool overrideClipRange = 0
+                uniform int2 resolution = (1280, 720)
+            }
+
+            def RenderProduct "Replicator_05" (
+                prepend apiSchemas = ["OmniRtxSettingsCommonAdvancedAPI_1", "OmniRtxSettingsRtAdvancedAPI_1", "OmniRtxSettingsPtAdvancedAPI_1", "OmniRtxPostColorGradingAPI_1", "OmniRtxPostChromaticAberrationAPI_1", "OmniRtxPostBloomPhysicalAPI_1", "OmniRtxPostMatteObjectAPI_1", "OmniRtxPostCompositingAPI_1", "OmniRtxPostDofAPI_1", "OmniRtxPostMotionBlurAPI_1", "OmniRtxPostTvNoiseAPI_1", "OmniRtxPostTonemapIrayReinhardAPI_1", "OmniRtxPostDebugSettingsAPI_1", "OmniRtxDebugSettingsAPI_1"]
+                hide_in_stage_window = true
+                no_delete = true
+            )
+            {
+                rel camera = </World/WheelBot/head_d435_Link/head_d435_optical_frame/camera>
+                bool omni:rtx:material:db:syncLoads = 1
+                bool omni:rtx:rt:ecoMode:enabled = 0
+                bool omni:rtx:scene:hydra:materialSyncLoads = 1
+                rel orderedVars = </Render/Vars/LdrColor>
+                custom bool overrideClipRange = 0
+                uniform int2 resolution = (1280, 720)
+            }
+
+            def RenderProduct "Replicator_06" (
+                prepend apiSchemas = ["OmniRtxSettingsCommonAdvancedAPI_1", "OmniRtxSettingsRtAdvancedAPI_1", "OmniRtxSettingsPtAdvancedAPI_1", "OmniRtxPostColorGradingAPI_1", "OmniRtxPostChromaticAberrationAPI_1", "OmniRtxPostBloomPhysicalAPI_1", "OmniRtxPostMatteObjectAPI_1", "OmniRtxPostCompositingAPI_1", "OmniRtxPostDofAPI_1", "OmniRtxPostMotionBlurAPI_1", "OmniRtxPostTvNoiseAPI_1", "OmniRtxPostTonemapIrayReinhardAPI_1", "OmniRtxPostDebugSettingsAPI_1", "OmniRtxDebugSettingsAPI_1"]
+                hide_in_stage_window = true
+                no_delete = true
+            )
+            {
+                rel camera = </World/WheelBot/left_wrist_d405_Link/left_wrist_d405_optical_frame/camera>
+                bool omni:rtx:material:db:syncLoads = 1
+                bool omni:rtx:rt:ecoMode:enabled = 0
+                bool omni:rtx:scene:hydra:materialSyncLoads = 1
+                rel orderedVars = </Render/Vars/LdrColor>
+                custom bool overrideClipRange = 0
+                uniform int2 resolution = (1280, 720)
+            }
+
+            def RenderProduct "Replicator_07" (
+                prepend apiSchemas = ["OmniRtxSettingsCommonAdvancedAPI_1", "OmniRtxSettingsRtAdvancedAPI_1", "OmniRtxSettingsPtAdvancedAPI_1", "OmniRtxPostColorGradingAPI_1", "OmniRtxPostChromaticAberrationAPI_1", "OmniRtxPostBloomPhysicalAPI_1", "OmniRtxPostMatteObjectAPI_1", "OmniRtxPostCompositingAPI_1", "OmniRtxPostDofAPI_1", "OmniRtxPostMotionBlurAPI_1", "OmniRtxPostTvNoiseAPI_1", "OmniRtxPostTonemapIrayReinhardAPI_1", "OmniRtxPostDebugSettingsAPI_1", "OmniRtxDebugSettingsAPI_1"]
+                hide_in_stage_window = true
+                no_delete = true
+            )
+            {
+                rel camera = </World/WheelBot/right_wrist_d405_Link/right_wrist_d405_optical_frame/camera>
+                bool omni:rtx:material:db:syncLoads = 1
+                bool omni:rtx:rt:ecoMode:enabled = 0
+                bool omni:rtx:scene:hydra:materialSyncLoads = 1
+                rel orderedVars = </Render/Vars/LdrColor>
+                custom bool overrideClipRange = 0
+                uniform int2 resolution = (1280, 720)
+            }
+        }
+    }
+
+    def RenderSettings "OmniverseGlobalRenderSettings" (
+        prepend apiSchemas = ["OmniRtxSettingsGlobalRtAdvancedAPI_1", "OmniRtxSettingsGlobalPtAdvancedAPI_1"]
+        no_delete = true
+    )
+    {
+        rel products = [
+            </Render/OmniverseKit/HydraTextures/omni_kit_widget_viewport_ViewportTexture_0>,
+            </Render/OmniverseKit/HydraTextures/Replicator>,
+            </Render/OmniverseKit/HydraTextures/Replicator_01>,
+            </Render/OmniverseKit/HydraTextures/Replicator_02>,
+            </Render/OmniverseKit/HydraTextures/Replicator_03>,
+            </Render/OmniverseKit/HydraTextures/Replicator_04>,
+            </Render/OmniverseKit/HydraTextures/Replicator_05>,
+            </Render/OmniverseKit/HydraTextures/Replicator_06>,
+            </Render/OmniverseKit/HydraTextures/Replicator_07>,
+        ]
+    }
+
+    def "Vars"
+    {
+        def RenderVar "LdrColor" (
+            hide_in_stage_window = true
+            no_delete = true
+        )
+        {
+            uniform string sourceName = "LdrColor"
+        }
+    }
+}
+
+def "World"
+{
+    def Xform "WheelBot" (
+        prepend references = @../../../../usd/assets/robots/wheel_bot/wheel_bot_with_cameras.usda@
+    )
+    {
+        over "base_link"
+        {
+            vector3f physics:angularVelocity = (0, 0, 0)
+            vector3f physics:velocity = (0, 0, 0)
+            quatd xformOp:orient = (1, 0, 0, 0)
+            double3 xformOp:translate = (1.4901161193847656e-8, -1.862645149230957e-9, -1.862645149230957e-8)
+        }
+
+        over "MID360_Link"
+        {
+            vector3f physics:angularVelocity = (0, 0, 0)
+            vector3f physics:velocity = (0, 0, 0)
+            quatd xformOp:orient = (0.9999999999999996, -2.165359767552166e-8, 2.0476771714895482e-8, -4.413097352348164e-11)
+            double3 xformOp:translate = (0.07649995386600494, 0.1953999251127243, 0.24622990190982819)
+        }
+
+        over "calf_Link"
+        {
+            vector3f physics:angularVelocity = (-6.48535e-13, -0.000002441259, 6.03063e-14)
+            vector3f physics:velocity = (-1.2213604e-8, 3.8697344e-15, 7.925337e-9)
+            quatd xformOp:orient = (0.966390042293566, 6.514521396659959e-8, 0.2570803107121109, -9.41145096046209e-9)
+            double3 xformOp:translate = (7.450580596923828e-9, 1.862645149230957e-9, 0.24785001575946808)
+        }
+
+        over "thigh_Link"
+        {
+            vector3f physics:angularVelocity = (-0.000016153062, -50.544697, 0.0000013326439)
+            vector3f physics:velocity = (0.15867825, -4.938152e-8, 0.053400766)
+            quatd xformOp:orient = (0.13942713759838535, 3.0535736600719645e-7, 0.9902323329911157, -5.5879350241499864e-9)
+            double3 xformOp:translate = (0.14906392991542816, -3.585591912269592e-8, 0.5081958770751953)
+        }
+
+        over "waist_Link"
+        {
+            vector3f physics:angularVelocity = (-0.000019938214, -60.281883, 0.0000011897008)
+            vector3f physics:velocity = (0.28654945, -8.931329e-8, 0.084299505)
+            quatd xformOp:orient = (0.015937462835169208, 3.185887206452444e-7, 0.9998729905734408, 1.1175870985602768e-8)
+            double3 xformOp:translate = (0.2457096427679062, -7.078051567077637e-8, 0.17180375754833221)
+        }
+
+        over "torso_Link"
+        {
+            vector3f physics:angularVelocity = (-0.0037186542, -60.281883, 0.11621472)
+            vector3f physics:velocity = (0.6491443, -0.00002256935, 0.08396522)
+            quatd xformOp:orient = (0.015937486141298716, 0.000026158795595811402, 0.9998729898597307, 4.1969181520846623e-7)
+            double3 xformOp:translate = (0.24828162789344788, -6.845948519185185e-8, 0.09114474058151245)
+        }
+
+        over "body_d435_Link"
+        {
+            vector3f physics:angularVelocity = (-0.0037186542, -60.281883, 0.11621472)
+            vector3f physics:velocity = (0.6375858, -0.00019426306, -0.005475494)
+            quatd xformOp:orient = (0.8997595069865372, -0.000008876435301323342, -0.43638610066339717, -0.000025619286589702355)
+            double3 xformOp:translate = (0.15408611297607422, 0.01750524900853634, -0.14704835414886475)
+        }
+
+        over "head_yaw_Link"
+        {
+            vector3f physics:angularVelocity = (-0.0038733718, -60.281883, 0.12078358)
+            vector3f physics:velocity = (0.9123883, -0.0000010607974, 0.10334175)
+            quatd xformOp:orient = (0.01593746102819102, 0.000050124252946202425, 0.9998729893455948, 7.990748697585807e-7)
+            double3 xformOp:translate = (0.2629741430282593, -6.472691893577576e-8, -0.3696209788322449)
+        }
+
+        over "head_pitch_Link"
+        {
+            vector3f physics:angularVelocity = (-0.00320253, -53.42858, 0.12080923)
+            vector3f physics:velocity = (1.0386586, -0.000042173964, 0.088546276)
+            quatd xformOp:orient = (0.014903169460044089, 0.000050112950541663654, 0.9998889403468805, 8.544883974284004e-7)
+            double3 xformOp:translate = (0.2649820148944855, -6.373738870024681e-8, -0.43258893489837646)
+        }
+
+        over "head_d435_Link"
+        {
+            vector3f physics:angularVelocity = (-0.00320253, -53.42858, 0.12080923)
+            vector3f physics:velocity = (1.0311074, -0.000108431945, 0.059042923)
+            quatd xformOp:orient = (0.8105218591030727, -0.000032996759133531305, -0.5857083853351972, -0.00004664063498185853)
+            double3 xformOp:translate = (0.1773291677236557, 0.017509212717413902, -0.5866797566413879)
+        }
+
+        over "left_shoulder_pitch_Link"
+        {
+            vector3f physics:angularVelocity = (-0.0031539896, -48.428234, 0.11624106)
+            vector3f physics:velocity = (0.77477145, -0.0000028240243, 0.09838899)
+            quatd xformOp:orient = (0.025224603931641998, 0.000026187202252160063, 0.9996818087124975, 1.7953788821270278e-7)
+            double3 xformOp:translate = (0.2602100372314453, 0.1659998893737793, -0.282664954662323)
+        }
+
+        over "left_shoulder_roll_Link"
+        {
+            vector3f physics:angularVelocity = (-0.21724255, -48.42822, 0.10452052)
+            vector3f physics:velocity = (0.724413, 0.00020770363, 0.09146838)
+            quatd xformOp:orient = (0.02522431632216203, 0.0001298943525179886, 0.9996733593788687, -0.004109932080244914)
+            double3 xformOp:translate = (0.26021382212638855, 0.23849989473819733, -0.28266483545303345)
+        }
+
+        over "left_shoulder_yaw_Link"
+        {
+            vector3f physics:angularVelocity = (-0.18885131, -48.433144, -0.48673216)
+            vector3f physics:velocity = (0.6022522, 0.00079990056, 0.08697698)
+            quatd xformOp:orient = (0.02522436463203106, 0.00014113663805229124, 0.999673357809435, -0.004109646623425916)
+            double3 xformOp:translate = (0.2542629539966583, 0.23947028815746307, -0.16481895744800568)
+        }
+
+        over "left_elbow_pitch_Link"
+        {
+            vector3f physics:angularVelocity = (-0.1981743, -63.29203, -0.36381572)
+            vector3f physics:velocity = (0.48447937, 0.0012286622, 0.09254323)
+            quatd xformOp:orient = (0.02149264408576196, 0.00015651388740718953, 0.9997605498585393, -0.0041090996771656375)
+            double3 xformOp:translate = (0.22997207939624786, 0.24066400527954102, -0.020865775644779205)
+        }
+
+        over "left_wrist_yaw_Link"
+        {
+            vector3f physics:angularVelocity = (-0.1620985, -63.298664, -1.1628423)
+            vector3f physics:velocity = (0.3508788, 0.0016934915, 0.084698245)
+            quatd xformOp:orient = (0.021492989440624596, 0.0002429948276578214, 0.9997605328570364, -0.004107225320561028)
+            double3 xformOp:translate = (0.2415330857038498, 0.24169941246509552, 0.105943962931633)
+        }
+
+        over "left_wrist_pitch_Link"
+        {
+            vector3f physics:angularVelocity = (-0.14719814, -48.939682, -1.2814693)
+            vector3f physics:velocity = (0.239861, 0.002041451, 0.080648564)
+            quatd xformOp:orient = (0.02094275623532251, 0.00024527205562832036, 0.9997722103612823, -0.004107090479021789)
+            double3 xformOp:translate = (0.23440805077552795, 0.24306276440620422, 0.2715851664543152)
+        }
+
+        over "left_wrist_roll_Link"
+        {
+            vector3f physics:angularVelocity = (2.925064, -48.941853, -1.159413)
+            vector3f physics:velocity = (0.13108476, -0.0035568448, 0.0684524)
+            quatd xformOp:orient = (0.020942432079217668, 0.0002723266419804501, 0.999766069835241, -0.005398701973957585)
+            double3 xformOp:translate = (0.20413461327552795, 0.24307242035865784, 0.2703162729740143)
+        }
+
+        over "left_wrist_d405_Link"
+        {
+            vector3f physics:angularVelocity = (2.925064, -48.941853, -1.159413)
+            vector3f physics:velocity = (0.12718655, -0.004022992, 0.07828706)
+            quatd xformOp:orient = (0.0002724022971348429, -0.020942383752859384, 0.005402319918397511, 0.9997660512836171)
+            double3 xformOp:translate = (0.22863449156284332, 0.3024844527244568, 0.40500614047050476)
+        }
+
+        over "leftfinger1_Link"
+        {
+            vector3f physics:angularVelocity = (2.925064, -48.941853, -1.159413)
+            vector3f physics:velocity = (0.023365274, -0.011160906, 0.11627242)
+            quatd xformOp:orient = (0.020942426453438464, 0.0002723268714750984, 0.9997660699514672, -0.005398702262181737)
+            double3 xformOp:translate = (0.2724321782588959, 0.24052296578884125, 0.502460777759552)
+        }
+
+        over "leftfinger2_Link"
+        {
+            vector3f physics:angularVelocity = (2.925064, -48.941853, -1.159413)
+            vector3f physics:velocity = (0.023511026, -0.008854867, 0.027632724)
+            quatd xformOp:orient = (0.02094243207921012, 0.00027232707853788263, 0.9997660698351223, -0.005398701973956946)
+            double3 xformOp:translate = (0.17834025621414185, 0.24055294692516327, 0.49851691722869873)
+        }
+
+        over "right_shoulder_pitch_Link"
+        {
+            vector3f physics:angularVelocity = (-0.0031553323, -48.479687, 0.11624091)
+            vector3f physics:velocity = (0.7756995, -0.0000028697514, 0.09839291)
+            quatd xformOp:orient = (0.025395708778969944, 0.000026190473036992916, 0.999677476634161, 1.717680886606116e-7)
+            double3 xformOp:translate = (0.2601926624774933, -0.16599997878074646, -0.28266552090644836)
+        }
+
+        over "right_shoulder_roll_Link"
+        {
+            vector3f physics:angularVelocity = (0.791827, -48.47973, 0.15642026)
+            vector3f physics:velocity = (0.7253778, -0.00084742694, 0.0913799)
+            quatd xformOp:orient = (0.025395472658203966, -0.00011578900616989181, 0.9996618522688766, 0.0055890678767839255)
+            double3 xformOp:translate = (0.26018887758255005, -0.2384999692440033, -0.2826656401157379)
+        }
+
+        over "right_shoulder_yaw_Link"
+        {
+            vector3f physics:angularVelocity = (0.7425503, -48.49131, 1.1756924)
+            vector3f physics:velocity = (0.6030566, -0.0029534295, 0.08687783)
+            quatd xformOp:orient = (0.02539547929294716, -0.000125907672818503, 0.9996618523394756, 0.005588806307967715)
+            double3 xformOp:translate = (0.25419771671295166, -0.2398192435503006, -0.1648252010345459)
+        }
+
+        over "right_elbow_pitch_Link"
+        {
+            vector3f physics:angularVelocity = (0.7542666, -63.39223, 1.0070465)
+            vector3f physics:velocity = (0.4851754, -0.0045425496, 0.09234794)
+            quatd xformOp:orient = (0.02180307419413972, -0.0001460444320436117, 0.9997466557089836, 0.0055882936046754445)
+            double3 xformOp:translate = (0.2298576533794403, -0.2414398193359375, -0.02088446542620659)
+        }
+
+        over "right_wrist_yaw_Link"
+        {
+            vector3f physics:angularVelocity = (0.68355215, -63.40979, 2.5514092)
+            vector3f physics:velocity = (0.3513481, -0.0062638484, 0.08441936)
+            quatd xformOp:orient = (0.021803796866762922, -0.0002683013177315092, 0.9997466294440657, 0.005585639786651105)
+            double3 xformOp:translate = (0.24133999645709991, -0.2428499460220337, 0.10592879354953766)
+        }
+
+        over "right_wrist_pitch_Link"
+        {
+            vector3f physics:angularVelocity = (0.66061074, -48.013855, 2.7254488)
+            vector3f physics:velocity = (0.23993926, -0.0075902822, 0.08025852)
+            quatd xformOp:orient = (0.021269674196325226, -0.0002713307943301266, 0.9997581355433008, 0.005585494979412954)
+            double3 xformOp:translate = (0.2341121882200241, -0.24470360577106476, 0.27156078815460205)
+        }
+
+        over "right_wrist_roll_Link"
+        {
+            vector3f physics:angularVelocity = (-5.7640305, -48.0205, 2.46754)
+            vector3f physics:velocity = (0.13298465, 0.0034723924, 0.07058077)
+            quatd xformOp:orient = (0.021269080738749193, -0.0003138417739938862, 0.9997449742887746, 0.0075838045997402865)
+            double3 xformOp:translate = (0.20383962988853455, -0.24471285939216614, 0.27027207612991333)
+        }
+
+        over "right_wrist_d405_Link"
+        {
+            vector3f physics:angularVelocity = (-5.7640305, -48.0205, 2.46754)
+            vector3f physics:velocity = (0.13099545, 0.004244395, 0.08094112)
+            quatd xformOp:orient = (-0.00031376200791646055, -0.02126914306795979, -0.007580194511691368, 0.9997450003664544)
+            double3 xformOp:translate = (0.228261798620224, -0.30470848083496094, 0.4047171175479889)
+        }
+
+        over "rightfinger1_Link"
+        {
+            vector3f physics:angularVelocity = (-5.7640305, -48.0205, 2.46754)
+            vector3f physics:velocity = (0.027566442, 0.018482849, 0.11523029)
+            quatd xformOp:orient = (0.021269084377016793, -0.00031384108586591624, 0.9997449741973614, 0.007583806475207929)
+            double3 xformOp:translate = (0.2719844877719879, -0.24316583573818207, 0.5024700164794922)
+        }
+
+        over "rightfinger2_Link"
+        {
+            vector3f physics:angularVelocity = (-5.7640305, -48.0205, 2.46754)
+            vector3f physics:velocity = (0.024936121, 0.013598009, 0.02811689)
+            quatd xformOp:orient = (0.02126908809685356, -0.00031383852470212435, 0.9997449741119678, 0.007583807405882694)
+            double3 xformOp:translate = (0.1778818815946579, -0.2431945502758026, 0.49846404790878296)
+        }
+
+        over "left_front_steering_Link"
+        {
+            vector3f physics:angularVelocity = (7.6638793e-13, 1.12016414e-13, 0.0000022723978)
+            vector3f physics:velocity = (-9.80297e-10, 3.6805826e-16, 3.3061438e-16)
+            quatd xformOp:orient = (0.999999999999999, 6.183779010481279e-33, 4.468020199166264e-8, 1.4425651837982164e-9)
+            double3 xformOp:translate = (0.1300000101327896, 0.21300002932548523, 0.11140002310276031)
+        }
+
+        over "left_front_wheel_Link"
+        {
+            vector3f physics:angularVelocity = (-7.512176e-10, -0.004967512, 0.0000022727436)
+            vector3f physics:velocity = (-4.7795393e-11, 1.8762096e-13, 4.075039e-10)
+            quatd xformOp:orient = (0.9999999999995451, 1.930698277871324e-8, 9.535943193747057e-7, 1.364129730008001e-9)
+            double3 xformOp:translate = (0.1300000101327896, 0.21300004422664642, -0.004599951207637787)
+        }
+
+        over "lidar_2d_Link"
+        {
+            vector3f physics:angularVelocity = (0, 0, 0)
+            vector3f physics:velocity = (0, 0, 0)
+            quatd xformOp:orient = (0.9999999999999972, 1.5352352064473177e-8, 6.675947034096673e-8, -2.9301766653357674e-8)
+            double3 xformOp:translate = (-0.21999995410442352, -0.18999996781349182, 0.24739991128444672)
+        }
+
+        over "rear_steering_Link"
+        {
+            vector3f physics:angularVelocity = (1.0059261e-12, 1.11581934e-13, 0.0000025346794)
+            vector3f physics:velocity = (-1.0665023e-9, 8.4708853e-16, 4.232575e-16)
+            quatd xformOp:orient = (0.9999999999999997, 1.1159268383638103e-24, 2.4326434807564052e-8, 8.623130773009892e-9)
+            double3 xformOp:translate = (-0.25499993562698364, 3.725290298461914e-9, 0.10539998859167099)
+        }
+
+        over "rear_wheel_Link"
+        {
+            vector3f physics:angularVelocity = (-5.002973e-10, -0.005104885, 0.000002535809)
+            vector3f physics:velocity = (5.403673e-11, 2.1583205e-13, 4.3035422e-10)
+            quatd xformOp:orient = (0.9999999999995723, -3.356603891803068e-8, 9.239811272929293e-7, 2.1166379210410615e-8)
+            double3 xformOp:translate = (-0.25499993562698364, -9.19681042432785e-9, -0.004600010812282562)
+        }
+
+        over "right_front_steering_Link"
+        {
+            vector3f physics:angularVelocity = (-7.5122374e-13, 1.2884396e-13, -0.000002222771)
+            vector3f physics:velocity = (-9.589265e-10, -3.5901383e-16, 3.240858e-16)
+            quatd xformOp:orient = (0.9999999999999989, 1.4763674053998583e-24, 4.707630501466308e-8, -2.0658062389099093e-9)
+            double3 xformOp:translate = (0.12999996542930603, -0.21299996972084045, 0.11140000075101852)
+        }
+
+        over "right_front_wheel_Link"
+        {
+            vector3f physics:angularVelocity = (-7.444424e-13, 6.7423436e-8, -0.000002222771)
+            vector3f physics:velocity = (4.7377262e-11, -8.075819e-16, -1.5934903e-17)
+            quatd xformOp:orient = (0.9999999999999954, -2.396349409467286e-8, 8.942248039546637e-8, -2.309111847926114e-8)
+            double3 xformOp:translate = (0.12999995052814484, -0.21299996972084045, -0.004599965177476406)
+        }
+
+        over "joints"
+        {
+            over "calf_pitch_joint"
+            {
+                float state:angular:physics:position = 29.793795
+                float state:angular:physics:velocity = -0.0000027364113
+            }
+
+            over "left_front_steering_joint"
+            {
+                float state:angular:physics:position = -4.2422236e-8
+                float state:angular:physics:velocity = 0.0000022723978
+            }
+
+            over "rear_steering_joint"
+            {
+                float state:angular:physics:position = -4.8751417e-8
+                float state:angular:physics:velocity = 0.0000025346792
+            }
+
+            over "right_front_steering_joint"
+            {
+                float state:angular:physics:position = 4.282516e-8
+                float state:angular:physics:velocity = -0.0000022227716
+            }
+
+            over "thigh_pitch_joint"
+            {
+                float state:angular:physics:position = 134.17683
+                float state:angular:physics:velocity = -50.544697
+            }
+
+            over "waist_pitch_joint"
+            {
+                float state:angular:physics:position = 14.203039
+                float state:angular:physics:velocity = -9.737199
+            }
+
+            over "waist_yaw_joint"
+            {
+                float state:angular:physics:position = 0.002980886
+                float state:angular:physics:velocity = -0.11625632
+            }
+
+            over "head_yaw_joint"
+            {
+                float state:angular:physics:position = 0.0027535676
+                float state:angular:physics:velocity = -0.004570683
+            }
+
+            over "left_shoulder_pitch_joint"
+            {
+                float state:angular:physics:position = -1.0644604
+                float state:angular:physics:velocity = 11.853656
+            }
+
+            over "right_shoulder_pitch_joint"
+            {
+                float state:angular:physics:position = -1.0840751
+                float state:angular:physics:velocity = 11.802204
+            }
+
+            over "head_pitch_joint"
+            {
+                float state:angular:physics:position = 0.118550114
+                float state:angular:physics:velocity = 6.853306
+            }
+
+            over "left_shoulder_roll_joint"
+            {
+                float state:angular:physics:position = 0.4711342
+                float state:angular:physics:velocity = 0.21436639
+            }
+
+            over "right_shoulder_roll_joint"
+            {
+                float state:angular:physics:position = -0.6406499
+                float state:angular:physics:velocity = -0.7959023
+            }
+
+            over "left_shoulder_yaw_joint"
+            {
+                float state:angular:physics:position = 0.0012885059
+                float state:angular:physics:velocity = 0.5919023
+            }
+
+            over "right_shoulder_yaw_joint"
+            {
+                float state:angular:physics:position = -0.0011701965
+                float state:angular:physics:velocity = -1.0204388
+            }
+
+            over "left_elbow_pitch_joint"
+            {
+                float state:angular:physics:position = 0.42774096
+                float state:angular:physics:velocity = -14.859406
+            }
+
+            over "right_elbow_pitch_joint"
+            {
+                float state:angular:physics:position = 0.41179144
+                float state:angular:physics:velocity = -14.901892
+            }
+
+            over "left_wrist_yaw_joint"
+            {
+                float state:angular:physics:position = 0.009916046
+                float state:angular:physics:velocity = 0.79974735
+            }
+
+            over "right_wrist_yaw_joint"
+            {
+                float state:angular:physics:position = -0.014020646
+                float state:angular:physics:velocity = -1.5458472
+            }
+
+            over "left_wrist_pitch_joint"
+            {
+                float state:angular:physics:position = 0.06306719
+                float state:angular:physics:velocity = 14.359476
+            }
+
+            over "right_wrist_pitch_joint"
+            {
+                float state:angular:physics:position = 0.06123126
+                float state:angular:physics:velocity = 15.396935
+            }
+
+            over "left_wrist_roll_joint"
+            {
+                float state:angular:physics:position = 0.14805235
+                float state:angular:physics:velocity = -3.07443
+            }
+
+            over "right_wrist_roll_joint"
+            {
+                float state:angular:physics:position = -0.2290453
+                float state:angular:physics:velocity = 6.429299
+            }
+
+            over "leftfinger1_joint"
+            {
+                float state:linear:physics:position = 0
+                float state:linear:physics:velocity = -0.00061466184
+            }
+
+            over "leftfinger2_joint"
+            {
+                float state:linear:physics:position = -0.0008356515
+                float state:linear:physics:velocity = 0.0026529501
+            }
+
+            over "rightfinger1_joint"
+            {
+                float state:linear:physics:position = 0
+                float state:linear:physics:velocity = -0.0005727059
+            }
+
+            over "rightfinger2_joint"
+            {
+                float state:linear:physics:position = -0.0008216943
+                float state:linear:physics:velocity = 0.0054474548
+            }
+        }
+    }
+
+    def Cube "Floor"
+    {
+        color3f[] primvars:displayColor = [(0.18, 0.21, 0.24)]
+        double size = 1
+        float3 xformOp:scale = (5, 5, 0.05)
+        double3 xformOp:translate = (0, 0, -0.05)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+    }
+
+    def Cube "BlueBox"
+    {
+        color3f[] primvars:displayColor = [(0.02, 0.24, 0.72)]
+        double size = 1
+        float3 xformOp:scale = (0.32, 0.46, 0.24)
+        double3 xformOp:translate = (1.15, 0, 0.38)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+    }
+
+    def Cube "LeftMarker"
+    {
+        color3f[] primvars:displayColor = [(0.05, 0.75, 0.24)]
+        double size = 1
+        float3 xformOp:scale = (0.08, 0.08, 0.6)
+        double3 xformOp:translate = (1.45, 0.7, 0.6)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+    }
+
+    def Cube "RightMarker"
+    {
+        color3f[] primvars:displayColor = [(0.85, 0.08, 0.06)]
+        double size = 1
+        float3 xformOp:scale = (0.08, 0.08, 0.6)
+        double3 xformOp:translate = (1.45, -0.7, 0.6)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+    }
+
+    def Cube "FrontWall"
+    {
+        color3f[] primvars:displayColor = [(0.55, 0.58, 0.62)]
+        double size = 1
+        float3 xformOp:scale = (0.05, 1.8, 1.2)
+        double3 xformOp:translate = (2.2, 0, 1.15)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+    }
+
+    def DistantLight "KeyLight"
+    {
+        float inputs:angle = 1
+        float inputs:intensity = 3000
+    }
+
+    def SphereLight "FillLight"
+    {
+        float inputs:intensity = 45000
+        float inputs:radius = 0.4
+        double3 xformOp:translate = (0.5, -1.5, 3.2)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def OmniGraph "ROS2CameraPublishers"
+    {
+        token evaluationMode = "Automatic"
+        token evaluator:type = "execution"
+        token fabricCacheBacking = "StageWithoutHistory"
+        int2 fileFormatVersion = (1, 9)
+        token pipelineStage = "pipelineStageSimulation"
+
+        def OmniGraphNode "OnPlaybackTick"
+        {
+            token node:type = "omni.graph.action.OnPlaybackTick"
+            int node:typeVersion = 2
+            custom double outputs:deltaSeconds
+            custom double outputs:frame
+            custom uint outputs:tick (
+                customData = {
+                    bool isExecution = 1
+                }
+            )
+            custom double outputs:time
+        }
+
+        def OmniGraphNode "Render_head_d435"
+        {
+            custom rel inputs:cameraPrim = </World/WheelBot/head_d435_Link/head_d435_optical_frame/camera> (
+                customData = {
+                    dictionary omni = {
+                        dictionary graph = {
+                            string relType = "target"
+                        }
+                    }
+                }
+            )
+            custom bool inputs:enabled
+            custom uint inputs:execIn (
+                customData = {
+                    bool isExecution = 1
+                }
+            )
+            prepend uint inputs:execIn.connect = </World/ROS2CameraPublishers/OnPlaybackTick.outputs:tick>
+            custom uint inputs:height = 720
+            custom uint inputs:width = 1280
+            token node:type = "isaacsim.core.nodes.IsaacCreateRenderProduct"
+            int node:typeVersion = 2
+            custom uint outputs:execOut (
+                customData = {
+                    bool isExecution = 1
+                }
+            )
+            custom token outputs:renderProductPath
+        }
+
+        def OmniGraphNode "Image_head_d435"
+        {
+            custom uint64 inputs:context
+            custom bool inputs:enabled
+            custom bool inputs:enableSemanticLabels
+            custom uint inputs:execIn (
+                customData = {
+                    bool isExecution = 1
+                }
+            )
+            prepend uint inputs:execIn.connect = </World/ROS2CameraPublishers/Render_head_d435.outputs:execOut>
+            custom string inputs:frameId = "head_d435_optical_frame"
+            custom uint inputs:frameSkipCount
+            custom string inputs:nodeNamespace
+            custom string inputs:qosProfile
+            custom uint64 inputs:queueSize = 5
+            custom token inputs:renderProductPath
+            prepend token inputs:renderProductPath.connect = </World/ROS2CameraPublishers/Render_head_d435.outputs:renderProductPath>
+            custom bool inputs:resetSimulationTimeOnStop
+            custom string inputs:semanticLabelsTopicName
+            custom float2 inputs:stereoOffset
+            custom string inputs:topicName = "/franzi/camera/head_d435/color/image_raw"
+            custom token inputs:type = "rgb" (
+                allowedTokens = ["rgb", "depth", "depth_pcl", "instance_segmentation", "semantic_segmentation", "bbox_2d_tight", "bbox_2d_loose", "bbox_3d"]
+            )
+            custom bool inputs:useSystemTime
+            custom token inputs:viewport
+            token node:type = "isaacsim.ros2.bridge.ROS2CameraHelper"
+            int node:typeVersion = 2
+        }
+
+        def OmniGraphNode "Info_head_d435"
+        {
+            custom uint64 inputs:context
+            custom bool inputs:enabled
+            custom uint inputs:execIn (
+                customData = {
+                    bool isExecution = 1
+                }
+            )
+            prepend uint inputs:execIn.connect = </World/ROS2CameraPublishers/Render_head_d435.outputs:execOut>
+            custom string inputs:frameId = "head_d435_optical_frame"
+            custom string inputs:frameIdRight
+            custom uint inputs:frameSkipCount
+            custom string inputs:nodeNamespace
+            custom string inputs:qosProfile
+            custom uint64 inputs:queueSize = 5
+            custom token inputs:renderProductPath
+            prepend token inputs:renderProductPath.connect = </World/ROS2CameraPublishers/Render_head_d435.outputs:renderProductPath>
+            custom token inputs:renderProductPathRight
+            custom bool inputs:resetSimulationTimeOnStop
+            custom string inputs:topicName = "/franzi/camera/head_d435/color/camera_info"
+            custom string inputs:topicNameRight
+            custom bool inputs:useSystemTime
+            token node:type = "isaacsim.ros2.bridge.ROS2CameraInfoHelper"
+            int node:typeVersion = 1
+        }
+
+        def OmniGraphNode "Render_chest_d435"
+        {
+            custom rel inputs:cameraPrim = </World/WheelBot/body_d435_Link/chest_d435_optical_frame/camera> (
+                customData = {
+                    dictionary omni = {
+                        dictionary graph = {
+                            string relType = "target"
+                        }
+                    }
+                }
+            )
+            custom bool inputs:enabled
+            custom uint inputs:execIn (
+                customData = {
+                    bool isExecution = 1
+                }
+            )
+            prepend uint inputs:execIn.connect = </World/ROS2CameraPublishers/OnPlaybackTick.outputs:tick>
+            custom uint inputs:height = 720
+            custom uint inputs:width = 1280
+            token node:type = "isaacsim.core.nodes.IsaacCreateRenderProduct"
+            int node:typeVersion = 2
+            custom uint outputs:execOut (
+                customData = {
+                    bool isExecution = 1
+                }
+            )
+            custom token outputs:renderProductPath
+        }
+
+        def OmniGraphNode "Image_chest_d435"
+        {
+            custom uint64 inputs:context
+            custom bool inputs:enabled
+            custom bool inputs:enableSemanticLabels
+            custom uint inputs:execIn (
+                customData = {
+                    bool isExecution = 1
+                }
+            )
+            prepend uint inputs:execIn.connect = </World/ROS2CameraPublishers/Render_chest_d435.outputs:execOut>
+            custom string inputs:frameId = "chest_d435_optical_frame"
+            custom uint inputs:frameSkipCount
+            custom string inputs:nodeNamespace
+            custom string inputs:qosProfile
+            custom uint64 inputs:queueSize = 5
+            custom token inputs:renderProductPath
+            prepend token inputs:renderProductPath.connect = </World/ROS2CameraPublishers/Render_chest_d435.outputs:renderProductPath>
+            custom bool inputs:resetSimulationTimeOnStop
+            custom string inputs:semanticLabelsTopicName
+            custom float2 inputs:stereoOffset
+            custom string inputs:topicName = "/franzi/camera/chest_d435/color/image_raw"
+            custom token inputs:type = "rgb" (
+                allowedTokens = ["rgb", "depth", "depth_pcl", "instance_segmentation", "semantic_segmentation", "bbox_2d_tight", "bbox_2d_loose", "bbox_3d"]
+            )
+            custom bool inputs:useSystemTime
+            custom token inputs:viewport
+            token node:type = "isaacsim.ros2.bridge.ROS2CameraHelper"
+            int node:typeVersion = 2
+        }
+
+        def OmniGraphNode "Info_chest_d435"
+        {
+            custom uint64 inputs:context
+            custom bool inputs:enabled
+            custom uint inputs:execIn (
+                customData = {
+                    bool isExecution = 1
+                }
+            )
+            prepend uint inputs:execIn.connect = </World/ROS2CameraPublishers/Render_chest_d435.outputs:execOut>
+            custom string inputs:frameId = "chest_d435_optical_frame"
+            custom string inputs:frameIdRight
+            custom uint inputs:frameSkipCount
+            custom string inputs:nodeNamespace
+            custom string inputs:qosProfile
+            custom uint64 inputs:queueSize = 5
+            custom token inputs:renderProductPath
+            prepend token inputs:renderProductPath.connect = </World/ROS2CameraPublishers/Render_chest_d435.outputs:renderProductPath>
+            custom token inputs:renderProductPathRight
+            custom bool inputs:resetSimulationTimeOnStop
+            custom string inputs:topicName = "/franzi/camera/chest_d435/color/camera_info"
+            custom string inputs:topicNameRight
+            custom bool inputs:useSystemTime
+            token node:type = "isaacsim.ros2.bridge.ROS2CameraInfoHelper"
+            int node:typeVersion = 1
+        }
+
+        def OmniGraphNode "Render_left_wrist_d405"
+        {
+            custom rel inputs:cameraPrim = </World/WheelBot/left_wrist_d405_Link/left_wrist_d405_optical_frame/camera> (
+                customData = {
+                    dictionary omni = {
+                        dictionary graph = {
+                            string relType = "target"
+                        }
+                    }
+                }
+            )
+            custom bool inputs:enabled
+            custom uint inputs:execIn (
+                customData = {
+                    bool isExecution = 1
+                }
+            )
+            prepend uint inputs:execIn.connect = </World/ROS2CameraPublishers/OnPlaybackTick.outputs:tick>
+            custom uint inputs:height = 720
+            custom uint inputs:width = 1280
+            token node:type = "isaacsim.core.nodes.IsaacCreateRenderProduct"
+            int node:typeVersion = 2
+            custom uint outputs:execOut (
+                customData = {
+                    bool isExecution = 1
+                }
+            )
+            custom token outputs:renderProductPath
+        }
+
+        def OmniGraphNode "Image_left_wrist_d405"
+        {
+            custom uint64 inputs:context
+            custom bool inputs:enabled
+            custom bool inputs:enableSemanticLabels
+            custom uint inputs:execIn (
+                customData = {
+                    bool isExecution = 1
+                }
+            )
+            prepend uint inputs:execIn.connect = </World/ROS2CameraPublishers/Render_left_wrist_d405.outputs:execOut>
+            custom string inputs:frameId = "left_wrist_d405_optical_frame"
+            custom uint inputs:frameSkipCount
+            custom string inputs:nodeNamespace
+            custom string inputs:qosProfile
+            custom uint64 inputs:queueSize = 5
+            custom token inputs:renderProductPath
+            prepend token inputs:renderProductPath.connect = </World/ROS2CameraPublishers/Render_left_wrist_d405.outputs:renderProductPath>
+            custom bool inputs:resetSimulationTimeOnStop
+            custom string inputs:semanticLabelsTopicName
+            custom float2 inputs:stereoOffset
+            custom string inputs:topicName = "/franzi/camera/left_wrist_d405/color/image_raw"
+            custom token inputs:type = "rgb" (
+                allowedTokens = ["rgb", "depth", "depth_pcl", "instance_segmentation", "semantic_segmentation", "bbox_2d_tight", "bbox_2d_loose", "bbox_3d"]
+            )
+            custom bool inputs:useSystemTime
+            custom token inputs:viewport
+            token node:type = "isaacsim.ros2.bridge.ROS2CameraHelper"
+            int node:typeVersion = 2
+        }
+
+        def OmniGraphNode "Info_left_wrist_d405"
+        {
+            custom uint64 inputs:context
+            custom bool inputs:enabled
+            custom uint inputs:execIn (
+                customData = {
+                    bool isExecution = 1
+                }
+            )
+            prepend uint inputs:execIn.connect = </World/ROS2CameraPublishers/Render_left_wrist_d405.outputs:execOut>
+            custom string inputs:frameId = "left_wrist_d405_optical_frame"
+            custom string inputs:frameIdRight
+            custom uint inputs:frameSkipCount
+            custom string inputs:nodeNamespace
+            custom string inputs:qosProfile
+            custom uint64 inputs:queueSize = 5
+            custom token inputs:renderProductPath
+            prepend token inputs:renderProductPath.connect = </World/ROS2CameraPublishers/Render_left_wrist_d405.outputs:renderProductPath>
+            custom token inputs:renderProductPathRight
+            custom bool inputs:resetSimulationTimeOnStop
+            custom string inputs:topicName = "/franzi/camera/left_wrist_d405/color/camera_info"
+            custom string inputs:topicNameRight
+            custom bool inputs:useSystemTime
+            token node:type = "isaacsim.ros2.bridge.ROS2CameraInfoHelper"
+            int node:typeVersion = 1
+        }
+
+        def OmniGraphNode "Render_right_wrist_d405"
+        {
+            custom rel inputs:cameraPrim = </World/WheelBot/right_wrist_d405_Link/right_wrist_d405_optical_frame/camera> (
+                customData = {
+                    dictionary omni = {
+                        dictionary graph = {
+                            string relType = "target"
+                        }
+                    }
+                }
+            )
+            custom bool inputs:enabled
+            custom uint inputs:execIn (
+                customData = {
+                    bool isExecution = 1
+                }
+            )
+            prepend uint inputs:execIn.connect = </World/ROS2CameraPublishers/OnPlaybackTick.outputs:tick>
+            custom uint inputs:height = 720
+            custom uint inputs:width = 1280
+            token node:type = "isaacsim.core.nodes.IsaacCreateRenderProduct"
+            int node:typeVersion = 2
+            custom uint outputs:execOut (
+                customData = {
+                    bool isExecution = 1
+                }
+            )
+            custom token outputs:renderProductPath
+        }
+
+        def OmniGraphNode "Image_right_wrist_d405"
+        {
+            custom uint64 inputs:context
+            custom bool inputs:enabled
+            custom bool inputs:enableSemanticLabels
+            custom uint inputs:execIn (
+                customData = {
+                    bool isExecution = 1
+                }
+            )
+            prepend uint inputs:execIn.connect = </World/ROS2CameraPublishers/Render_right_wrist_d405.outputs:execOut>
+            custom string inputs:frameId = "right_wrist_d405_optical_frame"
+            custom uint inputs:frameSkipCount
+            custom string inputs:nodeNamespace
+            custom string inputs:qosProfile
+            custom uint64 inputs:queueSize = 5
+            custom token inputs:renderProductPath
+            prepend token inputs:renderProductPath.connect = </World/ROS2CameraPublishers/Render_right_wrist_d405.outputs:renderProductPath>
+            custom bool inputs:resetSimulationTimeOnStop
+            custom string inputs:semanticLabelsTopicName
+            custom float2 inputs:stereoOffset
+            custom string inputs:topicName = "/franzi/camera/right_wrist_d405/color/image_raw"
+            custom token inputs:type = "rgb" (
+                allowedTokens = ["rgb", "depth", "depth_pcl", "instance_segmentation", "semantic_segmentation", "bbox_2d_tight", "bbox_2d_loose", "bbox_3d"]
+            )
+            custom bool inputs:useSystemTime
+            custom token inputs:viewport
+            token node:type = "isaacsim.ros2.bridge.ROS2CameraHelper"
+            int node:typeVersion = 2
+        }
+
+        def OmniGraphNode "Info_right_wrist_d405"
+        {
+            custom uint64 inputs:context
+            custom bool inputs:enabled
+            custom uint inputs:execIn (
+                customData = {
+                    bool isExecution = 1
+                }
+            )
+            prepend uint inputs:execIn.connect = </World/ROS2CameraPublishers/Render_right_wrist_d405.outputs:execOut>
+            custom string inputs:frameId = "right_wrist_d405_optical_frame"
+            custom string inputs:frameIdRight
+            custom uint inputs:frameSkipCount
+            custom string inputs:nodeNamespace
+            custom string inputs:qosProfile
+            custom uint64 inputs:queueSize = 5
+            custom token inputs:renderProductPath
+            prepend token inputs:renderProductPath.connect = </World/ROS2CameraPublishers/Render_right_wrist_d405.outputs:renderProductPath>
+            custom token inputs:renderProductPathRight
+            custom bool inputs:resetSimulationTimeOnStop
+            custom string inputs:topicName = "/franzi/camera/right_wrist_d405/color/camera_info"
+            custom string inputs:topicNameRight
+            custom bool inputs:useSystemTime
+            token node:type = "isaacsim.ros2.bridge.ROS2CameraInfoHelper"
+            int node:typeVersion = 1
+        }
+    }
+}

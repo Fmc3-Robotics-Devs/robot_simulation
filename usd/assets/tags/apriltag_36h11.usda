@@ -1,0 +1,69 @@
+#usda 1.0
+(
+    defaultPrim = "AprilTag36h11"
+    doc = "Versioned 100 mm AprilTag 36h11 board using Isaac Sim 5.1's official MDL material and mosaic texture."
+    metersPerUnit = 1
+    upAxis = "Z"
+)
+
+def Xform "AprilTag36h11" (
+    kind = "component"
+)
+{
+    custom string apriltag:assetVersion = "1.0.0"
+    custom string apriltag:family = "tag36h11"
+    custom int apriltag:id = 0
+    custom double apriltag:sizeMeters = 0.1
+    custom string apriltag:materialSource = "Isaac/5.1/Isaac/Materials/AprilTag"
+
+    def Material "AprilTagMaterial"
+    {
+        # Match the exact schema produced by Isaac Sim 5.1's
+        # CreateMdlMaterialPrim command.  MDL materials connect through the
+        # outputs:mdl namespace; a generic outputs:surface connection is not
+        # sufficient for RTX to shade the official AprilTag material.
+        token outputs:mdl:displacement.connect = </AprilTag36h11/AprilTagMaterial/Shader.outputs:out>
+        token outputs:mdl:surface.connect = </AprilTag36h11/AprilTagMaterial/Shader.outputs:out>
+        token outputs:mdl:volume.connect = </AprilTag36h11/AprilTagMaterial/Shader.outputs:out>
+
+        def Shader "Shader"
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:mdl:sourceAsset = @../../../vendor/isaac_assets/Isaac/Materials/AprilTag/AprilTag.mdl@
+            uniform token info:mdl:sourceAsset:subIdentifier = "AprilTag"
+            custom asset inputs:tag_mosaic = @../../../vendor/isaac_assets/Isaac/Materials/AprilTag/Textures/tag36h11.png@
+            # Isaac 5.1's 263x274 tag36h11 mosaic contains 24 columns of
+            # 10-pixel tags separated by one-pixel gutters.
+            int inputs:tag_size = 10
+            int inputs:tags_per_row = 24
+            int inputs:spacing = 1
+            int inputs:tag_id = 0
+            token outputs:out (
+                renderType = "material"
+            )
+        }
+    }
+
+    # The board lies in local XY; its visible side faces local +Z.  Scene
+    # placements rotate this normal toward the intended observing camera.
+    def Mesh "Face"
+    {
+        bool doubleSided = 1
+        int[] faceVertexCounts = [4]
+        int[] faceVertexIndices = [0, 1, 2, 3]
+        point3f[] points = [(-0.05, -0.05, 0.001), (0.05, -0.05, 0.001), (0.05, 0.05, 0.001), (-0.05, 0.05, 0.001)]
+        normal3f[] normals = [(0, 0, 1)] (interpolation = "uniform")
+        texCoord2f[] primvars:st = [(0, 0), (1, 0), (1, 1), (0, 1)] (interpolation = "vertex")
+        rel material:binding = </AprilTag36h11/AprilTagMaterial>
+        uniform token subdivisionScheme = "none"
+    }
+
+    # A thin, neutral backing makes the board legible against warehouse walls.
+    def Cube "Backing"
+    {
+        double size = 1
+        double3 xformOp:scale = (0.052, 0.052, 0.001)
+        uniform token[] xformOpOrder = ["xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.92, 0.92, 0.92)]
+    }
+}

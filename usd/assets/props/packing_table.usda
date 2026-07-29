@@ -1,0 +1,26 @@
+#usda 1.0
+(
+    defaultPrim = "PackingTable"
+    doc = "Project-owned metre-scale wrapper around NVIDIA's heavy-duty packing table with collision geometry."
+    metersPerUnit = 1
+    upAxis = "Z"
+)
+
+def Xform "PackingTable" (
+    kind = "component"
+)
+{
+    custom double3 asset:dimensionsMeters = (2.4736465, 0.762, 0.9940514)
+    custom string asset:source = "Isaac/5.1/Isaac/Props/PackingTable"
+    custom string scenario:role = "work_surface"
+
+    # The source mesh is authored in centimetres.  Keep the conversion inside
+    # this project-owned wrapper so every scene composes the table in metres.
+    def Xform "Model" (
+        prepend references = @../../../vendor/isaac_assets/Isaac/Props/PackingTable/props/SM_HeavyDutyPackingTable_C02_01/SM_HeavyDutyPackingTable_C02_01_physics.usd@
+    )
+    {
+        double3 xformOp:scale = (0.01, 0.01, 0.01)
+        uniform token[] xformOpOrder = ["xformOp:scale"]
+    }
+}

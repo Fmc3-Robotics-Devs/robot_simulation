@@ -1,0 +1,35 @@
+#usda 1.0
+(
+    defaultPrim = "WheelBotBoxTransfer"
+    doc = "AprilTag placement overlay that rigidly attaches tag 0 to the blue transport box front face."
+    metersPerUnit = 1
+    upAxis = "Z"
+)
+
+# The placement remains an overlay so the tag family/ID can change without
+# editing the metre-scale box asset.  Parenting below BlueTransportBox makes
+# the tag follow every grasp, transport, reset, and randomised box pose.
+over "WheelBotBoxTransfer"
+{
+    over "BlueTransportBox"
+    {
+        custom string apriltag:layerVersion = "1.0.0"
+        custom string apriltag:family = "tag36h11"
+        custom double apriltag:sizeMeters = 0.1
+        custom string apriltag:asset = "../assets/tags/apriltag_36h11.usda"
+
+        # The NVIDIA A08 box measures 0.605133 x 0.405133 x 0.170294 m.
+        # Local +Z becomes box -X after the Y rotation, so the visible side
+        # faces the WheelBot at the origin.  The 1.5 mm offset avoids z-fight.
+        def Xform "AprilTag_0" (
+            prepend references = @../assets/tags/apriltag_36h11.usda@
+        )
+        {
+            double3 xformOp:translate = (-0.3040666, 0, 0.0851469)
+            double3 xformOp:rotateXYZ = (0, -90, 0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+            custom int apriltag:id = 0
+            custom string scenario:role = "box_pose_landmark"
+        }
+    }
+}

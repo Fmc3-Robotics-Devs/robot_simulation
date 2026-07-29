@@ -1,0 +1,28 @@
+#usda 1.0
+(
+    defaultPrim = "BlueTransportBox"
+    doc = "Project-owned metre-scale blue transport box wrapper using NVIDIA visual geometry."
+    metersPerUnit = 1
+    upAxis = "Z"
+)
+
+def Xform "BlueTransportBox" (
+    kind = "component"
+)
+{
+    custom double3 asset:dimensionsMeters = (0.6051333, 0.4051332, 0.1702938)
+    custom string asset:source = "Isaac/5.1/Isaac/Props/PackingTable/SM_Crate_A08_Blue_01"
+    custom string scenario:role = "pick_object"
+
+    # The referenced NVIDIA crate is authored in centimetres.  Only the model
+    # child is scaled, leaving task children such as AprilTag in metre units.
+    # Use the visual-only source so project physics remains explicit and the
+    # box can never compose two overlapping colliders.
+    def Xform "Model" (
+        prepend references = @../../../vendor/isaac_assets/Isaac/Props/PackingTable/props/SM_Crate_A08_Blue_01/SM_Crate_A08_Blue_01.usd@
+    )
+    {
+        double3 xformOp:scale = (0.01, 0.01, 0.01)
+        uniform token[] xformOpOrder = ["xformOp:scale"]
+    }
+}
