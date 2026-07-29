@@ -344,8 +344,6 @@ class Mirror:
         self._robot.write_root_pose_to_sim(root[:, :7])
         self._robot.write_root_velocity_to_sim(root[:, 7:] * 0.0)
 
-        self._apply_workpiece()
-
     def _apply_workpiece(self):
         """Place the workpiece prop.
 
@@ -714,6 +712,11 @@ def main():
                 # crash surface - at a third.
                 if step_count % 3 == 0:
                     mirror.write_back_to_stage()
+                    # Same beat as the arm's stage write-back: the held part
+                    # must advance exactly when the hand's rendered pose does,
+                    # or it leads the hand by up to two frames while the base
+                    # drives - which reads as flicker on camera.
+                    mirror._apply_workpiece()
                 step_count += 1
                 if step_count % 600 == 0:
                     # Ground truth for cross-checking against the ROS TF tree:
