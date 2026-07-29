@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "inbc-arm-sdk"
+version = "0.1.0"
+description = "Python client SDK for INBC Arm (arm_sdk.* RPC)"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = [
+    "core*",
+]
+
+[tool.setuptools]
+py-modules = []

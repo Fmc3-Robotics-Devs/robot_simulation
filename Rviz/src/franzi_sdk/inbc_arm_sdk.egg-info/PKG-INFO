@@ -1,0 +1,14 @@
+Metadata-Version: 2.4
+Name: inbc-arm-sdk
+Version: 0.1.0
+Summary: Python client SDK for INBC Arm (arm_sdk.* RPC)
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+
+包安装方式
+1:conda create -n sdk_vr python==3.12
+2:conda activate sdk_vr
+3:pip install -e .
+4:pip install numpy pure-python-adb pyyaml scipy

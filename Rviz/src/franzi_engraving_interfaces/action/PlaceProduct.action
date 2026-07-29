@@ -1,0 +1,10 @@
+# Put the finished part down on the outfeed (plan section 9.5).
+string station
+# Empty picks the next free slot.
+string slot
+---
+bool success
+string error_code
+string slot_used
+---
+string phase

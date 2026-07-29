@@ -1,0 +1,45 @@
+# Skill-layer tuning, simulation profile.
+#
+# The cell layout itself (stations, benches, tags, grasp geometry) comes from
+# franzi_pick_place/config/task.yaml - one source for the demo, the skills and
+# the Isaac stage. This file only holds what is specific to running the skills.
+#
+# The hardware profile changes: mock_tags.enabled -> false (apriltag_ros
+# publishes the detections), dock.stable_frames -> 15 (plan section 8.7), and
+# the arrival scatter moves from parameters into reality.
+
+skill_server:
+  ros__parameters:
+    mock_tags.enabled: true
+    # Seconds to let TF settle after a motion before trusting a detection.
+    tag_settle: 0.3
+    # A tag that places the part further than this from the survey is a
+    # calibration fault, not a grasp target (plan section 2.3).
+    max_survey_deviation: 0.10
+    # How long the machine's presence sensor may take to see a loaded part.
+    material_wait: 3.0
+
+    # Precise docking (plan sections 8.6 - 8.9 and the appendix defaults).
+    dock.position_tolerance: 0.008
+    dock.yaw_tolerance_deg: 0.8
+    # Each observation costs a settle period here, so three consecutive frames
+    # stand in for the plan's fifteen camera frames. Raise on hardware.
+    dock.stable_frames: 3
+    dock.max_linear_step: 0.15
+    dock.max_yaw_step_deg: 12.0
+    dock.dead_band: 0.002
+    dock.lost_tolerance: 2
+    dock.retreat_step: 0.08
+    dock.max_retreats: 3
+    dock.max_iterations: 60
+    dock.approach_speed: 0.08
+    dock.observe_timeout: 1.5
+
+    # Outfeed tray (plan section 9.5).
+    tray.rows: 1
+    tray.columns: 2
+    tray.pitch: [0.12, 0.12]
+
+    # Where the robot wakes up. "home" is the taught standby point itself;
+    # any other station means backed off its dock by dock.standby_retreat.
+    initial_station: "home"

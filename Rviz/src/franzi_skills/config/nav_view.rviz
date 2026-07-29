@@ -1,0 +1,104 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+    Tree Height: 300
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz_default_plugins/Grid
+      Enabled: true
+      Name: Grid
+      Cell Size: 1
+      Color: 140; 140; 148
+      Plane Cell Count: 30
+    - Class: rviz_default_plugins/Map
+      Enabled: true
+      Name: Map
+      Topic:
+        Value: /map
+        Durability Policy: Transient Local
+        Reliability Policy: Reliable
+      Color Scheme: map
+      Draw Behind: true
+    - Class: rviz_default_plugins/Map
+      Enabled: true
+      Name: Costmap
+      Topic:
+        Value: /global_costmap/costmap
+        Durability Policy: Transient Local
+        Reliability Policy: Reliable
+      Color Scheme: costmap
+      Alpha: 0.35
+      Draw Behind: false
+    - Class: rviz_default_plugins/LaserScan
+      Enabled: true
+      Name: Scan
+      Topic:
+        Value: /scan
+        Reliability Policy: Best Effort
+      Style: Points
+      Size (Pixels): 3
+      Color Transformer: FlatColor
+      Color: 240; 80; 60
+    - Class: rviz_default_plugins/Path
+      Enabled: true
+      Name: GlobalPlan
+      Topic:
+        Value: /plan
+      Line Style: Billboards
+      Line Width: 0.04
+      Color: 40; 200; 80
+    - Class: rviz_default_plugins/Odometry
+      Enabled: true
+      Name: Trail
+      Topic:
+        Value: /odom
+      Keep: 4000
+      Position Tolerance: 0.05
+      Angle Tolerance: 0.2
+      Shape:
+        Value: Arrow
+        Color: 60; 130; 250
+        Shaft Length: 0.08
+        Shaft Radius: 0.015
+        Head Length: 0.05
+        Head Radius: 0.03
+    - Class: rviz_default_plugins/RobotModel
+      Enabled: true
+      Name: Robot
+      Description Source: Topic
+      Description Topic:
+        Value: /robot_description
+        Durability Policy: Transient Local
+      TF Prefix: ""
+    - Class: rviz_default_plugins/Pose
+      Enabled: true
+      Name: AmclPose
+      Topic:
+        Value: /amcl_pose
+      Shape: Arrow
+      Color: 255; 170; 0
+  Global Options:
+    Background Color: 30; 32; 38
+    Fixed Frame: map
+    Frame Rate: 15
+  Views:
+    Current:
+      Class: rviz_default_plugins/TopDownOrtho
+      Name: Current View
+      Near Clip Distance: 0.01
+      Scale: 75
+      Target Frame: <Fixed Frame>
+      Value: TopDownOrtho (rviz_default_plugins)
+      X: 0.2
+      Y: 0
+      Angle: -1.5707963
+Window Geometry:
+  Displays:
+    collapsed: true
+  Height: 900
+  Width: 1600
+  X: 0
+  Y: 0
+  Hide Left Dock: true
+  Hide Right Dock: true

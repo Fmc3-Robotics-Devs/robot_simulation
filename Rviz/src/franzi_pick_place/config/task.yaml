@@ -1,0 +1,168 @@
+# Machine-tending cell layout and task parameters.
+#
+# All lengths are metres in the `odom` frame. Navigation happens in `map`;
+# manipulation stays in `odom`, which drifts but never jumps on loop closure.
+# The floor sits at z = -0.0873 (wheel contact), so a table top at z = 0.80 is
+# 0.887 m above the ground.
+
+pick_place_task:
+  ros__parameters:
+    frame_id: "odom"
+
+    # --- robot interfaces ------------------------------------------------
+    arm_group: "left_arm"
+    body_group: "body"
+    head_group: "head"
+    park_group: "both_arms"
+    body_posture: "work"
+    head_posture: "home"
+    park_posture: "off_arms"
+    tip_link: "left_wrist_roll_Link"
+    attach_link: "left_wrist_roll_Link"
+    touch_links:
+      - "leftfinger1_Link"
+      - "leftfinger2_Link"
+      - "left_wrist_roll_Link"
+      - "left_wrist_d405_Link"
+
+    # --- gripper ---------------------------------------------------------
+    gripper_controller: "left_gripper_controller"
+    gripper_joints: ["leftfinger1_joint", "leftfinger2_joint"]
+    # The jaws are 95 mm apart at joint zero and close towards each other.
+    gripper_gap_at_zero: 0.095
+    gripper_max_stroke: 0.0475
+    gripper_open_gap: 0.085
+    grasp_squeeze: 0.002
+
+    # --- grasp -----------------------------------------------------------
+    # Grasp centre between the finger pads, expressed in the tip link frame.
+    tcp_offset: [-0.0305, -0.0018, -0.2414]
+    # Grasp above the workpiece centre so the fingers clear the pocket walls.
+    grasp_height_offset: 0.01
+    grasp_yaw: 0.0
+    # Where the part is held while driving, in the base frame. Held up in front
+    # rather than hanging: a dangling arm swings the part down past bench edges.
+    # Keep it inside the reach_map envelope - too close to the shoulder is just
+    # as unreachable as too far, because the elbow has to fold into the torso.
+    carry_tcp: [0.36, 0.24, 0.985]
+    approach_height: 0.12
+    approach_velocity_scaling: 0.15
+    ik_attempts: 25
+    ik_timeout: 0.05
+
+    # --- cell ------------------------------------------------------------
+    ground_z: -0.0873
+
+    # World positions of the part on each bench. They are laid out along y, so
+    # the omnidirectional chassis strafes between them without turning.
+    #
+    # These are SIMULATED TRUTH, not knowledge the robot has. They build the
+    # world and feed the mock detector. Manipulation poses come from the tag.
+    # Spread across the hall: the dock line sits at x = 1.76 and the robot's
+    # home (the odom origin) is 1.8 m back from it, mid-aisle.
+    station:
+      feeder_xy: [2.20, -4.00]
+      machine_xy: [2.20, 0.00]
+      outfeed_xy: [2.20, 4.00]
+
+    # --- AprilTags -------------------------------------------------------
+    # One tag per bench, lying flat on the bench top. `to_part_xy` is the
+    # surveyed offset from the tag to where the part rests - measured once per
+    # bench design, and the thing that turns a detection into a grasp pose.
+    # Negative x puts the tag further from the robot than the part, where the
+    # downward-looking head camera actually points.
+    tag:
+      feeder_id: 0
+      machine_id: 1
+      outfeed_id: 2
+      size: 0.08
+      thickness: 0.002
+      to_part_xy: [-0.16, 0.0]
+      # On the machine the fixture sits under the spindle, so its tag moves
+      # deeper onto the plate, off the vise. Keep the lateral offset small:
+      # at the dock the head camera's half-FOV is ~34 deg, and a tag on the
+      # plate corner falls outside the image entirely.
+      machine_to_part_xy: [-0.30, -0.10]
+
+    tag_timeout: 5.0
+    camera_frame: "head_d435_Link"
+    look_posture: "look_down"
+
+    # Hand-eye calibration result, published as a correction on top of the URDF
+    # nominal extrinsic. Zero means a perfect calibration; dial in an error here
+    # to watch the grasp drift by exactly that much.
+    handeye_correction:
+      xyz: [0.0, 0.0, 0.0]
+      rpy: [0.0, 0.0, 0.0]
+
+    # Stands in for apriltag_ros. FOV is approximated as a symmetric cone.
+    tag_detection:
+      max_range: 3.0
+      min_range: 0.25
+      fov: 1.047
+      position_noise: 0.0
+      rotation_noise: 0.0
+
+    bench:
+      size_xy: [0.70, 1.00]
+      top_z: 0.80
+      thickness: 0.03
+      # How far in from the near edge the part sits, so the chassis can get
+      # close enough without the arm having to reach over the whole bench.
+      part_inset: 0.12
+      leg_size: 0.05
+      leg_inset: 0.03
+
+    # A flat rectangular billet, lying on its largest face like the shop
+    # stock. Every dimension fits inside the 85 mm gripper opening.
+    workpiece:
+      size: [0.07, 0.07, 0.04]
+
+    pocket:
+      # Half-gap between the workpiece and each wall. Tight tolerances belong
+      # in the physics stage; here they only make planning brittle. Walls low
+      # enough that the fingers, gripping a 40 mm part near its top, clear.
+      clearance: 0.012
+      wall_thickness: 0.015
+      wall_height: 0.015
+
+    # --- docking ---------------------------------------------------------
+    dock:
+      # Where a station sits in the base frame once parked. This is the number
+      # that has to stay inside the arm envelope - check it with `reach_map`,
+      # and mind that the chassis reaches to x = +0.24, so too small a value
+      # parks the robot inside the bench.
+      offset: [0.44, 0.16]
+      yaw: 0.0
+      # How far to back off from the machine while it runs.
+      standby_retreat: 0.9
+
+    base:
+      linear_speed: 0.5
+      angular_speed: 0.8
+      wheel_radius: 0.0827
+
+    # --- machining cycle -------------------------------------------------
+    machining:
+      duration: 8.0
+      # Set true to block until `ros2 service call
+      # /machining_station/complete std_srvs/srv/Trigger {}` is issued.
+      wait_for_trigger: false
+
+    repeat: 1
+
+    # Taught by `ros2 run franzi_pick_place teach_docks`. Empty falls back to
+    # config/dock_poses.yaml in the package share.
+    dock_poses_file: ""
+
+    # --- tuning tools ----------------------------------------------------
+    # How far off the nominal dock the sweep probes, and which yaw errors.
+    dock_sweep:
+      span: 0.20
+      step: 0.05
+      yaw_errors: [0.0, 10.0]
+
+    reach_map:
+      x_range: [0.28, 0.60]
+      y_range: [-0.24, 0.42]
+      step: 0.04

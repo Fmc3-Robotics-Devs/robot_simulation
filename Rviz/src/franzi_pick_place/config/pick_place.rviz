@@ -1,0 +1,71 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+    Property Tree Widget:
+      Expanded:
+        - /MotionPlanning1
+  - Class: rviz_common/Help
+    Name: Help
+  - Class: rviz_common/Views
+    Name: Views
+Visualization Manager:
+  Displays:
+    - Class: rviz_default_plugins/Grid
+      Name: Grid
+      Value: true
+    - Class: moveit_rviz_plugin/MotionPlanning
+      Name: MotionPlanning
+      # Only one robot should be on screen: the one actually executing. The
+      # interactive query states park at the last goal and the planned-path
+      # animation races ahead of execution - both read as ghosts.
+      Planned Path:
+        Loop Animation: false
+        Show Robot Visual: false
+        Show Robot Collision: false
+        Show Trail: false
+        State Display Time: 0.05 s
+        Trajectory Topic: display_planned_path
+      Planning Request:
+        Query Start State: false
+        Query Goal State: false
+      Planning Scene Topic: monitored_planning_scene
+      Robot Description: robot_description
+      Scene Geometry:
+        Scene Alpha: 1
+      Scene Robot:
+        Robot Alpha: 1
+        Show Robot Visual: true
+      Value: true
+    - Class: rviz_default_plugins/MarkerArray
+      Name: Machining Station
+      Namespaces:
+        machining_station: true
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /machining_station/markers
+      Value: true
+  Global Options:
+    Fixed Frame: odom
+  Tools:
+    - Class: rviz_default_plugins/Interact
+    - Class: rviz_default_plugins/MoveCamera
+    - Class: rviz_default_plugins/Select
+  Value: true
+  Views:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      Distance: 6.5
+      Focal Point:
+        X: 0.80
+        Y: 0.00
+        Z: 0.70
+      Name: Current View
+      Pitch: 0.55
+      Target Frame: odom
+      Yaw: 2.60
+Window Geometry:
+  Height: 975
+  Width: 1200

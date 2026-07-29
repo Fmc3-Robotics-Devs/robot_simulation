@@ -1,0 +1,9 @@
+# Put the workpiece into the machine's clamp (plan section 9.3).
+# The interlocks are checked by the skill, not assumed by the caller.
+string station
+---
+bool success
+string error_code
+bool material_detected
+---
+string phase

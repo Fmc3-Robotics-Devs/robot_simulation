@@ -1,0 +1,7 @@
+# Fold the arm into a named posture: transport, station-safe, or machine-safe.
+string posture
+---
+bool success
+string error_code
+---
+string phase

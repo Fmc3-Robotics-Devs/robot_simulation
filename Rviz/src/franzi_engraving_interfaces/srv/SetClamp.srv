@@ -1,0 +1,7 @@
+# Ask the machine to open or close its clamp, and wait for the confirming
+# feedback signal. Returns false on timeout: never report success from having
+# sent the request (plan section 12.6).
+bool close
+---
+bool success
+string error_code

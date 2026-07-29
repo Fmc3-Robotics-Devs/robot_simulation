@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>franzi_task_manager</name>
+  <version>0.1.0</version>
+  <description>
+    Runs the engraving cycle from plan section 13. The sequence, its timeouts
+    and its failure routing are a YAML table; this package only executes it.
+  </description>
+  <maintainer email="puheliang122@gmail.com">phl</maintainer>
+  <license>Apache-2.0</license>
+
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>python3-yaml</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>franzi_engraving_interfaces</exec_depend>
+
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

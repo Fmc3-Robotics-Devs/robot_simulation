@@ -1,0 +1,7 @@
+# Ignore generated colcon artifacts in the RViz workspace.
+Rviz/build/
+Rviz/install/
+Rviz/log/
+
+**/__pycache__/
+*.py[cod]

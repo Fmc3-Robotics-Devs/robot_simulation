@@ -1,0 +1,24 @@
+# Docking poses taught by driving the robot to each station.
+# Frame: odom. Re-teach after the map changes; do not hand-edit.
+# Only coarse accuracy is needed - the station tag supplies the rest.
+docks:
+  # The standby point: where the robot starts, waits out machining, and ends.
+  # No tag, no bench - just a taught pose clear of every station.
+  # The wall corner: out of every aisle, facing the cell centre. Start of
+  # every run, and where machining is waited out.
+  home:
+    x: -7.0
+    y: -7.0
+    yaw: 0.67
+  feeder:
+    x: 1.76
+    y: -4.16
+    yaw: 0.0
+  machine:
+    x: 1.76
+    y: -0.16
+    yaw: 0.0
+  outfeed:
+    x: 1.76
+    y: 3.84
+    yaw: 0.0

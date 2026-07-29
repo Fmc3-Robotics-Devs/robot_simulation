@@ -1,0 +1,38 @@
+# Extra parameters merged into the MoveItPy configuration.
+#
+# MoveItCpp reads plan request parameters from `<namespace>.plan_request_params.*`
+# and the namespaces used here are selected by name from motion.py.
+
+planning_pipelines:
+  pipeline_names: ["ompl", "pilz_industrial_motion_planner", "chomp"]
+
+planning_scene_monitor_options:
+  name: "pick_place_scene_monitor"
+  robot_description: "robot_description"
+  joint_state_topic: "/joint_states"
+  attached_collision_object_topic: "/pick_place_moveit/planning_scene_monitor"
+  publish_planning_scene_topic: "/pick_place_moveit/publish_planning_scene"
+  # Follow the scene owned by move_group so that objects applied through
+  # /apply_planning_scene are visible to the planners used here.
+  monitored_planning_scene_topic: "/monitored_planning_scene"
+  wait_for_initial_state_timeout: 30.0
+
+# Free-space transfers between stations.
+ompl_transfer:
+  plan_request_params:
+    planning_attempts: 10
+    planning_pipeline: "ompl"
+    planner_id: "RRTConnect"
+    max_velocity_scaling_factor: 0.4
+    max_acceleration_scaling_factor: 0.4
+    planning_time: 5.0
+
+# Straight-line approach, insertion and retreat segments.
+pilz_lin:
+  plan_request_params:
+    planning_attempts: 1
+    planning_pipeline: "pilz_industrial_motion_planner"
+    planner_id: "LIN"
+    max_velocity_scaling_factor: 0.15
+    max_acceleration_scaling_factor: 0.15
+    planning_time: 2.0
