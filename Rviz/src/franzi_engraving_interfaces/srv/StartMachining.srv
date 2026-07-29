@@ -1,0 +1,5 @@
+# Refused unless every condition in plan section 12.4 holds.
+---
+bool success
+string error_code
+string blocked_by

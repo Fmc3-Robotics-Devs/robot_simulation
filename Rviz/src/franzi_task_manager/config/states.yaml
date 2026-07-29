@@ -1,0 +1,303 @@
+# The engraving cycle, from plan section 13.
+#
+# Conditions are machine signals from /machine/status, negated with a leading
+# "not ". Actions are one of:
+#   skill:   call a skill action server and wait for its result
+#   service: call a machine service and require success
+#   wait:    hold until the success_conditions become true
+#   none:    a bookkeeping state
+#
+# Timeouts are from plan section 12.6 where the plan gives one. Every state has
+# somewhere to go when it fails; the table refuses to load otherwise.
+
+initial: IDLE
+
+states:
+  IDLE:
+    action: {kind: none}
+    next: SYSTEM_CHECK
+
+  SYSTEM_CHECK:
+    # Refuse to start a cycle against a machine that is not answering or is
+    # already unhappy. Cheap here, expensive later.
+    action: {kind: wait}
+    success_conditions: [link_ok, machine_ready, not alarm, not emergency_stop]
+    timeout: 10.0
+    error_code: MACHINE_NOT_READY
+    failure_transition: FAULT
+    next: GO_RAW_STATION
+
+  GO_RAW_STATION:
+    action: {kind: skill, skill: navigate, station: feeder}
+    timeout: 90.0
+    max_retry: 2
+    error_code: NAV_FAILED
+    failure_transition: RECOVERY
+    next: DOCK_RAW_STATION
+
+  DOCK_RAW_STATION:
+    action: {kind: skill, skill: precise_dock, station: feeder}
+    timeout: 45.0
+    max_retry: 2
+    error_code: DOCK_FAILED
+    failure_transition: RECOVERY
+    next: DETECT_MATERIAL
+
+  DETECT_MATERIAL:
+    action: {kind: skill, skill: detect_material, station: feeder}
+    timeout: 15.0
+    max_retry: 2
+    error_code: MATERIAL_NOT_FOUND
+    failure_transition: RECOVERY
+    next: PICK_MATERIAL
+
+  PICK_MATERIAL:
+    action: {kind: skill, skill: pick_material, station: feeder}
+    timeout: 60.0
+    max_retry: 1
+    error_code: PICK_FAILED
+    failure_transition: RECOVERY
+    next: VERIFY_PICK
+
+  VERIFY_PICK:
+    # The gripper reports whether it actually holds something. Carrying on
+    # without checking is how an empty gripper gets loaded into a clamp.
+    action: {kind: none}
+    timeout: 5.0
+    error_code: PICK_NOT_VERIFIED
+    failure_transition: RECOVERY
+    next: MOVE_TRANSPORT_POSE
+
+  MOVE_TRANSPORT_POSE:
+    action: {kind: skill, skill: move_safe, posture: transport}
+    timeout: 30.0
+    error_code: ARM_FAILED
+    failure_transition: RECOVERY
+    next: GO_MACHINE
+
+  GO_MACHINE:
+    action: {kind: skill, skill: navigate, station: machine}
+    timeout: 90.0
+    max_retry: 2
+    error_code: NAV_FAILED
+    failure_transition: RECOVERY
+    next: DOCK_MACHINE
+
+  DOCK_MACHINE:
+    action: {kind: skill, skill: precise_dock, station: machine}
+    timeout: 45.0
+    max_retry: 2
+    error_code: DOCK_FAILED
+    failure_transition: RECOVERY
+    next: CHECK_MACHINE_READY
+
+  CHECK_MACHINE_READY:
+    action: {kind: wait}
+    success_conditions: [link_ok, machine_ready, spindle_stopped, not alarm, not emergency_stop]
+    timeout: 15.0
+    error_code: MACHINE_NOT_READY
+    failure_transition: FAULT
+    next: OPEN_DOOR
+
+  OPEN_DOOR:
+    action: {kind: service, service: set_door, close: false}
+    timeout: 12.0
+    max_retry: 1
+    error_code: DOOR_TIMEOUT
+    failure_transition: RECOVERY
+    next: OPEN_CLAMP
+
+  OPEN_CLAMP:
+    action: {kind: service, service: set_clamp, close: false}
+    timeout: 8.0
+    max_retry: 1
+    error_code: CLAMP_TIMEOUT
+    failure_transition: RECOVERY
+    next: LOAD_MACHINE
+
+  LOAD_MACHINE:
+    # The skill re-checks the entry interlock itself; stating it here as well
+    # means the cycle stops before the arm moves rather than during. The arm
+    # is about to cross the machine envelope, so robot_clear drops first.
+    action: {kind: skill, skill: load_machine, station: machine}
+    entry_conditions: [spindle_stopped, door_open, clamp_open, not alarm, not emergency_stop]
+    signals_on_entry: {robot_clear: false}
+    success_conditions: [material_detected]
+    timeout: 40.0
+    max_retry: 1
+    error_code: LOAD_FAILED
+    failure_transition: RECOVERY
+    next: CLOSE_CLAMP
+
+  CLOSE_CLAMP:
+    action: {kind: service, service: set_clamp, close: true}
+    success_conditions: [clamp_closed, material_detected]
+    timeout: 8.0
+    max_retry: 1
+    error_code: CLAMP_TIMEOUT
+    failure_transition: RECOVERY
+    next: EXIT_MACHINE
+
+  EXIT_MACHINE:
+    # Nothing may start until the machine has been told the arm is out, so
+    # robot_clear rises only when this state has actually succeeded.
+    action: {kind: skill, skill: move_safe, posture: machine_safe}
+    signals_on_success: {robot_clear: true}
+    timeout: 30.0
+    error_code: ARM_FAILED
+    failure_transition: RECOVERY
+    next: CLOSE_DOOR
+
+  CLOSE_DOOR:
+    action: {kind: service, service: set_door, close: true}
+    timeout: 12.0
+    max_retry: 1
+    error_code: DOOR_TIMEOUT
+    failure_transition: RECOVERY
+    next: START_MACHINING
+
+  START_MACHINING:
+    action: {kind: service, service: start_machining}
+    timeout: 10.0
+    error_code: START_REFUSED
+    failure_transition: FAULT
+    next: GO_HOME_WAIT
+
+  GO_HOME_WAIT:
+    # The machine does not need company: wait out the cycle at the standby
+    # point, off the machine's apron, like the real cell will.
+    action: {kind: skill, skill: navigate, station: home}
+    timeout: 90.0
+    max_retry: 2
+    error_code: NAV_FAILED
+    failure_transition: RECOVERY
+    next: WAIT_MACHINING
+
+  WAIT_MACHINING:
+    # Cycle time plus margin, per plan section 12.6. Finishing is not enough:
+    # the spindle has to be confirmed stopped before anything opens.
+    action: {kind: wait}
+    success_conditions: [finished, spindle_stopped]
+    timeout: 120.0
+    error_code: MACHINING_TIMEOUT
+    failure_transition: FAULT
+    next: GO_MACHINE_UNLOAD
+
+  GO_MACHINE_UNLOAD:
+    action: {kind: skill, skill: navigate, station: machine}
+    timeout: 90.0
+    max_retry: 2
+    error_code: NAV_FAILED
+    failure_transition: RECOVERY
+    next: DOCK_MACHINE_UNLOAD
+
+  DOCK_MACHINE_UNLOAD:
+    action: {kind: skill, skill: precise_dock, station: machine}
+    timeout: 45.0
+    max_retry: 2
+    error_code: DOCK_FAILED
+    failure_transition: RECOVERY
+    next: OPEN_DOOR_UNLOAD
+
+  OPEN_DOOR_UNLOAD:
+    action: {kind: service, service: set_door, close: false}
+    timeout: 12.0
+    max_retry: 1
+    error_code: DOOR_TIMEOUT
+    failure_transition: RECOVERY
+    next: OPEN_CLAMP_UNLOAD
+
+  OPEN_CLAMP_UNLOAD:
+    action: {kind: service, service: set_clamp, close: false}
+    timeout: 8.0
+    max_retry: 1
+    error_code: CLAMP_TIMEOUT
+    failure_transition: RECOVERY
+    next: UNLOAD_MACHINE
+
+  UNLOAD_MACHINE:
+    action: {kind: skill, skill: unload_machine, station: machine}
+    entry_conditions: [spindle_stopped, door_open, clamp_open, not alarm, not emergency_stop]
+    signals_on_entry: {robot_clear: false}
+    timeout: 40.0
+    max_retry: 1
+    error_code: UNLOAD_FAILED
+    failure_transition: RECOVERY
+    next: VERIFY_UNLOAD
+
+  VERIFY_UNLOAD:
+    action: {kind: wait}
+    success_conditions: [not material_detected]
+    timeout: 5.0
+    error_code: UNLOAD_NOT_VERIFIED
+    failure_transition: RECOVERY
+    next: EXIT_MACHINE_UNLOAD
+
+  EXIT_MACHINE_UNLOAD:
+    # Same retreat as after loading: the arm leaves the envelope with the
+    # part, and only then may the base drive anywhere.
+    action: {kind: skill, skill: move_safe, posture: machine_safe}
+    signals_on_success: {robot_clear: true}
+    timeout: 30.0
+    error_code: ARM_FAILED
+    failure_transition: RECOVERY
+    next: GO_OUTPUT
+
+  GO_OUTPUT:
+    action: {kind: skill, skill: navigate, station: outfeed}
+    timeout: 90.0
+    max_retry: 2
+    error_code: NAV_FAILED
+    failure_transition: RECOVERY
+    next: DOCK_OUTPUT
+
+  DOCK_OUTPUT:
+    action: {kind: skill, skill: precise_dock, station: outfeed}
+    timeout: 45.0
+    max_retry: 2
+    error_code: DOCK_FAILED
+    failure_transition: RECOVERY
+    next: PLACE_PRODUCT
+
+  PLACE_PRODUCT:
+    action: {kind: skill, skill: place_product, station: outfeed}
+    timeout: 40.0
+    max_retry: 1
+    error_code: PLACE_FAILED
+    failure_transition: RECOVERY
+    next: RETURN_HOME
+
+  RETURN_HOME:
+    action: {kind: skill, skill: move_safe, posture: transport}
+    timeout: 30.0
+    error_code: ARM_FAILED
+    failure_transition: FAULT
+    next: GO_HOME_END
+
+  GO_HOME_END:
+    action: {kind: skill, skill: navigate, station: home}
+    timeout: 90.0
+    max_retry: 2
+    error_code: NAV_FAILED
+    failure_transition: FAULT
+    next: DONE
+
+  RECOVERY:
+    # Deliberately does not retry the cycle on its own. Recovery puts the robot
+    # somewhere known and stops; deciding whether to resume is a person's job
+    # until the failure modes are understood on real hardware.
+    action: {kind: skill, skill: move_safe, posture: transport}
+    timeout: 30.0
+    error_code: RECOVERY_FAILED
+    failure_transition: FAULT
+    next: FAULT
+
+  DONE:
+    action: {kind: none}
+    signals_on_entry: {robot_clear: true}
+
+  FAULT:
+    # Deliberately no robot_clear here: a faulted arm may be anywhere,
+    # including inside the machine, and saying otherwise is how a door closes
+    # on it.
+    action: {kind: none}

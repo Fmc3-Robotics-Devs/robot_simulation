@@ -1,0 +1,15 @@
+# Close the loop on a station tag until the base is inside tolerance
+# (plan sections 8.6 - 8.9). Coarse navigation gets the robot near; this is
+# what makes the arm's job repeatable.
+string station
+# Override the configured tolerances when non-zero.
+float64 position_tolerance
+float64 yaw_tolerance
+---
+bool success
+string error_code
+float64 final_error_x
+float64 final_error_y
+float64 final_error_yaw
+---
+franzi_engraving_interfaces/DockStatus status

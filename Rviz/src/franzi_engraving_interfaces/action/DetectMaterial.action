@@ -1,0 +1,12 @@
+# Find the workpiece at a station and report where to grasp it.
+string station
+---
+bool success
+string error_code
+geometry_msgs/PoseStamped grasp_pose
+# Distance between the measurement and where the station survey says the part
+# should be. Large values mean the calibration or the survey is wrong, and are
+# worth failing on rather than grasping through.
+float64 deviation
+---
+string phase

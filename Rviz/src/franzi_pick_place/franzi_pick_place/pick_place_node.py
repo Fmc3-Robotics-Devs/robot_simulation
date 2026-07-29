@@ -12,14 +12,8 @@ import math
 import os
 import sys
 import threading
-import time
-from pathlib import Path
 
 import rclpy
-import yaml
-from ament_index_python.packages import get_package_share_directory
-from moveit.planning import MoveItPy
-from moveit_configs_utils import MoveItConfigsBuilder
 from rclpy.executors import MultiThreadedExecutor
 from rclpy.node import Node
 from tf2_ros import TransformListener
@@ -37,6 +31,12 @@ from .geometry import (
 from .gripper import Gripper
 from .machining import MachiningStation
 from .motion import ArmMotion, PlanningFailure
+from .params import (
+    build_moveit,
+    declare_cell_parameters,
+    default_dock_poses_file,
+    layout_from,
+)
 from .planning_scene import PlanningSceneClient
 from .tags import HandEyeCorrection, MockTagDetector, TagObserver, pose_from_tag
 from .transforms import from_pose
@@ -48,151 +48,26 @@ from .scene import (
     OUTFEED,
     STATIONS,
     WORKPIECE,
-    CellLayout,
     bench_id,
     build_ground,
     build_station,
     build_workpiece,
 )
 
-DEFAULTS = {
-    "frame_id": "odom",
-    "arm_group": "left_arm",
-    "body_group": "body",
-    "head_group": "head",
-    "park_group": "both_arms",
-    "body_posture": "work",
-    "head_posture": "home",
-    "park_posture": "off_arms",
-    "tip_link": "left_wrist_roll_Link",
-    "attach_link": "left_wrist_roll_Link",
-    "touch_links": [
-        "leftfinger1_Link",
-        "leftfinger2_Link",
-        "left_wrist_roll_Link",
-        "left_wrist_d405_Link",
-    ],
-    "gripper_controller": "left_gripper_controller",
-    "gripper_joints": ["leftfinger1_joint", "leftfinger2_joint"],
-    "gripper_gap_at_zero": 0.095,
-    "gripper_max_stroke": 0.0475,
-    "gripper_open_gap": 0.085,
-    "grasp_squeeze": 0.002,
-    "tcp_offset": [-0.0305, -0.0018, -0.2414],
-    "grasp_height_offset": 0.02,
-    "grasp_yaw": 0.0,
-    "carry_tcp": [0.36, 0.24, 0.985],
-    "approach_height": 0.12,
-    "approach_velocity_scaling": 0.15,
-    "ik_attempts": 25,
-    "ik_timeout": 0.05,
-    "repeat": 1,
-    "ground_z": -0.0873,
-    "station.feeder_xy": [1.00, -1.50],
-    "station.machine_xy": [1.00, 0.00],
-    "station.outfeed_xy": [1.00, 1.50],
-    "tag.feeder_id": 0,
-    "tag.machine_id": 1,
-    "tag.outfeed_id": 2,
-    "tag.size": 0.08,
-    "tag.thickness": 0.002,
-    "tag.to_part_xy": [-0.16, 0.0],
-    "tag_timeout": 5.0,
-    "camera_frame": "head_d435_Link",
-    "look_posture": "look_down",
-    "handeye_correction.xyz": [0.0, 0.0, 0.0],
-    "handeye_correction.rpy": [0.0, 0.0, 0.0],
-    "tag_detection.max_range": 3.0,
-    "tag_detection.min_range": 0.25,
-    "tag_detection.fov": 1.047,
-    "tag_detection.position_noise": 0.0,
-    "tag_detection.rotation_noise": 0.0,
-    "bench.size_xy": [0.50, 0.70],
-    "bench.top_z": 0.80,
-    "bench.thickness": 0.03,
-    "bench.part_inset": 0.12,
-    "bench.leg_size": 0.05,
-    "bench.leg_inset": 0.03,
-    "workpiece.size": [0.05, 0.05, 0.09],
-    "pocket.clearance": 0.012,
-    "pocket.wall_thickness": 0.015,
-    "pocket.wall_height": 0.03,
-    "dock.offset": [0.44, 0.16],
-    "dock.yaw": 0.0,
-    "dock.standby_retreat": 0.9,
-    "base.linear_speed": 0.5,
-    "base.angular_speed": 0.8,
-    "base.wheel_radius": 0.0827,
-    # One sigma of the navigation stack's docking error. Zero makes the base
-    # arrive perfectly, which flatters the tag pipeline into looking correct.
-    "base.arrival_position_error": 0.03,
-    "base.arrival_yaw_error": 0.03,
-    "machining.duration": 8.0,
-    "machining.wait_for_trigger": False,
-    "dock_poses_file": "",
-    "handeye_mount_frame": "head_pitch_Link",
-    "handeye_truth.xyz": [0.0, 0.0, 0.0],
-    "handeye_truth.rpy": [0.0, 0.0, 0.0],
-    "handeye_base_dx": [0.0, -0.15, 0.10, -0.10, 0.05, -0.05],
-    "handeye_base_dy": [0.0, 0.12, -0.12, -0.08, 0.15, -0.15],
-    "handeye_base_dyaw": [0.0, 0.15, -0.15, 0.25, -0.25, 0.10],
-    "handeye_head_yaw": [0.0, 0.25, -0.25, 0.15, -0.15, 0.0],
-    "handeye_head_pitch": [0.52, 0.30, 0.45, 0.15, 0.52, 0.35],
-    "handeye_waist_pitch": [-0.45, -0.10, -0.50, 0.20, 0.10, -0.30],
-    "handeye_settle": 0.4,
-    "dock_sweep.span": 0.20,
-    "dock_sweep.step": 0.05,
-    "dock_sweep.yaw_errors": [0.0, 10.0],
-    "reach_map.x_range": [0.28, 0.60],
-    "reach_map.y_range": [-0.24, 0.42],
-    "reach_map.step": 0.04,
-}
-
-
 class PickPlaceTask(Node):
     def __init__(self):
         super().__init__("pick_place_task")
-        for name, value in DEFAULTS.items():
-            self.declare_parameter(name, value)
+        declare_cell_parameters(self)
 
     def get(self, name):
         return self.get_parameter(name).value
 
     def layout(self):
-        return CellLayout(
-            frame_id=self.get("frame_id"),
-            ground_z=self.get("ground_z"),
-            station_xy={
-                FEEDER: tuple(self.get("station.feeder_xy")),
-                MACHINE: tuple(self.get("station.machine_xy")),
-                OUTFEED: tuple(self.get("station.outfeed_xy")),
-            },
-            tag_ids={
-                FEEDER: self.get("tag.feeder_id"),
-                MACHINE: self.get("tag.machine_id"),
-                OUTFEED: self.get("tag.outfeed_id"),
-            },
-            tag_size=self.get("tag.size"),
-            tag_thickness=self.get("tag.thickness"),
-            tag_to_part_xy=tuple(self.get("tag.to_part_xy")),
-            bench_size_xy=tuple(self.get("bench.size_xy")),
-            bench_top_z=self.get("bench.top_z"),
-            bench_thickness=self.get("bench.thickness"),
-            bench_part_inset=self.get("bench.part_inset"),
-            leg_size=self.get("bench.leg_size"),
-            leg_inset=self.get("bench.leg_inset"),
-            workpiece_size=tuple(self.get("workpiece.size")),
-            pocket_clearance=self.get("pocket.clearance"),
-            pocket_wall_thickness=self.get("pocket.wall_thickness"),
-            pocket_wall_height=self.get("pocket.wall_height"),
-            dock_offset=tuple(self.get("dock.offset")),
-            dock_yaw=self.get("dock.yaw"),
-            standby_retreat=self.get("dock.standby_retreat"),
-        )
+        return layout_from(self)
 
 
 class MachineTendingDemo:
-    def __init__(self, node: PickPlaceTask, moveit: MoveItPy, base: MobileBase):
+    def __init__(self, node: PickPlaceTask, moveit, base: MobileBase):
         self._node = node
         self._logger = node.get_logger()
         self._layout = node.layout()
@@ -250,12 +125,7 @@ class MachineTendingDemo:
         )
         self._tags = TagObserver(node, self._tf_buffer, self._layout.frame_id)
 
-        self._docks = DockBook.load(
-            node.get("dock_poses_file")
-            or Path(get_package_share_directory("franzi_pick_place"))
-            / "config"
-            / "dock_poses.yaml"
-        )
+        self._docks = DockBook.load(default_dock_poses_file(node))
         self._workpiece_placed = False
         self._tcp_offset = tuple(node.get("tcp_offset"))
         self._grasp_orientation = quaternion_from_rpy(0.0, 0.0, node.get("grasp_yaw"))
@@ -341,12 +211,7 @@ class MachineTendingDemo:
 
     def reset_workpiece(self):
         self._scene.remove_objects([WORKPIECE])
-        self._docks = DockBook.load(
-            node.get("dock_poses_file")
-            or Path(get_package_share_directory("franzi_pick_place"))
-            / "config"
-            / "dock_poses.yaml"
-        )
+        self._docks = DockBook.load(default_dock_poses_file(self._node))
         self._workpiece_placed = False
         self._station.reset()
 
@@ -439,7 +304,7 @@ class MachineTendingDemo:
         tag = self._tags.wait_for(
             self._layout.tag_ids[station], timeout=self._node.get("tag_timeout")
         )
-        pose = pose_from_tag(tag, self._layout.part_offset_in_tag)
+        pose = pose_from_tag(tag, self._layout.part_offset_in_tag_for(station))
         truth = self._layout.part_pose(station)
         error = math.dist(
             (pose.position.x, pose.position.y, pose.position.z),
@@ -531,27 +396,6 @@ class MachineTendingDemo:
             self._logger.info(f"--- cycle {cycle + 1}/{cycles} ---")
             self.run_once()
         self._logger.info("machine tending demo finished")
-
-
-def build_moveit():
-    """Start an embedded MoveIt instance that shares move_group's scene."""
-    moveit_config = (
-        MoveItConfigsBuilder("wheel_robot_4.0", package_name="franzi_moveit_config")
-        .planning_pipelines(
-            default_planning_pipeline="ompl",
-            pipelines=["ompl", "chomp", "pilz_industrial_motion_planner"],
-        )
-        .pilz_cartesian_limits()
-        .to_moveit_configs()
-    )
-
-    config = moveit_config.to_dict()
-    planning_params = (
-        Path(get_package_share_directory("franzi_pick_place")) / "config" / "moveit_py.yaml"
-    )
-    config.update(yaml.safe_load(planning_params.read_text()))
-
-    return MoveItPy(node_name="pick_place_moveit", config_dict=config)
 
 
 def main():

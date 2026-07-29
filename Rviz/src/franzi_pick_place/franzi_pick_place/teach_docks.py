@@ -98,7 +98,7 @@ def main():
                 raise RuntimeError(f"{station}: base pose never reached MoveIt")
 
             tag = tags.wait_for(layout.tag_ids[station], timeout=node.get("tag_timeout"))
-            part = pose_from_tag(tag, layout.part_offset_in_tag)
+            part = pose_from_tag(tag, layout.part_offset_in_tag_for(station))
 
             workpiece = build_workpiece(layout)
             workpiece.pose = part

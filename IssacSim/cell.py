@@ -59,9 +59,12 @@ class Cell:
         return (x, y, self.bench_top + self["workpiece.size"][2] / 2.0)
 
     def tag_position(self, station):
-        """Ground truth for the marker centre. Mirrors CellLayout.tag_pose."""
+        """Ground truth for the marker centre. Mirrors CellLayout.tag_pose,
+        including the per-station offset override."""
         x, y = self.station_xy(station)
-        offset_x, offset_y = self["tag.to_part_xy"]
+        offset_x, offset_y = self.params["tag"].get(
+            f"{station}_to_part_xy", self["tag.to_part_xy"]
+        )
         return (x - offset_x, y - offset_y, self.bench_top + self["tag.thickness"] / 2.0)
 
     def bench_centre(self, station):
@@ -69,9 +72,21 @@ class Cell:
         return (x + self["bench.size_xy"][0] / 2.0 - self["bench.part_inset"], y)
 
     def dock_pose(self, station):
-        """Where the chassis parks. Mirrors CellLayout.dock_pose at yaw 0."""
+        """Where the chassis parks. Mirrors CellLayout.dock_pose at yaw 0.
+
+        ``home`` is the taught standby pose - the wall corner - read from the
+        same dock book the skills use, so Isaac's robot wakes up exactly where
+        the ROS base will place itself and the recording never shows a jump."""
         import math
 
+        if station == "home":
+            import yaml as _yaml
+
+            docks = _yaml.safe_load(
+                (REPO / "Rviz" / "src" / "franzi_pick_place" / "config"
+                 / "dock_poses.yaml").read_text()
+            )["docks"]["home"]
+            return (float(docks["x"]), float(docks["y"]), float(docks["yaw"]))
         x, y = self.station_xy(station)
         yaw = self["dock.yaw"]
         offset_x, offset_y = self["dock.offset"]

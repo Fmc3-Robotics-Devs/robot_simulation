@@ -1,0 +1,10 @@
+# Safe pose, pre-grasp, Cartesian descent, close, verify, Cartesian lift
+# (plan section 9.2). The grasp pose comes from DetectMaterial.
+geometry_msgs/PoseStamped grasp_pose
+string station
+---
+bool success
+string error_code
+bool holding
+---
+string phase

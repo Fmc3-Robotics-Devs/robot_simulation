@@ -38,7 +38,7 @@ pick_place_task:
     # Grasp centre between the finger pads, expressed in the tip link frame.
     tcp_offset: [-0.0305, -0.0018, -0.2414]
     # Grasp above the workpiece centre so the fingers clear the pocket walls.
-    grasp_height_offset: 0.02
+    grasp_height_offset: 0.01
     grasp_yaw: 0.0
     # Where the part is held while driving, in the base frame. Held up in front
     # rather than hanging: a dangling arm swings the part down past bench edges.
@@ -58,10 +58,12 @@ pick_place_task:
     #
     # These are SIMULATED TRUTH, not knowledge the robot has. They build the
     # world and feed the mock detector. Manipulation poses come from the tag.
+    # Spread across the hall: the dock line sits at x = 1.76 and the robot's
+    # home (the odom origin) is 1.8 m back from it, mid-aisle.
     station:
-      feeder_xy: [1.00, -1.50]
-      machine_xy: [1.00, 0.00]
-      outfeed_xy: [1.00, 1.50]
+      feeder_xy: [2.20, -4.00]
+      machine_xy: [2.20, 0.00]
+      outfeed_xy: [2.20, 4.00]
 
     # --- AprilTags -------------------------------------------------------
     # One tag per bench, lying flat on the bench top. `to_part_xy` is the
@@ -76,6 +78,11 @@ pick_place_task:
       size: 0.08
       thickness: 0.002
       to_part_xy: [-0.16, 0.0]
+      # On the machine the fixture sits under the spindle, so its tag moves
+      # deeper onto the plate, off the vise. Keep the lateral offset small:
+      # at the dock the head camera's half-FOV is ~34 deg, and a tag on the
+      # plate corner falls outside the image entirely.
+      machine_to_part_xy: [-0.30, -0.10]
 
     tag_timeout: 5.0
     camera_frame: "head_d435_Link"
@@ -97,7 +104,7 @@ pick_place_task:
       rotation_noise: 0.0
 
     bench:
-      size_xy: [0.50, 0.70]
+      size_xy: [0.70, 1.00]
       top_z: 0.80
       thickness: 0.03
       # How far in from the near edge the part sits, so the chassis can get
@@ -106,15 +113,18 @@ pick_place_task:
       leg_size: 0.05
       leg_inset: 0.03
 
+    # A flat rectangular billet, lying on its largest face like the shop
+    # stock. Every dimension fits inside the 85 mm gripper opening.
     workpiece:
-      size: [0.05, 0.05, 0.09]
+      size: [0.07, 0.07, 0.04]
 
     pocket:
       # Half-gap between the workpiece and each wall. Tight tolerances belong
-      # in the physics stage; here they only make planning brittle.
+      # in the physics stage; here they only make planning brittle. Walls low
+      # enough that the fingers, gripping a 40 mm part near its top, clear.
       clearance: 0.012
       wall_thickness: 0.015
-      wall_height: 0.03
+      wall_height: 0.015
 
     # --- docking ---------------------------------------------------------
     dock:

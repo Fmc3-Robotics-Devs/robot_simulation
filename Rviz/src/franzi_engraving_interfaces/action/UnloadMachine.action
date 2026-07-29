@@ -1,0 +1,8 @@
+# Take the finished part back out (plan section 9.4).
+string station
+---
+bool success
+string error_code
+bool holding
+---
+string phase

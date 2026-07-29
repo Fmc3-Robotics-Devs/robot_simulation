@@ -75,6 +75,9 @@ class CellLayout:
     tag_size: float
     tag_thickness: float
     tag_to_part_xy: tuple
+    # Stations whose tag cannot sit on the default spot (the machine's centre
+    # is under the spindle) override the surveyed offset here.
+    tag_to_part_overrides: dict
     bench_size_xy: tuple
     bench_top_z: float
     bench_thickness: float
@@ -102,12 +105,14 @@ class CellLayout:
     def tag_z(self):
         return self.bench_top_z + self.tag_thickness / 2.0
 
+    def tag_to_part(self, station):
+        return self.tag_to_part_overrides.get(station, self.tag_to_part_xy)
+
     def tag_pose(self, station):
         """Ground truth: the tag lies flat on the bench, facing up."""
         x, y = self.station_xy[station]
-        return make_pose(
-            (x - self.tag_to_part_xy[0], y - self.tag_to_part_xy[1], self.tag_z)
-        )
+        offset = self.tag_to_part(station)
+        return make_pose((x - offset[0], y - offset[1], self.tag_z))
 
     @property
     def part_offset_in_tag(self):
@@ -121,6 +126,12 @@ class CellLayout:
             self.tag_to_part_xy[1],
             self.workpiece_centre_z - self.tag_z,
         )
+
+    def part_offset_in_tag_for(self, station):
+        """Per-station surveyed constant; stations without an override use
+        the shared one."""
+        offset = self.tag_to_part(station)
+        return (offset[0], offset[1], self.workpiece_centre_z - self.tag_z)
 
     def bench_centre(self, station):
         """Benches sit back from their part, which rests near the near edge."""
@@ -220,10 +231,11 @@ def build_workpiece(layout):
     )
 
 
-def _tag_centre(layout):
+def _tag_centre(layout, station):
+    offset = layout.tag_to_part(station)
     return (
-        -layout.tag_to_part_xy[0],
-        -layout.tag_to_part_xy[1],
+        -offset[0],
+        -offset[1],
         -layout.workpiece_size[2] / 2.0 + layout.tag_thickness / 2.0,
     )
 
@@ -233,7 +245,8 @@ def build_tag(layout, station, part_pose):
     builder = CollisionObjectBuilder(tag_id(station), layout.frame_id)
     builder.set_pose(part_pose)
     return builder.add_box(
-        (layout.tag_size, layout.tag_size, layout.tag_thickness), _tag_centre(layout)
+        (layout.tag_size, layout.tag_size, layout.tag_thickness),
+        _tag_centre(layout, station),
     ).build()
 
 
@@ -245,7 +258,7 @@ def build_tag_code(layout, station, part_pose):
     """
     size = layout.tag_size
     cell = size / 8.0
-    cx, cy, cz = _tag_centre(layout)
+    cx, cy, cz = _tag_centre(layout, station)
     # Sits a hair above the plate so it is not z-fighting with it.
     z = cz + layout.tag_thickness
     height = layout.tag_thickness / 2.0

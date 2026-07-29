@@ -1,7 +1,7 @@
 # Franzi pick-and-place (machine tending)
 
 Kinematic machine-tending demo for the Franzi robot on ROS 2 Jazzy. Three benches
-stand 1.5 m apart, so the mobile base is part of the job:
+stand 4 m apart, so the mobile base is part of the job:
 
 1. dock at the feeder bench and pick the workpiece,
 2. drive to the machine and insert it into the fixture pocket,
@@ -110,9 +110,15 @@ Stations are laid out along `y` so the base strafes between them:
 
 | Station | world x, y | Role |
 | --- | --- | --- |
-| feeder | 1.00, -1.50 | where the raw workpiece starts |
-| machine | 1.00, 0.00 | fixture the part is inserted into |
-| outfeed | 1.00, 1.50 | where the finished part is set down |
+| feeder | 2.20, -4.00 | where the raw workpiece starts |
+| machine | 2.20, 0.00 | fixture the part is inserted into |
+| outfeed | 2.20, 4.00 | where the finished part is set down |
+
+The odom origin - where the base wakes up - is the robot's home spot,
+1.8 m back from the dock line, mid-aisle. The machine's tag has its own
+surveyed offset (`tag.machine_to_part_xy`): the fixture sits under the
+spindle, so the marker moves deeper onto the pallet plate, and it must stay
+within the head camera's ~34 degree half-FOV as seen from the dock.
 
 The station world poses and the arm envelope are tied together by one number,
 `dock.offset` (default `[0.44, 0.16]`): where a station has to sit **in the base

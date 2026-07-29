@@ -22,7 +22,8 @@ import random
 import threading
 import time
 
-from geometry_msgs.msg import TransformStamped
+from geometry_msgs.msg import PoseStamped, TransformStamped, Twist
+from nav_msgs.msg import Odometry
 from sensor_msgs.msg import JointState
 from tf2_ros import TransformBroadcaster
 
@@ -52,6 +53,7 @@ class MobileBase:
         position_error=0.0,
         yaw_error=0.0,
         rate=50.0,
+        callback_group=None,
     ):
         self._node = node
         self._logger = node.get_logger()
@@ -72,7 +74,32 @@ class MobileBase:
 
         self._tf = TransformBroadcaster(node)
         self._joints = node.create_publisher(JointState, "joint_states", 10)
-        self._timer = node.create_timer(self._period, self._publish)
+        # The same pose as the transform, in a message a non-tf2 consumer can
+        # subscribe to plainly - the Isaac mirror reads this to place the robot.
+        self._pose_publisher = node.create_publisher(PoseStamped, "base/pose", 10)
+
+        # The Nav2-facing half: velocity commands in, odometry out. Commands
+        # are integrated by the publish timer; `drive_to` keeps priority, so a
+        # late zero-twist from a finished navigation cannot fight a docking
+        # correction.
+        self._command = (0.0, 0.0, 0.0)
+        self._command_time = 0.0
+        self._velocity = (0.0, 0.0, 0.0)
+        self._driving = False
+        self._last_tick = time.monotonic()
+        # Odometry is a heartbeat the whole navigation stack depends on. It
+        # gets its own reentrant group so that no long-running skill callback
+        # in the node's default group can starve it - a 27-second odom gap is
+        # how "Initial robot pose is not available" happens mid-cycle.
+        from rclpy.callback_groups import ReentrantCallbackGroup
+
+        group = callback_group or ReentrantCallbackGroup()
+        node.create_subscription(
+            Twist, "cmd_vel", self._on_cmd_vel, 10, callback_group=group
+        )
+        self._odom_publisher = node.create_publisher(Odometry, "odom", 20)
+
+        self._timer = node.create_timer(self._period, self._tick, callback_group=group)
         self._publish()
 
     @property
@@ -85,7 +112,38 @@ class MobileBase:
             self._pose = (x, y, yaw)
         self._publish()
 
-    def drive_to(self, x, y, yaw, label=None):
+    # -- velocity interface (Nav2's side of the base) ----------------------
+
+    def _on_cmd_vel(self, message):
+        self._command = (message.linear.x, message.linear.y, message.angular.z)
+        self._command_time = time.monotonic()
+
+    def _tick(self):
+        """Integrate any live velocity command, then publish state."""
+        now = time.monotonic()
+        dt = min(now - self._last_tick, 4.0 * self._period)
+        self._last_tick = now
+
+        vx, vy, wz = self._command
+        fresh = (now - self._command_time) < 0.5
+        moving = abs(vx) > 1e-4 or abs(vy) > 1e-4 or abs(wz) > 1e-4
+        self._velocity = (vx, vy, wz) if (fresh and moving) else (0.0, 0.0, 0.0)
+        if fresh and moving and not self._driving:
+            x, y, yaw = self.pose
+            cos_yaw, sin_yaw = math.cos(yaw), math.sin(yaw)
+            world_vx = cos_yaw * vx - sin_yaw * vy
+            world_vy = sin_yaw * vx + cos_yaw * vy
+            self._step(
+                (x + world_vx * dt, y + world_vy * dt, normalise(yaw + wz * dt)),
+                (world_vx, world_vy),
+                wz,
+                yaw,
+                dt,
+            )
+        else:
+            self._publish()
+
+    def drive_to(self, x, y, yaw, label=None, exact=False, speed=None):
         """Drive to a goal and park near it. Returns where it actually stopped.
 
         Parking is deliberately imperfect. Navigation under SLAM lands within
@@ -93,15 +151,28 @@ class MobileBase:
         reason the station carries a tag: a base that always arrives exactly
         makes the tag pipeline look like it works while never asking it to do
         anything. Callers must use the returned pose, not the goal.
+
+        ``exact`` skips the arrival scatter: it models the short, slow,
+        visually-servoed corrections of precise docking, whose execution error
+        is far below the tag observation noise that the loop already carries.
+        ``speed`` caps the linear speed for those corrections.
         """
+        self._driving = True
+        try:
+            return self._drive_to(x, y, yaw, label=label, exact=exact, speed=speed)
+        finally:
+            self._driving = False
+
+    def _drive_to(self, x, y, yaw, label=None, exact=False, speed=None):
         start_x, start_y, start_yaw = self.pose
-        x, y, yaw = self._arrival(x, y, yaw)
+        if not exact:
+            x, y, yaw = self._arrival(x, y, yaw)
 
         delta_yaw = normalise(yaw - start_yaw)
         distance = math.hypot(x - start_x, y - start_y)
 
         duration = max(
-            distance / self._linear_speed,
+            distance / min(speed or self._linear_speed, self._linear_speed),
             abs(delta_yaw) / self._angular_speed,
         )
         if duration < 1e-3:
@@ -203,6 +274,26 @@ class MobileBase:
         transform.transform.rotation.z = math.sin(yaw / 2.0)
         transform.transform.rotation.w = math.cos(yaw / 2.0)
         self._tf.sendTransform(transform)
+
+        pose = PoseStamped()
+        pose.header.stamp = stamp
+        pose.header.frame_id = self._frame_id
+        pose.pose.position.x = x
+        pose.pose.position.y = y
+        pose.pose.orientation.z = transform.transform.rotation.z
+        pose.pose.orientation.w = transform.transform.rotation.w
+        self._pose_publisher.publish(pose)
+
+        odom = Odometry()
+        odom.header.stamp = stamp
+        odom.header.frame_id = self._frame_id
+        odom.child_frame_id = self._child_frame
+        odom.pose.pose = pose.pose
+        vx, vy, wz = self._velocity
+        odom.twist.twist.linear.x = vx
+        odom.twist.twist.linear.y = vy
+        odom.twist.twist.angular.z = wz
+        self._odom_publisher.publish(odom)
 
         state = JointState()
         state.header.stamp = stamp

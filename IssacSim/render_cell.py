@@ -40,13 +40,19 @@ CAMERAS = {
 }
 
 
-def spawn_textured_quad(stage, path, size, texture, position):
+def spawn_textured_quad(stage, path, size, texture, position, yaw_degrees=0.0):
     """A flat, matte, textured square lying in the XY plane, facing +Z.
 
     Built with plain USD rather than an IsaacLab material config, which cannot
     take a texture path. UV (0,0) maps to the lower-left of the image, so the
     marker comes out unmirrored when viewed from above - which matters, because
     a mirrored AprilTag does not decode.
+
+    ``yaw_degrees`` turns the pattern about its centre: how the printed board
+    is mounted. The umich apriltag detector defines the tag frame from the
+    pattern half a turn from where OpenCV's ArUco does, so a cell surveyed
+    against one convention mounts its boards rotated for the other - the same
+    alignment a real tag board needs against its survey (plan section 7.9).
     """
     from pxr import Gf, Sdf, UsdGeom, UsdShade
 
@@ -70,7 +76,10 @@ def spawn_textured_quad(stage, path, size, texture, position):
         "st", Sdf.ValueTypeNames.TexCoord2fArray, UsdGeom.Tokens.faceVarying
     )
     coords.Set([Gf.Vec2f(0, 0), Gf.Vec2f(1, 0), Gf.Vec2f(1, 1), Gf.Vec2f(0, 1)])
-    UsdGeom.Xformable(mesh).AddTranslateOp().Set(Gf.Vec3d(*position))
+    xform = UsdGeom.Xformable(mesh)
+    xform.AddTranslateOp().Set(Gf.Vec3d(*position))
+    if yaw_degrees:
+        xform.AddRotateZOp().Set(yaw_degrees)
 
     material = UsdShade.Material.Define(stage, f"{path}/Material")
     surface = UsdShade.Shader.Define(stage, f"{path}/Material/Surface")
@@ -182,6 +191,7 @@ def main():
     from isaaclab.sensors import Camera, CameraCfg
 
     import apriltags
+    import paint
 
     cell = Cell.load()
     print(f"cell loaded from {Cell.load.__doc__ and 'task.yaml'}", flush=True)
@@ -192,40 +202,10 @@ def main():
         sim_utils.SimulationCfg(dt=1.0 / 60.0, device="cuda:0", gravity=(0.0, 0.0, 0.0))
     )
 
-    ground = sim_utils.GroundPlaneCfg()
-    ground.func("/World/ground", ground, translation=(0.0, 0.0, cell["ground_z"]))
-    dome = sim_utils.DomeLightCfg(intensity=1200.0, color=(0.95, 0.95, 1.0))
-    dome.func("/World/dome", dome)
-    key = sim_utils.DistantLightCfg(intensity=2500.0, angle=1.0)
-    key.func("/World/key", key, orientation=(0.86, 0.35, 0.35, 0.0))
-
-    wood = sim_utils.PreviewSurfaceCfg(diffuse_color=(0.62, 0.50, 0.36), roughness=0.8)
-    steel = sim_utils.PreviewSurfaceCfg(diffuse_color=(0.45, 0.48, 0.55), roughness=0.5)
-    orange = sim_utils.PreviewSurfaceCfg(diffuse_color=(0.90, 0.45, 0.15), roughness=0.6)
-
     stage = omni.usd.get_context().get_stage()
-    for station in STATIONS:
-        slab = sim_utils.CuboidCfg(size=cell.slab_size, visual_material=wood)
-        slab.func(f"/World/bench_{station}/slab", slab, translation=cell.slab_position(station))
-        for index, position in enumerate(cell.leg_positions(station)):
-            leg = sim_utils.CuboidCfg(size=cell.leg_size, visual_material=steel)
-            leg.func(f"/World/bench_{station}/leg_{index}", leg, translation=position)
+    import scenery
 
-        tag_id = cell.tag_id(station)
-        texture = apriltags.write_marker(tag_id, TEXTURES / f"tag_{tag_id}.png")
-        # The sheet is wider than the marker by its quiet zone; the marker
-        # itself has to end up exactly `tag.size` across or every pose estimate
-        # scales with the error.
-        spawn_textured_quad(
-            stage,
-            f"/World/tag_{station}",
-            cell["tag.size"] * apriltags.sheet_scale(),
-            texture,
-            cell.tag_position(station),
-        )
-
-    workpiece = sim_utils.CuboidCfg(size=tuple(cell["workpiece.size"]), visual_material=orange)
-    workpiece.func("/World/workpiece", workpiece, translation=cell.part_position("feeder"))
+    scenery.build(stage, sim_utils, cell, TEXTURES)
 
     dock_x, dock_y, dock_yaw = cell.dock_pose(args.dock)
     robot = Articulation(
@@ -249,6 +229,8 @@ def main():
             },
         )
     )
+    paint.paint_robot(stage)
+    paint.spawn_logo(stage)
 
     cameras = {}
     for name, (link, intrinsics, (width, height)) in CAMERAS.items():

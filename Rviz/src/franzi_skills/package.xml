@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>franzi_skills</name>
+  <version>0.1.0</version>
+  <description>
+    The engraving cell's skills as ROS 2 action servers: navigation, precise
+    docking, detection, pick, load, unload, place and safe postures. The task
+    manager sequences them; they own the arm, the base and the planning scene.
+  </description>
+  <maintainer email="puheliang122@gmail.com">phl</maintainer>
+  <license>Proprietary</license>
+
+  <depend>rclpy</depend>
+  <depend>std_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>tf2_ros</depend>
+  <depend>franzi_engraving_interfaces</depend>
+  <depend>franzi_machine_bridge</depend>
+  <depend>franzi_pick_place</depend>
+
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

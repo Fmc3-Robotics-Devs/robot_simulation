@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>franzi_machine_bridge</name>
+  <version>0.1.0</version>
+  <description>
+    The engraving machine's interface to the robot: reports its signals,
+    accepts requests, and refuses the ones the interlocks forbid. The interlock
+    logic is hardware independent; only the MachineIO backend changes between
+    the simulated machine and Modbus or digital IO on the real one.
+  </description>
+  <maintainer email="puheliang122@gmail.com">phl</maintainer>
+  <license>Apache-2.0</license>
+
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>franzi_engraving_interfaces</exec_depend>
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>
