@@ -1,33 +1,42 @@
 {
   "ok": true,
-  "captured_at": "2026-07-30T12:35:56+08:00",
+  "captured_at": "2026-07-30T14:21:53+08:00",
   "renderer": {
     "isaac_sim_version": "5.1.0.0",
     "mode": "RaytracedLighting",
     "rt_subframes": 32
   },
   "git": {
-    "revision": "f6611acb71f67ea55f27d2c774ae82b925dc698e",
+    "revision": "2fd159c03a9166de88f583069b87323f2bf88722",
     "tracked_files_dirty_at_capture": false
   },
   "formal_scene": "usd/scenes/warehouse_box_transfer.usda",
-  "formal_scene_sha256": "5cd8c5677da6c6ea78c918d7f616470a78ba8ff768d49db8e0946e31993c7dfb",
+  "formal_scene_sha256": "7b0f2ae203472b59af899eab7a175b00cc56e400f73d25cce399c09ff8951dff",
   "project_source_sha256": {
-    "usd/scenes/warehouse_box_transfer.usda": "5cd8c5677da6c6ea78c918d7f616470a78ba8ff768d49db8e0946e31993c7dfb",
+    "usd/scenes/warehouse_box_transfer.usda": "7b0f2ae203472b59af899eab7a175b00cc56e400f73d25cce399c09ff8951dff",
     "usd/scenes/warehouse_box_transfer_workcell.usda": "abb7bc43dfaf412cfe01f28f0af594b2fd8e3340062eda0cc4a469b87b8e84cf",
     "usd/scenes/warehouse_box_transfer_apriltags.usda": "56418d48697aceba2c8933c368272c65dc065ffe2d468067a9138320946ce60f",
+    "usd/scenes/warehouse_box_transfer_table_apriltags.usda": "0a339bd956be38acee303aeeee2a929c6712a02421b821f1b7a219e0d749280c",
     "usd/scenes/warehouse_box_transfer_physics.usda": "db61f1c0ca53d6bcd886981cdc0be2ed01e1ad80dcd6345ab3e62a2930d928b0",
+    "Rviz/src/franzi_description/urdf/wheel_robot_4.0.urdf": "f9df1ab8618faf6f14b9baff7fd80e74aa57d10c82d05592deb37cb03f4ae348",
+    "scripts/import_robot_urdf.py": "c920901fdda9b2fe8e483f6a3ba2a008c26455d63fa72d8878e7eb3925b2b277",
+    "usd/assets/robots/wheel_bot/.asset_hash": "b650fe315677b01a2677862ef9cde54e9154815746e64af29687b4d06895fd99",
+    "usd/assets/robots/wheel_bot/config.yaml": "23ab465680876fd57b2cc9a75578157c4311ab03872910cf109232a652b7c9b2",
     "usd/assets/robots/wheel_bot/wheel_bot.usd": "04eb7d092a822773e3b6f1745196a5aa94d1a76ba9ca26c3fbe41cda92480d69",
+    "usd/assets/robots/wheel_bot/configuration/wheel_bot_base.usd": "85d65ddb6f667997fa4369ded696d7d81946f5adaca057eb3d866a0ee78e63dc",
+    "usd/assets/robots/wheel_bot/configuration/wheel_bot_physics.usd": "97aae7d6f40e89a1427a05f302845e2f54c07f5f8c6ca40bb43bf5f575e299f4",
+    "usd/assets/robots/wheel_bot/configuration/wheel_bot_robot.usd": "7acc5a2afb91dfa61064bebb63d70fefdfb0386d8dfcd815d113d3282f6580ac",
+    "usd/assets/robots/wheel_bot/configuration/wheel_bot_sensor.usd": "66177340fdbf2438701cc7af76d74674e29393392cc79abe60887687f9374813",
     "usd/assets/robots/wheel_bot/wheel_bot_with_cameras.usda": "d67de31271798ef683b2bb19d4b7f410f0007c62f7c72c68487fb3a931de8207",
-    "usd/assets/robots/wheel_bot/camera_sensors.usda": "42754910c9e08066bb865ba12ae6cb6c66d58d1828d39978775053ec6c1a7c9d",
+    "usd/assets/robots/wheel_bot/camera_sensors.usda": "288f2e4374b27469a52b77094e2b214b9a6aec4fd66f787dd07c19ed36895b9b",
     "usd/assets/props/packing_table.usda": "2154d83206cd2af0642c5c9e3aee64d2d8a724d804526898b18df6fa4cbc8ed4",
     "usd/assets/props/blue_transport_box.usda": "8ab5c43e25872a5a50d9abb0e2212d8a6a93c4f6a2d3978aa9b9a7d4e93727f7",
     "usd/assets/tags/apriltag_36h11.usda": "c87b949882587c24dbe706ce6a6083df70d5bafb94f4322e61b2ba1246a64a50",
-    "source/franzi_sim/franzi_sim/cameras.py": "5c1bfb6bfb39f8696555449f05f9c828736d4c95041c546ca9ebed991034b188",
-    "source/franzi_sim/franzi_sim/scenarios/box_transfer.py": "1e88e5ec2fbc6b290c348e469b794d9a4259f6c446135cdaeafa8fc95cdeca6d",
-    "scripts/capture_workcell_evidence.py": "f3c4270f7d8f5eda1a66f19a194675f8ffa3b23102c67a7542fdbb18fc44b7bd"
+    "source/franzi_sim/franzi_sim/cameras.py": "ad61bfe688483b00fa64bbbcc47a7638d7eb2ce0cdb96f7087849da10ee87091",
+    "source/franzi_sim/franzi_sim/scenarios/box_transfer.py": "0ac7bf97a5fa7fbf578b95f909503e24758655ce2343d444499b1d75b67623c1",
+    "scripts/capture_workcell_evidence.py": "ca6f258a2b9c22db6e1ba80129b5e0e96c2c44767b79a8a3a05434d3f1278aad"
   },
-  "project_source_bundle_sha256": "24dfe46a984b1b6da3d8de6d51a28355596c03efa0e3bd1f6ea4db18036d02e6",
+  "project_source_bundle_sha256": "441ae02c29c1b033bc3f5ae4654ec93a20e752345c46ad75dd443c355e8a25b3",
   "stage_meters_per_unit": 1.0,
   "stage_up_axis": "Z",
   "simulation_time_s": 0.041666668839752674,
@@ -38,15 +47,40 @@
     "decoded_ids_in_box_closeup": [
       0
     ],
-    "robot_camera_detection_required": true,
+    "head_d435_detection_required": true,
     "robot_cameras_decoding_tag_0": [
-      "head_d435",
-      "left_wrist_d405",
-      "right_wrist_d405"
+      "head_d435"
     ],
     "size_m": 0.1,
     "parent_prim": "/WheelBotBoxTransfer/BlueTransportBox",
     "face_prim": "/WheelBotBoxTransfer/BlueTransportBox/AprilTag_0/Face"
+  },
+  "apriltags": {
+    "box_tag_0": {
+      "id": 0,
+      "size_m": 0.1,
+      "face_prim": "/WheelBotBoxTransfer/BlueTransportBox/AprilTag_0/Face",
+      "decoded_in": [
+        "apriltag_box_closeup",
+        "head_d435"
+      ]
+    },
+    "table_tag_1": {
+      "id": 1,
+      "size_m": 0.08,
+      "face_prim": "/WheelBotBoxTransfer/Workcell/PickTable/AprilTag_1/Face",
+      "decoded_in": [
+        "apriltag_table_closeup"
+      ]
+    },
+    "table_tag_2": {
+      "id": 2,
+      "size_m": 0.08,
+      "face_prim": "/WheelBotBoxTransfer/Workcell/PickTable/AprilTag_2/Face",
+      "decoded_in": [
+        "apriltag_table_closeup"
+      ]
+    }
   },
   "views": [
     {
@@ -56,12 +90,12 @@
         1600,
         900
       ],
-      "sha256": "a38d3958bd3d6874cabe2e9aa03d0abd876c9438259dc20c7e8b639859f6ed14",
+      "sha256": "b9c8219cdf72f12889f426a41666dd9223f3f8d06c21f246f9da374ca7507a2c",
       "pixel_metrics": {
         "minimum": 0,
         "maximum": 250,
-        "mean": 95.623,
-        "standard_deviation": 52.687
+        "mean": 96.355,
+        "standard_deviation": 52.982
       }
     },
     {
@@ -71,15 +105,34 @@
         1280,
         720
       ],
-      "sha256": "5a8a0f855196f440582266afa8b4e596f9a093244d52ddff3f6c44b02690f043",
+      "sha256": "9bfbdcf0264799fb79dfd573943812253bfca73cf478b0c5aaa1883dc2914d51",
       "pixel_metrics": {
         "minimum": 0,
-        "maximum": 240,
-        "mean": 118.861,
-        "standard_deviation": 63.694
+        "maximum": 239,
+        "mean": 119.884,
+        "standard_deviation": 63.811
       },
       "decoded_apriltag_ids": [
         0
+      ]
+    },
+    {
+      "name": "apriltag_table_closeup",
+      "file": "apriltag_table_closeup.png",
+      "resolution": [
+        2560,
+        1440
+      ],
+      "sha256": "b0c4ccf7bd387cad6b49aa138f9e8b675ca91c15b40e819bd8abd516ddce9f31",
+      "pixel_metrics": {
+        "minimum": 0,
+        "maximum": 250,
+        "mean": 140.035,
+        "standard_deviation": 47.625
+      },
+      "decoded_apriltag_ids": [
+        1,
+        2
       ]
     },
     {
@@ -89,12 +142,12 @@
         1280,
         720
       ],
-      "sha256": "217a7dd0bc4dfe07f09da5c7cbc7ce8c722fe77355ef9321b52f8e9fced1022c",
+      "sha256": "db4ca9d6a8c624a50dae8dcf2d4c2fd47b644c6d4bc34ee43f79e6a41f5282d6",
       "pixel_metrics": {
         "minimum": 0,
-        "maximum": 242,
-        "mean": 134.502,
-        "standard_deviation": 52.722
+        "maximum": 244,
+        "mean": 134.74,
+        "standard_deviation": 53.046
       },
       "decoded_apriltag_ids": [
         0
@@ -107,12 +160,12 @@
         1280,
         720
       ],
-      "sha256": "06c662f8c7a8e18580cd52a8958f5b32dedb6fa9d500dac303009f322518a64f",
+      "sha256": "92962b99aa3f0ebe25ee4a320ba326ad1012c1f4cc24b1d52cfff102654e8b62",
       "pixel_metrics": {
         "minimum": 0,
-        "maximum": 239,
-        "mean": 81.86,
-        "standard_deviation": 47.294
+        "maximum": 241,
+        "mean": 81.685,
+        "standard_deviation": 47.592
       },
       "decoded_apriltag_ids": []
     },
@@ -123,16 +176,14 @@
         1280,
         720
       ],
-      "sha256": "8e415b7c460bb36a51b72ec10788bfbfb0d277b9167fa8e9480a6bb9936ddbc6",
+      "sha256": "c449eb698d0ecbcfaba5c637ee5d4d6e7cd15319d9725c7c7b687180df573619",
       "pixel_metrics": {
         "minimum": 0,
-        "maximum": 249,
-        "mean": 140.13,
-        "standard_deviation": 66.456
+        "maximum": 247,
+        "mean": 162.098,
+        "standard_deviation": 63.762
       },
-      "decoded_apriltag_ids": [
-        0
-      ]
+      "decoded_apriltag_ids": []
     },
     {
       "name": "right_wrist_d405",
@@ -141,16 +192,14 @@
         1280,
         720
       ],
-      "sha256": "cac42faef69d41fb9054ed1acda1e7589d5e0d744e7db8c2573949290b76c58b",
+      "sha256": "d2231abc74f8f89b2bca50756cfd6636a19a647b0c581f3f9a6a85737513a144",
       "pixel_metrics": {
-        "minimum": 0,
-        "maximum": 250,
-        "mean": 141.022,
-        "standard_deviation": 76.507
+        "minimum": 4,
+        "maximum": 248,
+        "mean": 181.065,
+        "standard_deviation": 54.159
       },
-      "decoded_apriltag_ids": [
-        0
-      ]
+      "decoded_apriltag_ids": []
     }
   ],
   "camera_contract": {
@@ -161,8 +210,8 @@
       "right_wrist_d405"
     ],
     "all_four_rgb_frames_valid": true,
-    "tag_0_detected_by_robot_camera": true,
-    "both_d405_cameras_decode_tag_0": true,
+    "tag_0_detected_by_head_d435": true,
+    "d405_views_follow_gripper_axis": true,
     "cameras": {
       "head_d435": {
         "prim_path": "/WheelBotBoxTransfer/WheelBot/head_d435_Link/head_d435_camera_mount/camera",
@@ -211,79 +260,95 @@
     }
   },
   "robot_review_pose": {
-    "name": "box_transfer_camera_review_seed",
+    "name": "neutral_hanging_gripper_camera_review",
     "joint_positions_rad": {
-      "left_shoulder_pitch_joint": -1.62772,
-      "left_shoulder_roll_joint": -0.5,
-      "left_shoulder_yaw_joint": 0.16625,
-      "right_shoulder_pitch_joint": -1.2,
-      "left_elbow_pitch_joint": -2.52086,
-      "right_elbow_pitch_joint": -2.4,
-      "left_wrist_yaw_joint": -1.65108,
-      "right_wrist_yaw_joint": -2.25762,
-      "left_wrist_pitch_joint": -0.39265,
-      "right_wrist_pitch_joint": -0.30325,
-      "left_wrist_roll_joint": 0.09479,
-      "right_wrist_roll_joint": 0.60289
+      "left_shoulder_pitch_joint": 0.0,
+      "right_shoulder_pitch_joint": 0.0,
+      "left_shoulder_roll_joint": 0.0,
+      "right_shoulder_roll_joint": 0.0,
+      "left_shoulder_yaw_joint": 0.0,
+      "right_shoulder_yaw_joint": 0.0,
+      "left_elbow_pitch_joint": 0.0,
+      "right_elbow_pitch_joint": 0.0,
+      "left_wrist_yaw_joint": 0.0,
+      "right_wrist_yaw_joint": 0.0,
+      "left_wrist_pitch_joint": 0.0,
+      "right_wrist_pitch_joint": 0.0,
+      "left_wrist_roll_joint": 0.0,
+      "right_wrist_roll_joint": 0.0
     },
-    "minimum_joint_limit_margin_rad": 0.019999921321868896,
-    "maximum_set_position_error_rad": 9.620666485687934e-08
+    "minimum_joint_limit_margin_rad": 0.12999998033046722,
+    "maximum_set_position_error_rad": 0.0
   },
-  "d405_alignment": {
+  "d405_gripper_alignment": {
     "valid": true,
     "cameras": {
       "left_wrist_d405": {
         "camera_position_m": [
-          -0.08795259166916163,
-          0.2673400196245308,
-          1.6407206605558748
+          0.00031207342372615443,
+          0.2963290496908336,
+          0.72701279638848
         ],
         "forward_world": [
-          0.8637955767212391,
-          -0.11112904374905724,
-          -0.49143416372108506
+          -0.0001342303451053181,
+          -0.0012175231846114037,
+          -0.9999992498094733
+        ],
+        "image_right_world": [
+          -0.00031945297780843103,
+          0.9999992078455002,
+          -0.0012174802532036308
         ],
         "image_up_world": [
-          0.48537862989007136,
-          -0.07808779139191734,
-          0.8708099003121001
+          -0.9999999399660031,
+          -0.000319289315363287,
+          0.00013461918018102114
         ],
-        "aim_to_apriltag_dot": 0.9779294517635304,
-        "image_up_to_projected_gravity_dot": 0.9998796354321777,
+        "forward_to_gripper_minus_z_dot": 0.999999999999999,
         "forward_to_housing_minus_z_dot": 1.0,
-        "distal_raycast_start_offset_m": 0.18,
-        "distal_raycast_first_hit": "/WheelBotBoxTransfer/BlueTransportBox/PhysicsCollision",
-        "distal_raycast_first_hit_distance_m": 0.9648852348327637,
-        "distal_raycast_reaches_box_after_mount_hull": true
+        "forward_to_world_down_dot": 0.9999992498094733,
+        "image_right_to_robot_left_dot": 0.9999992078455002,
+        "image_up_to_robot_back_dot": 0.9999999399660031,
+        "downward_raycast_start_offset_m": 0.01,
+        "downward_raycast_first_hit": "/WheelBotBoxTransfer/GroundPlane/CollisionPlane",
+        "downward_raycast_first_hit_distance_m": 0.7170132398605347,
+        "downward_raycast_clear_of_near_tool": true
       },
       "right_wrist_d405": {
         "camera_position_m": [
-          0.09599430326210093,
-          -0.2769356281395389,
-          1.738060389623534
+          0.00033306344330894194,
+          -0.29622263571957913,
+          0.7269563323946431
         ],
         "forward_world": [
-          0.601702321330973,
-          0.5498621022632213,
-          -0.5793150999236851
+          0.00021049843491803877,
+          0.002227835054868389,
+          -0.9999974962175542
+        ],
+        "image_right_world": [
+          0.0005223918348878428,
+          0.9999973816810249,
+          0.0022279447626382368
         ],
         "image_up_world": [
-          0.42917361222484185,
-          0.38912647132603173,
-          0.8151015886889388
+          -0.9999998413985773,
+          0.000522859505817956,
+          -0.00020933408092385227
         ],
-        "aim_to_apriltag_dot": 0.9977366325249362,
-        "image_up_to_projected_gravity_dot": 0.9999974298974026,
+        "forward_to_gripper_minus_z_dot": 0.9999999999999944,
         "forward_to_housing_minus_z_dot": 1.0,
-        "distal_raycast_start_offset_m": 0.18,
-        "distal_raycast_first_hit": "/WheelBotBoxTransfer/BlueTransportBox/PhysicsCollision",
-        "distal_raycast_first_hit_distance_m": 1.049764633178711,
-        "distal_raycast_reaches_box_after_mount_hull": true
+        "forward_to_world_down_dot": 0.9999974962175542,
+        "image_right_to_robot_left_dot": 0.9999973816810249,
+        "image_up_to_robot_back_dot": 0.9999998413985773,
+        "downward_raycast_start_offset_m": 0.01,
+        "downward_raycast_first_hit": "/WheelBotBoxTransfer/WheelBot/base_link/collisions/base_link/node_STL_BINARY_",
+        "downward_raycast_first_hit_distance_m": 0.4946709871292114,
+        "downward_raycast_clear_of_near_tool": true
       }
     }
   },
   "review_board": "workcell_review_board.png",
-  "review_board_sha256": "0ef400194f82fc47dfb4d038e226242ddc136be283aea33c2e80c6449147f56a",
+  "review_board_sha256": "da3238ab38da6f5a71a8cc9163fd4b06feb88d5bce9a34815ea9e5a34cffbdab",
   "four_camera_contact_sheet": "four_camera_contact_sheet.png",
-  "four_camera_contact_sheet_sha256": "d2036b9723c846ffe1e6c448ec9de1eecb62011f27da7de452436fade60c5e8c"
+  "four_camera_contact_sheet_sha256": "5617a53b37884d5c82ba959e4246e7144dba4505d59bad0d7d29dabe72ed3c97"
 }

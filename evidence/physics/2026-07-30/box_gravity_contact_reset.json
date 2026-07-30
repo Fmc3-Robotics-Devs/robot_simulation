@@ -303,17 +303,18 @@
   "ok": true,
   "physics_dt_s": 0.008333333333333333,
   "physics_steps": 480,
-  "project_source_bundle_sha256": "cf218f830e88e703795f79b6600ed862a603c518da0fa7cb497ffe6cd964c092",
+  "project_source_bundle_sha256": "872970a8fca790a7775e49195b7255cd4a69b754bd53e2e941402c349f70cdeb",
   "project_source_sha256": {
-    "scripts/verify_box_physics_smoke.py": "c4950d808710c8b77bb74dea5ddfc24b7abd3852a5e3c90fbf85b8ac24c52d72",
+    "scripts/verify_box_physics_smoke.py": "4ae23f15890f11a2b82a8696f38e9aa5bfe83485c0543bc5dc4a0b401f81b462",
     "usd/assets/props/blue_transport_box.usda": "8ab5c43e25872a5a50d9abb0e2212d8a6a93c4f6a2d3978aa9b9a7d4e93727f7",
     "usd/assets/props/packing_table.usda": "2154d83206cd2af0642c5c9e3aee64d2d8a724d804526898b18df6fa4cbc8ed4",
     "usd/assets/tags/apriltag_36h11.usda": "c87b949882587c24dbe706ce6a6083df70d5bafb94f4322e61b2ba1246a64a50",
-    "usd/scenes/warehouse_box_transfer.usda": "5cd8c5677da6c6ea78c918d7f616470a78ba8ff768d49db8e0946e31993c7dfb",
+    "usd/scenes/warehouse_box_transfer.usda": "7b0f2ae203472b59af899eab7a175b00cc56e400f73d25cce399c09ff8951dff",
     "usd/scenes/warehouse_box_transfer_apriltags.usda": "56418d48697aceba2c8933c368272c65dc065ffe2d468067a9138320946ce60f",
     "usd/scenes/warehouse_box_transfer_physics.usda": "db61f1c0ca53d6bcd886981cdc0be2ed01e1ad80dcd6345ab3e62a2930d928b0",
+    "usd/scenes/warehouse_box_transfer_table_apriltags.usda": "0a339bd956be38acee303aeeee2a929c6712a02421b821f1b7a219e0d749280c",
     "usd/scenes/warehouse_box_transfer_workcell.usda": "abb7bc43dfaf412cfe01f28f0af594b2fd8e3340062eda0cc4a469b87b8e84cf"
   },
   "scene": "usd/scenes/warehouse_box_transfer.usda",
-  "scene_sha256": "5cd8c5677da6c6ea78c918d7f616470a78ba8ff768d49db8e0946e31993c7dfb"
+  "scene_sha256": "7b0f2ae203472b59af899eab7a175b00cc56e400f73d25cce399c09ff8951dff"
 }

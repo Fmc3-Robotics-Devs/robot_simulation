@@ -1,4 +1,5 @@
 {
+  "apriltag_failures": [],
   "apriltag_pose": {
     "origin_m": [
       0.8959333999999999,
@@ -21,6 +22,173 @@
     "shader_prim": "/WheelBotBoxTransfer/BlueTransportBox/AprilTag_0/AprilTagMaterial/Shader",
     "texture_coordinate_count": 4
   },
+  "apriltags": {
+    "box_tag_0": {
+      "bound_material": "/WheelBotBoxTransfer/BlueTransportBox/AprilTag_0/AprilTagMaterial",
+      "double_sided": true,
+      "face_authored_normal": [
+        -1.0,
+        0.0,
+        2.220446049250313e-16
+      ],
+      "face_edge_lengths_m": [
+        0.10000000149011612,
+        0.10000000149011612,
+        0.10000000149011612,
+        0.10000000149011612
+      ],
+      "face_geometric_normal": [
+        -1.0,
+        0.0,
+        0.0
+      ],
+      "face_prim": "/WheelBotBoxTransfer/BlueTransportBox/AprilTag_0/Face",
+      "face_vertex_counts": [
+        4
+      ],
+      "face_vertex_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "family": "tag36h11",
+      "mdl_source_asset": "@../../../vendor/isaac_assets/Isaac/Materials/AprilTag/AprilTag.mdl@",
+      "mdl_sub_identifier": "AprilTag",
+      "mosaic_asset": "@../../../vendor/isaac_assets/Isaac/Materials/AprilTag/Textures/tag36h11.png@",
+      "origin_m": [
+        0.8959333999999999,
+        0.38,
+        1.0801469
+      ],
+      "prim_path": "/WheelBotBoxTransfer/BlueTransportBox/AprilTag_0",
+      "role": "box_pose_landmark",
+      "shader_prim": "/WheelBotBoxTransfer/BlueTransportBox/AprilTag_0/AprilTagMaterial/Shader",
+      "shader_spacing": 1,
+      "shader_tag_id": 0,
+      "shader_tag_size": 10,
+      "shader_tags_per_row": 24,
+      "size_m": 0.1,
+      "tag_id": 0,
+      "texture_coordinate_count": 4,
+      "valid": true,
+      "visible_normal": [
+        -1.0,
+        0.0,
+        2.220446049250313e-16
+      ]
+    },
+    "pick_table_tag_1": {
+      "bound_material": "/WheelBotBoxTransfer/Workcell/PickTable/AprilTag_1/AprilTagMaterial",
+      "double_sided": true,
+      "face_authored_normal": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "face_edge_lengths_m": [
+        0.08000000119209272,
+        0.08000000119209294,
+        0.08000000119209272,
+        0.08000000119209294
+      ],
+      "face_geometric_normal": [
+        0.0,
+        -0.0,
+        0.9999999999999999
+      ],
+      "face_prim": "/WheelBotBoxTransfer/Workcell/PickTable/AprilTag_1/Face",
+      "face_vertex_counts": [
+        4
+      ],
+      "face_vertex_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "family": "tag36h11",
+      "mdl_source_asset": "@../../../vendor/isaac_assets/Isaac/Materials/AprilTag/AprilTag.mdl@",
+      "mdl_sub_identifier": "AprilTag",
+      "mosaic_asset": "@../../../vendor/isaac_assets/Isaac/Materials/AprilTag/Textures/tag36h11.png@",
+      "origin_m": [
+        0.9499999999999997,
+        -1.16,
+        0.9946
+      ],
+      "prim_path": "/WheelBotBoxTransfer/Workcell/PickTable/AprilTag_1",
+      "role": "pick_table_right_static_landmark",
+      "shader_prim": "/WheelBotBoxTransfer/Workcell/PickTable/AprilTag_1/AprilTagMaterial/Shader",
+      "shader_spacing": 1,
+      "shader_tag_id": 1,
+      "shader_tag_size": 10,
+      "shader_tags_per_row": 24,
+      "size_m": 0.08,
+      "tag_id": 1,
+      "texture_coordinate_count": 4,
+      "valid": true,
+      "visible_normal": [
+        0.0,
+        0.0,
+        1.0
+      ]
+    },
+    "pick_table_tag_2": {
+      "bound_material": "/WheelBotBoxTransfer/Workcell/PickTable/AprilTag_2/AprilTagMaterial",
+      "double_sided": true,
+      "face_authored_normal": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "face_edge_lengths_m": [
+        0.08000000119209272,
+        0.08000000119209294,
+        0.08000000119209272,
+        0.08000000119209294
+      ],
+      "face_geometric_normal": [
+        0.0,
+        -0.0,
+        0.9999999999999999
+      ],
+      "face_prim": "/WheelBotBoxTransfer/Workcell/PickTable/AprilTag_2/Face",
+      "face_vertex_counts": [
+        4
+      ],
+      "face_vertex_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "family": "tag36h11",
+      "mdl_source_asset": "@../../../vendor/isaac_assets/Isaac/Materials/AprilTag/AprilTag.mdl@",
+      "mdl_sub_identifier": "AprilTag",
+      "mosaic_asset": "@../../../vendor/isaac_assets/Isaac/Materials/AprilTag/Textures/tag36h11.png@",
+      "origin_m": [
+        0.9500000000000003,
+        1.16,
+        0.9946
+      ],
+      "prim_path": "/WheelBotBoxTransfer/Workcell/PickTable/AprilTag_2",
+      "role": "pick_table_left_static_landmark",
+      "shader_prim": "/WheelBotBoxTransfer/Workcell/PickTable/AprilTag_2/AprilTagMaterial/Shader",
+      "shader_spacing": 1,
+      "shader_tag_id": 2,
+      "shader_tag_size": 10,
+      "shader_tags_per_row": 24,
+      "size_m": 0.08,
+      "tag_id": 2,
+      "texture_coordinate_count": 4,
+      "valid": true,
+      "visible_normal": [
+        0.0,
+        0.0,
+        1.0
+      ]
+    }
+  },
   "bounds": {
     "/WheelBotBoxTransfer/BlueTransportBox": {
       "maximum_m": [
@@ -42,17 +210,17 @@
     "/WheelBotBoxTransfer/WheelBot": {
       "maximum_m": [
         0.24465815722942352,
-        0.31747499294523984,
+        0.3174749929457903,
         1.8158231202840804
       ],
       "minimum_m": [
         -0.3376596048474312,
-        -0.31747515946478655,
+        -0.3174749929457903,
         3.441910743713639e-05
       ],
       "size_m": [
         0.5823177620768547,
-        0.6349501524100264,
+        0.6349499858915806,
         1.8157887011766434
       ]
     },
@@ -77,7 +245,7 @@
       "maximum_m": [
         1.630999984741211,
         1.236823272705078,
-        0.9940513610839844
+        0.995400000037998
       ],
       "minimum_m": [
         0.8690000152587889,
@@ -87,7 +255,7 @@
       "size_m": [
         0.7619999694824222,
         2.473646545410156,
-        0.9940513610839844
+        0.995400000037998
       ]
     }
   },
@@ -101,6 +269,7 @@
         100.0
       ],
       "clipping_range_valid": true,
+      "d405_camera_forward_to_gripper_axis_dot": null,
       "d405_camera_forward_to_housing_lens_axis_dot": null,
       "optical_frame_path": "/WheelBotBoxTransfer/WheelBot/body_d435_Link/chest_d435_optical_frame",
       "optical_frame_prim": true,
@@ -119,6 +288,7 @@
         100.0
       ],
       "clipping_range_valid": true,
+      "d405_camera_forward_to_gripper_axis_dot": null,
       "d405_camera_forward_to_housing_lens_axis_dot": null,
       "optical_frame_path": "/WheelBotBoxTransfer/WheelBot/head_d435_Link/head_d435_optical_frame",
       "optical_frame_prim": true,
@@ -137,13 +307,14 @@
         100.0
       ],
       "clipping_range_valid": true,
-      "d405_camera_forward_to_housing_lens_axis_dot": 1.0000000000000002,
+      "d405_camera_forward_to_gripper_axis_dot": 1.0,
+      "d405_camera_forward_to_housing_lens_axis_dot": 1.0,
       "optical_frame_path": "/WheelBotBoxTransfer/WheelBot/left_wrist_d405_Link/left_wrist_d405_optical_frame",
       "optical_frame_prim": true,
       "prim_path": "/WheelBotBoxTransfer/WheelBot/left_wrist_d405_Link/left_wrist_d405_camera_mount/camera",
       "usd_to_ros_axis_dots": {
-        "down": 1.0000000000000002,
-        "forward": 1.0000000000000002,
+        "down": 1.0,
+        "forward": 1.0,
         "right": 1.0
       }
     },
@@ -155,13 +326,14 @@
         100.0
       ],
       "clipping_range_valid": true,
-      "d405_camera_forward_to_housing_lens_axis_dot": 1.0000000000000002,
+      "d405_camera_forward_to_gripper_axis_dot": 1.0,
+      "d405_camera_forward_to_housing_lens_axis_dot": 1.0,
       "optical_frame_path": "/WheelBotBoxTransfer/WheelBot/right_wrist_d405_Link/right_wrist_d405_optical_frame",
       "optical_frame_prim": true,
       "prim_path": "/WheelBotBoxTransfer/WheelBot/right_wrist_d405_Link/right_wrist_d405_camera_mount/camera",
       "usd_to_ros_axis_dots": {
-        "down": 1.0000000000000002,
-        "forward": 1.0000000000000002,
+        "down": 1.0,
+        "forward": 1.0,
         "right": 1.0
       }
     }
@@ -194,6 +366,9 @@
     "/WheelBotBoxTransfer",
     "/WheelBotBoxTransfer/WheelBot",
     "/WheelBotBoxTransfer/BlueTransportBox",
+    "/WheelBotBoxTransfer/BlueTransportBox/AprilTag_0",
+    "/WheelBotBoxTransfer/Workcell/PickTable/AprilTag_1",
+    "/WheelBotBoxTransfer/Workcell/PickTable/AprilTag_2",
     "/WheelBotBoxTransfer/DropZone",
     "/WheelBotBoxTransfer/PhysicsScene",
     "/WheelBotBoxTransfer/BlueTransportBox/PhysicsCollision"
