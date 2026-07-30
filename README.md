@@ -12,7 +12,7 @@ Wheel Bot 的 Isaac Sim 工程基线：项目 `.venv` 使用 **Python 3.11.14**�
 
 蓝箱采用 NVIDIA 视觉资产叠加项目**单一** `PhysicsCollision` 代理；刚体、质量和摩擦参数由项目物理层提供。正式场景的 gravity、接触落稳、Tag 随箱、reset 冒烟测试已通过，见 [`box_gravity_contact_reset.json`](evidence/physics/2026-07-30/box_gravity_contact_reset.json)。
 
-尚未完成的范围是固定底盘双臂搬箱执行器，以及 `≤0.01 rad` 的机械臂跟踪门。ROS 2 的 Image/CameraInfo **精确同时间戳**验证器已经实现；但最新正式场景的 live ROS 2 与 TF/Tag 位姿闭环尚未重新采集，历史 ROS 证据不能当作该门已通过。
+当前已增加一个可复现的**软件在环搬箱演示**：120 Hz 关键帧驱动底盘、转向轮、头部、双臂与夹爪；双手位置、夹爪闭合量和工具轴方向通过门槛后，蓝箱受控跟随双夹爪中点，释放后恢复为自由动态刚体并在桌面落稳。它用于验证任务流程、全身动作、正式 USD 和五路录像链路，不等同于 MoveIt 闭环或纯摩擦物理抓取。P3/P4 尚未完成的范围仍包括 MoveIt/ROS 2 执行器、真实接触抓取、批量成功率与稳定性门。ROS 2 的 Image/CameraInfo **精确同时间戳**验证器已经实现；但最新正式场景的 live ROS 2 与 TF/Tag 位姿闭环尚未重新采集，历史 ROS 证据不能当作该门已通过。
 
 实施范围、阶段门和接口约定见 [实施计划](docs/implementation_plan.md)；汇报材料为 [PPT v0.2](report/WheelBot仿真项目计划汇报_v0.2.pptx) 与 [PDF v0.2](report/WheelBot仿真项目计划汇报_v0.2.pdf)。运行时、素材挂载与 ROS 边界见 [Isaac Sim 说明](IsaacSim/README.md)。
 
@@ -35,6 +35,21 @@ uv run python --version
 uv run python -c "from importlib.metadata import version; print('isaacsim', version('isaacsim')); print('isaaclab', version('isaaclab'))"
 uv run isaacsim isaacsim.exp.compatibility_check
 ```
+
+## 搬箱动态演示与五路录像
+
+[`record_box_transfer_demo.py`](scripts/record_box_transfer_demo.py) 直接打开正式场景，按“接近—预抓—合爪—抬升—横移—下降—释放—撤离—复位”执行 21 秒动作。蓝箱从 `(1.20, 0.38, 0.995) m` 搬到同一 PickTable 的另一角 `(1.20, -0.72, 0.995) m`。录像同步包含总览、头部 D435、胸部 D435、左腕 D405、右腕 D405；所有源帧均为 1280×720，合成视频为 1920×1080。
+
+```bash
+demo_output=/tmp/wheelbot_box_transfer
+env -u PYTHONPATH -u CMAKE_PREFIX_PATH OMNI_KIT_ACCEPT_EULA=YES \
+  uv run --frozen python scripts/record_box_transfer_demo.py \
+  --scene usd/scenes/warehouse_box_transfer.usda \
+  --output-dir "$demo_output" \
+  --fps 15 --rt-subframes 4 --headless
+```
+
+输出包含五路独立 MP4、带阶段/时间/箱体状态的合成 MP4、代表关键帧、逐帧时间线和带源码/场景哈希的 `manifest.json`。脚本只接受不存在或为空的输出目录，避免旧帧混入新结果；Replicator 以 `delta_time=0.0` 取帧，仿真时间只由 120 Hz 控制循环推进。正式归档位于 [`evidence/box_transfer/2026-07-30/final/`](evidence/box_transfer/2026-07-30/final/)；实现边界和指标解释见 [搬箱演示说明](docs/box_transfer_demo.md)。
 
 ## 验证
 

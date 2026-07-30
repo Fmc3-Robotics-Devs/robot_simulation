@@ -46,7 +46,9 @@ robot_simulation/
 
 顶层入口保持为 `usd/scenes/warehouse_box_transfer.usda`。该层引用官方仓库环境并组合项目自有机器人、货箱和传感器层；所有路径必须相对项目根目录，不能写死个人机器的绝对资产路径。
 
-截至 2026-07-30，该入口已形成正式的 Unitree 式多工位 Warehouse 工位：Wheel Bot 位于主作业台，蓝色运输箱位于其前方，交付台与三处背景工位共同提供正常仓储语义。蓝箱正面附着项目自有 `tag36h11` **ID 0**，用于随箱位姿；主 PickTable 近侧右、左两个对称空闲角另组合朝 `+Z` 的 80 mm **ID 1/2**，作为静态工位定位基准。三者必须在检测、TF 和验证输出中按 ID/角色区分。结构、碰撞与四相机坐标基线为 `evidence/usd/2026-07-30/warehouse_workcell.json`，RTX 总览、Tag 0/1/2 独立近景和四相机截图为 `evidence/workcell/2026-07-30/final/`；证据 manifest 同时绑定正式场景、完整机器人配置层和 D405 修正版 URDF。蓝箱的重力、接触、Tag 跟随和 reset smoke 见 `evidence/physics/2026-07-30/box_gravity_contact_reset.json`。这仍不等同于搬箱闭环完成：固定底盘双臂执行器和 `≤0.01 rad` 跟踪门仍在 P3。
+截至 2026-07-30，该入口已形成正式的 Unitree 式多工位 Warehouse 工位：Wheel Bot 位于主作业台，蓝色运输箱位于其前方，交付台与三处背景工位共同提供正常仓储语义。蓝箱正面附着项目自有 `tag36h11` **ID 0**，用于随箱位姿；主 PickTable 近侧右、左两个对称空闲角另组合朝 `+Z` 的 80 mm **ID 1/2**，作为静态工位定位基准。三者必须在检测、TF 和验证输出中按 ID/角色区分。结构、碰撞与四相机坐标基线为 `evidence/usd/2026-07-30/warehouse_workcell.json`，RTX 总览、Tag 0/1/2 独立近景和四相机截图为 `evidence/workcell/2026-07-30/final/`；证据 manifest 同时绑定正式场景、完整机器人配置层和 D405 修正版 URDF。蓝箱的重力、接触、Tag 跟随和 reset smoke 见 `evidence/physics/2026-07-30/box_gravity_contact_reset.json`。
+
+同日新增 21 秒软件在环搬箱演示：底盘、转向轮、头部、双臂和夹爪执行“接近—预抓—抓取—抬升—横移—下降—释放—撤离—复位”，蓝箱从 `(1.20,0.38,0.995) m` 搬到 `(1.20,-0.72,0.995) m`，并同步记录总览加四个机载相机。该演示通过双手几何/闭合/方向门后使用受控动态刚体位姿约束，释放后由 PhysX 落桌；实现和证据规范见 `docs/box_transfer_demo.md`。这证明任务流程、全身轨迹和五路录像链可运行，但仍不等同于 P3/P4 的 MoveIt/ROS 2 闭环、纯摩擦抓取、批量成功率与稳定性门。
 
 ## 3. 目标场景与任务接口
 
@@ -200,6 +202,14 @@ env -u PYTHONPATH -u CMAKE_PREFIX_PATH OMNI_KIT_ACCEPT_EULA=YES \
   uv run --frozen python scripts/verify_box_physics_smoke.py \
   --scene usd/scenes/warehouse_box_transfer.usda \
   --output evidence/physics/$(date +%F)/box_gravity_contact_reset.json
+
+# 21 秒全身搬箱与五路同步录像
+demo_output=/tmp/wheelbot_box_transfer
+env -u PYTHONPATH -u CMAKE_PREFIX_PATH OMNI_KIT_ACCEPT_EULA=YES \
+  uv run --frozen python scripts/record_box_transfer_demo.py \
+  --scene usd/scenes/warehouse_box_transfer.usda \
+  --output-dir "$demo_output" \
+  --fps 15 --rt-subframes 4 --headless
 ```
 
 最新正式场景的 ROS 2 验收必须在 Isaac Sim ROS 2 Bridge 已启动后，从系统 Jazzy 终端启动；验证器只接受时间戳完全相同的 `Image`/`CameraInfo` 对，不能拿历史 JSON 回填：
@@ -294,3 +304,4 @@ python3 scripts/verify_ros2_camera_topics.py \
 | 2026-07-30 | 主 PickTable 对称桌角新增独立 `tag36h11` Tag 1/2；与随箱 Tag 0 分层、分 prim、分验证角色 | 为工位坐标提供不随任务对象运动的静态定位基准 | USD、静态验证、README/资产约定 | 项目负责人 |
 | 2026-07-29 | 将 Hugging Face 固定版本数据加入第三层参考源，建立最小下载、许可证与兼容性门 | 负责人补充可用的 Isaac Lab/Isaac Sim 数据来源 | 资料、资产、数据结构与 subagent 调研 | 项目负责人 |
 | 2026-07-30 | D405 实体镜头、USD 光轴和夹爪 `-Z` 同轴；自然下垂时朝地，USD/ROS roll 分别为 `Rz90` / `Rz90·Rx180`（先安装旋转，再乘局部 optical 变换）；中立腕相机不设 Tag 解码门。机器人根节点按轮面抬高 87.3 mm，并显式审计 37 个 convex hull | 以夹爪物理方向和真实 D405 参考画面重新定义验收 | 相机、URDF/USD、TF、场景、碰撞、测试与证据 | 项目负责人 |
+| 2026-07-30 | 增加 21 秒软件在环全身搬箱、30 mm 双手抓取门、释放后 PhysX 落桌和总览/四机载相机五路录像；放置 XY 门为 30 mm | 先形成可见、可重复、可追溯的端到端流程证据，再接 MoveIt/ROS 2 与真实接触抓取 | P3/P4 演示、录像、README、测试与证据 | 项目负责人 |

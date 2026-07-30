@@ -17,7 +17,7 @@ uv run isaacsim isaacsim.exp.compatibility_check
 
 [`usd/scenes/warehouse_box_transfer.usda`](../usd/scenes/warehouse_box_transfer.usda) 是当前正式场景，不是 foundation 占位层。它以 NVIDIA Warehouse 作为只读环境，组合了 Unitree 式多工位仓储布局、Wheel Bot、蓝色运输箱、Tag 和放置工位。蓝箱正面绑定随箱移动的 `tag36h11` ID 0；主 PickTable 近侧两个对称桌角另有朝 `+Z` 的 80 mm ID 1（世界 `y≈-1.16 m`）和 ID 2（世界 `y≈+1.16 m`），作为不随箱移动的右、左静态工位定位基准。箱体标签与桌面双标签使用独立场景层和 prim，验证与检测结果必须按 ID/角色分开；三者的 composed-stage 验证见 [`warehouse_workcell.json`](../evidence/usd/2026-07-30/warehouse_workcell.json)。
 
-蓝箱保留 NVIDIA 的视觉资产，并只添加一个项目控制的 `PhysicsCollision` 代理；箱体是动态刚体。正式场景的重力、台面接触、Tag 跟随与 reset 均已通过 headless smoke，结果见 [`box_gravity_contact_reset.json`](../evidence/physics/2026-07-30/box_gravity_contact_reset.json)。这证明物理场景基础可用，但不等同于双臂抓取/搬运任务已经完成。
+蓝箱保留 NVIDIA 的视觉资产，并只添加一个项目控制的 `PhysicsCollision` 代理；箱体是动态刚体。正式场景的重力、台面接触、Tag 跟随与 reset 均已通过 headless smoke，结果见 [`box_gravity_contact_reset.json`](../evidence/physics/2026-07-30/box_gravity_contact_reset.json)。软件在环搬箱演示还会在双手门槛通过后对该动态刚体施加受控位姿约束，释放后停止约束并让 PhysX 完成桌面接触。它证明任务动作与记录链可运行，但不等同于 MoveIt 闭环或纯摩擦抓取。
 
 ```bash
 env -u PYTHONPATH -u CMAKE_PREFIX_PATH OMNI_KIT_ACCEPT_EULA=YES \
@@ -34,7 +34,16 @@ env -u PYTHONPATH -u CMAKE_PREFIX_PATH OMNI_KIT_ACCEPT_EULA=YES \
   uv run --frozen python scripts/verify_box_physics_smoke.py \
   --scene usd/scenes/warehouse_box_transfer.usda \
   --output evidence/physics/$(date +%F)/box_gravity_contact_reset.json
+
+demo_output=/tmp/wheelbot_box_transfer
+env -u PYTHONPATH -u CMAKE_PREFIX_PATH OMNI_KIT_ACCEPT_EULA=YES \
+  uv run --frozen python scripts/record_box_transfer_demo.py \
+  --scene usd/scenes/warehouse_box_transfer.usda \
+  --output-dir "$demo_output" \
+  --fps 15 --rt-subframes 4 --headless
 ```
+
+动态录像脚本以 120 Hz 推进仿真，并用 Replicator `delta_time=0.0` 同步读取总览、头部、胸部和双腕五路 1280×720 RGB，避免取帧动作额外推进物理时间。输出目录包含五路独立视频、1920×1080 合成视频、关键帧、时间线和运行 manifest；完整说明见 [搬箱演示说明](../docs/box_transfer_demo.md)。
 
 ## 相机与 ROS 2 验证
 
@@ -53,4 +62,4 @@ python3 scripts/verify_ros2_camera_topics.py \
 
 系统 ROS 2 Jazzy 保持在系统 Python 3.12 环境中；项目 Python 3.11 通过 Isaac Sim ROS 2 Bridge/DDS 通信。不要将 `/opt/ros/jazzy` 的 Python 包或 `rclpy` 安装进 `.venv`。
 
-当前尚未通过的 P3 门是固定底盘的双臂预抓、夹持、抬升、放置、撤离执行器，以及 `≤0.01 rad` 的机械臂跟踪误差。阶段计划与交付说明见 [实施计划](../docs/implementation_plan.md)；汇报材料见 [PPT v0.2](../report/WheelBot仿真项目计划汇报_v0.2.pptx) 和 [PDF v0.2](../report/WheelBot仿真项目计划汇报_v0.2.pdf)。
+软件在环演示已覆盖底盘接近、双臂预抓、受控夹持、抬升、横移、放置、撤离和五路录像；P3/P4 仍未通过的门是 MoveIt/ROS 2 执行闭环、纯接触抓取、重复成功率、故障恢复与长时间稳定性。阶段计划与交付说明见 [实施计划](../docs/implementation_plan.md)；汇报材料见 [PPT v0.2](../report/WheelBot仿真项目计划汇报_v0.2.pptx) 和 [PDF v0.2](../report/WheelBot仿真项目计划汇报_v0.2.pdf)。
