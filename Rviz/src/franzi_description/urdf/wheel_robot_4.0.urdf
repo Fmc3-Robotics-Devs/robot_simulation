@@ -1012,7 +1012,7 @@
     type="fixed">
     <origin
       xyz="-0.0301 0.057975 -0.13418"
-      rpy="3.1416 0 0" />
+      rpy="0 0 0" />
     <parent
       link="left_wrist_roll_Link" />
     <child
@@ -1587,7 +1587,7 @@
     type="fixed">
     <origin
       xyz="-0.0301 -0.057975 -0.13418"
-      rpy="3.1416 0 0" />
+      rpy="0 0 0" />
     <parent
       link="right_wrist_roll_Link" />
     <child

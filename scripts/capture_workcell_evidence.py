@@ -3,7 +3,8 @@
 
 The capture is deliberately made from ``warehouse_box_transfer.usda`` rather
 than a synthetic calibration scene.  It therefore checks the exact USD entry
-that users open in Isaac Sim, including the box-attached AprilTag.
+that users open in Isaac Sim, including the box Tag 0, tabletop Tags 1/2, and
+the gripper-aligned downward D405 views.
 """
 
 from __future__ import annotations
@@ -13,6 +14,7 @@ import hashlib
 from importlib.metadata import version as package_version
 import json
 from datetime import datetime
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -45,12 +47,30 @@ CAMERAS = (
         "right_wrist_d405_camera_mount/camera",
     ),
 )
+D405_WRIST_ROLL_PATHS = {
+    "left_wrist_d405": "/WheelBotBoxTransfer/WheelBot/left_wrist_roll_Link",
+    "right_wrist_d405": "/WheelBotBoxTransfer/WheelBot/right_wrist_roll_Link",
+}
+BOX_TAG_FACE_PATH = "/WheelBotBoxTransfer/BlueTransportBox/AprilTag_0/Face"
+TABLE_TAG_FACE_PATHS = {
+    1: "/WheelBotBoxTransfer/Workcell/PickTable/AprilTag_1/Face",
+    2: "/WheelBotBoxTransfer/Workcell/PickTable/AprilTag_2/Face",
+}
 PROJECT_SOURCE_FILES = (
     Path("usd/scenes/warehouse_box_transfer.usda"),
     Path("usd/scenes/warehouse_box_transfer_workcell.usda"),
     Path("usd/scenes/warehouse_box_transfer_apriltags.usda"),
+    Path("usd/scenes/warehouse_box_transfer_table_apriltags.usda"),
     Path("usd/scenes/warehouse_box_transfer_physics.usda"),
+    Path("Rviz/src/franzi_description/urdf/wheel_robot_4.0.urdf"),
+    Path("scripts/import_robot_urdf.py"),
+    Path("usd/assets/robots/wheel_bot/.asset_hash"),
+    Path("usd/assets/robots/wheel_bot/config.yaml"),
     Path("usd/assets/robots/wheel_bot/wheel_bot.usd"),
+    Path("usd/assets/robots/wheel_bot/configuration/wheel_bot_base.usd"),
+    Path("usd/assets/robots/wheel_bot/configuration/wheel_bot_physics.usd"),
+    Path("usd/assets/robots/wheel_bot/configuration/wheel_bot_robot.usd"),
+    Path("usd/assets/robots/wheel_bot/configuration/wheel_bot_sensor.usd"),
     Path("usd/assets/robots/wheel_bot/wheel_bot_with_cameras.usda"),
     Path("usd/assets/robots/wheel_bot/camera_sensors.usda"),
     Path("usd/assets/props/packing_table.usda"),
@@ -242,11 +262,12 @@ def _save_four_camera_sheet(
 
 def _save_review_board(
     overview_path: Path,
-    closeup_path: Path,
+    box_closeup_path: Path,
+    table_closeup_path: Path,
     camera_paths: list[tuple[str, Path]],
     output_path: Path,
 ) -> None:
-    """Create one review image containing overview, tag inset, and four cameras."""
+    """Create one review image containing overview, tag insets, and cameras."""
 
     width, overview_height, camera_height = 1600, 850, 250
     header_height, footer_height, gap = 80, 58, 10
@@ -265,7 +286,7 @@ def _save_review_board(
     )
     draw.text(
         (28, 53),
-        "Official Isaac assets · AprilTag 0 attached to blue box · formal USD",
+        "Official Isaac assets · Tag 0 on box · Tags 1/2 on table · formal USD",
         font=body_font,
         fill=(146, 190, 226),
     )
@@ -276,28 +297,42 @@ def _save_review_board(
     )
     canvas.paste(overview, (0, header_height))
 
-    # The inset makes the physical tag placement reviewable even when the full
-    # warehouse is framed wide enough to show the mobile delivery station.
+    # Insets keep all three tag placements reviewable while the main frame
+    # remains wide enough to show the complete workcell and natural arm pose.
     inset_size = (420, 236)
-    inset = _fit_cover(Image.open(closeup_path).convert("RGB"), inset_size)
     inset_x = width - inset_size[0] - 24
-    inset_y = header_height + overview_height - inset_size[1] - 24
-    draw.rectangle(
-        (
-            inset_x - 5,
-            inset_y - 34,
-            inset_x + inset_size[0] + 5,
-            inset_y + inset_size[1] + 5,
-        ),
-        fill=(10, 15, 21),
+
+    def paste_inset(path: Path, y: int, label: str) -> None:
+        """Place one captioned evidence inset over the overview."""
+
+        inset = _fit_cover(Image.open(path).convert("RGB"), inset_size)
+        draw.rectangle(
+            (
+                inset_x - 5,
+                y - 34,
+                inset_x + inset_size[0] + 5,
+                y + inset_size[1] + 5,
+            ),
+            fill=(10, 15, 21),
+        )
+        draw.text(
+            (inset_x + 8, y - 29),
+            label,
+            font=camera_font,
+            fill=(255, 255, 255),
+        )
+        canvas.paste(inset, (inset_x, y))
+
+    paste_inset(
+        table_closeup_path,
+        header_height + 58,
+        "APRILTAG 1/2 · TABLE CORNERS",
     )
-    draw.text(
-        (inset_x + 8, inset_y - 29),
+    paste_inset(
+        box_closeup_path,
+        header_height + overview_height - inset_size[1] - 24,
         "APRILTAG 0 · BOX FRONT FACE",
-        font=camera_font,
-        fill=(255, 255, 255),
     )
-    canvas.paste(inset, (inset_x, inset_y))
 
     cell_width = width // 4
     camera_y = header_height + overview_height + gap
@@ -406,34 +441,24 @@ def _apply_robot_review_pose() -> tuple[object, dict[str, object]]:
             f"camera review pose error is {maximum_error:.6f} rad"
         )
     return world, {
-        "name": "box_transfer_camera_review_seed",
+        "name": "neutral_hanging_gripper_camera_review",
         "joint_positions_rad": dict(BOX_TRANSFER_CAMERA_REVIEW_POSE_RAD),
         "minimum_joint_limit_margin_rad": float(np.min(limit_margins)),
         "maximum_set_position_error_rad": maximum_error,
     }
 
 
-def _measure_d405_review_alignment(stage: object) -> dict[str, object]:
-    """Measure task aim, roll, lens axis, and the distal task ray.
-
-    The imported wrist/bracket convex hull encloses the camera origin, so the
-    physics ray intentionally begins beyond that known hull.  It is not proof
-    that the complete optical ray is unobstructed; successful RTX Tag 0 decode
-    is the end-to-end visibility gate.
-    """
+def _measure_d405_gripper_alignment(stage: object) -> dict[str, object]:
+    """Measure the rigid D405-to-gripper axis in the neutral hanging pose."""
 
     import carb
     from omni.physx import get_physx_scene_query_interface
     from pxr import Gf, Usd, UsdGeom
 
     xform_cache = UsdGeom.XformCache(Usd.TimeCode.Default())
-    tag_prim = stage.GetPrimAtPath(
-        "/WheelBotBoxTransfer/BlueTransportBox/AprilTag_0/Face"
-    )
-    tag_position = xform_cache.GetLocalToWorldTransform(tag_prim).Transform(
-        Gf.Vec3d(0, 0, 0)
-    )
-    world_up = Gf.Vec3d(0, 0, 1)
+    world_down = Gf.Vec3d(0, 0, -1)
+    robot_left = Gf.Vec3d(0, 1, 0)
+    robot_back = Gf.Vec3d(-1, 0, 0)
     measurements: dict[str, dict[str, object]] = {}
     for name, camera_path in CAMERAS:
         if not name.endswith("wrist_d405"):
@@ -444,26 +469,27 @@ def _measure_d405_review_alignment(stage: object) -> dict[str, object]:
         housing_matrix = xform_cache.GetLocalToWorldTransform(housing_prim)
         camera_position = camera_matrix.Transform(Gf.Vec3d(0, 0, 0))
         forward = camera_matrix.TransformDir(Gf.Vec3d(0, 0, -1)).GetNormalized()
+        image_right = camera_matrix.TransformDir(
+            Gf.Vec3d(1, 0, 0)
+        ).GetNormalized()
         image_up = camera_matrix.TransformDir(Gf.Vec3d(0, 1, 0)).GetNormalized()
         physical_lens_axis = housing_matrix.TransformDir(
             Gf.Vec3d(0, 0, -1)
         ).GetNormalized()
-        to_tag = (tag_position - camera_position).GetNormalized()
-        projected_world_up = (
-            world_up - forward * (forward * world_up)
+        wrist_roll_matrix = xform_cache.GetLocalToWorldTransform(
+            stage.GetPrimAtPath(D405_WRIST_ROLL_PATHS[name])
+        )
+        gripper_direction = wrist_roll_matrix.TransformDir(
+            Gf.Vec3d(0, 0, -1)
         ).GetNormalized()
-        # Imported wrist-roll/yaw collision hulls enclose the 134 mm fixed
-        # sensor bracket.  Start beyond that known local assembly so this ray
-        # measures task-line occlusion instead of a sensor-origin overlap.
-        distal_raycast_start_offset_m = 0.18
-        ray_origin = camera_position + forward * distal_raycast_start_offset_m
-        ray_to_tag = tag_position - ray_origin
-        distance_to_tag = float(ray_to_tag.GetLength())
-        ray_direction = ray_to_tag.GetNormalized()
+        # The sensor is 0.5 mm outside the mesh.  A 10 mm offset clears numeric
+        # contact skin while remaining in front of the physical lens plane.
+        raycast_start_offset_m = 0.01
+        ray_origin = camera_position + forward * raycast_start_offset_m
         raycast_hit = get_physx_scene_query_interface().raycast_closest(
             carb.Float3(*[float(value) for value in ray_origin]),
-            carb.Float3(*[float(value) for value in ray_direction]),
-            distance_to_tag + 0.02,
+            carb.Float3(*[float(value) for value in forward]),
+            2.0,
             True,
         )
         first_hit_collision = (
@@ -472,37 +498,49 @@ def _measure_d405_review_alignment(stage: object) -> dict[str, object]:
         first_hit_distance_m = (
             float(raycast_hit.get("distance", 0.0)) if raycast_hit.get("hit") else None
         )
-        distal_raycast_reaches_box = first_hit_collision.startswith(
-            "/WheelBotBoxTransfer/BlueTransportBox/"
+        # A distant base/floor hit is expected in the natural hanging pose and
+        # mirrors the real D405 reference, where part of the robot may remain
+        # at the image edge.  Reject only near wrist/tool self-occlusion.
+        downward_ray_clear_of_near_tool = (
+            bool(raycast_hit.get("hit"))
+            and first_hit_distance_m is not None
+            and first_hit_distance_m > 0.3
         )
         measurements[name] = {
             "camera_position_m": [float(value) for value in camera_position],
             "forward_world": [float(value) for value in forward],
+            "image_right_world": [float(value) for value in image_right],
             "image_up_world": [float(value) for value in image_up],
-            "aim_to_apriltag_dot": float(forward * to_tag),
-            "image_up_to_projected_gravity_dot": float(
-                image_up * projected_world_up
+            "forward_to_gripper_minus_z_dot": float(
+                forward * gripper_direction
             ),
             "forward_to_housing_minus_z_dot": float(
                 forward * physical_lens_axis
             ),
-            "distal_raycast_start_offset_m": distal_raycast_start_offset_m,
-            "distal_raycast_first_hit": first_hit_collision,
-            "distal_raycast_first_hit_distance_m": first_hit_distance_m,
-            "distal_raycast_reaches_box_after_mount_hull": (
-                distal_raycast_reaches_box
+            "forward_to_world_down_dot": float(forward * world_down),
+            "image_right_to_robot_left_dot": float(
+                image_right * robot_left
+            ),
+            "image_up_to_robot_back_dot": float(image_up * robot_back),
+            "downward_raycast_start_offset_m": raycast_start_offset_m,
+            "downward_raycast_first_hit": first_hit_collision,
+            "downward_raycast_first_hit_distance_m": first_hit_distance_m,
+            "downward_raycast_clear_of_near_tool": (
+                downward_ray_clear_of_near_tool
             ),
         }
 
     valid = all(
-        float(values["aim_to_apriltag_dot"]) >= 0.85
-        and float(values["image_up_to_projected_gravity_dot"]) >= 0.999
+        float(values["forward_to_gripper_minus_z_dot"]) >= 0.999
         and float(values["forward_to_housing_minus_z_dot"]) >= 0.999
-        and bool(values["distal_raycast_reaches_box_after_mount_hull"])
+        and float(values["forward_to_world_down_dot"]) >= 0.999
+        and float(values["image_right_to_robot_left_dot"]) >= 0.999
+        and float(values["image_up_to_robot_back_dot"]) >= 0.999
+        and bool(values["downward_raycast_clear_of_near_tool"])
         for values in measurements.values()
     )
     if not valid or len(measurements) != 2:
-        raise RuntimeError(f"D405 task-pose alignment failed: {measurements}")
+        raise RuntimeError(f"D405 gripper-axis alignment failed: {measurements}")
     return {"valid": True, "cameras": measurements}
 
 
@@ -552,7 +590,7 @@ def main() -> int:
         stage = context.get_stage()
         world, review_pose = _apply_robot_review_pose()
         app.update()
-        d405_alignment = _measure_d405_review_alignment(stage)
+        d405_alignment = _measure_d405_gripper_alignment(stage)
         from pxr import UsdGeom
 
         stage_meters_per_unit = float(UsdGeom.GetStageMetersPerUnit(stage))
@@ -577,11 +615,9 @@ def main() -> int:
                 "resolution": resolution_values,
                 "clipping_range_m": clipping_values,
             }
-        tag_path = (
-            "/WheelBotBoxTransfer/BlueTransportBox/AprilTag_0/Face"
-        )
-        if not stage.GetPrimAtPath(tag_path).IsValid():
-            raise RuntimeError(f"box-attached tag face is missing: {tag_path}")
+        for tag_path in (BOX_TAG_FACE_PATH, *TABLE_TAG_FACE_PATHS.values()):
+            if not stage.GetPrimAtPath(tag_path).IsValid():
+                raise RuntimeError(f"formal AprilTag face is missing: {tag_path}")
 
         overview_camera = rep.create.camera(
             position=(-3.6, -4.6, 3.8),
@@ -597,10 +633,20 @@ def main() -> int:
             horizontal_aperture=20.0,
             clipping_range=(0.01, 100.0),
         )
+        table_closeup_camera = rep.create.camera(
+            position=(0.95, 0.0, 3.35),
+            look_at=(0.95, 0.0, 0.995),
+            focal_length=16.0,
+            horizontal_aperture=20.0,
+            clipping_range=(0.01, 100.0),
+        )
 
         view_specs: list[tuple[str, object, tuple[int, int]]] = [
             ("overview", overview_camera, (1600, 900)),
             ("apriltag_box_closeup", closeup_camera, (1280, 720)),
+            # Both 80 mm corner tags share one 2.32 m-wide view.  Render this
+            # QA frame at 2K so each tag retains enough cells for decoding.
+            ("apriltag_table_closeup", table_closeup_camera, (2560, 1440)),
         ]
         view_specs.extend((name, path, (1280, 720)) for name, path in CAMERAS)
 
@@ -637,42 +683,46 @@ def main() -> int:
                 }
             )
 
-        # Decode both the independent close-up and the four real robot-mounted
-        # camera frames.  A temporary review camera alone is not sufficient
-        # evidence for the perception path used by the task.
+        # Decode the dedicated Tag 0/1/2 QA views and all four robot-mounted
+        # camera frames.  Tag 0 must additionally decode in the real head-D435
+        # task view; the overhead table view is the formal Tag 1/2 QA path.
         import cv2
 
         decoded_by_view = {
             name: _detect_apriltag_ids(saved[name], cv2)
-            for name in ("apriltag_box_closeup", *(name for name, _path in CAMERAS))
+            for name in (
+                "apriltag_box_closeup",
+                "apriltag_table_closeup",
+                *(name for name, _path in CAMERAS),
+            )
         }
         if 0 not in decoded_by_view["apriltag_box_closeup"]:
             raise RuntimeError(
                 "formal box close-up does not contain a decodable AprilTag 0; "
                 f"decoded IDs: {decoded_by_view['apriltag_box_closeup']}"
             )
+        if not {1, 2}.issubset(decoded_by_view["apriltag_table_closeup"]):
+            raise RuntimeError(
+                "formal table close-up must decode corner AprilTags 1 and 2; "
+                f"decoded IDs: {decoded_by_view['apriltag_table_closeup']}"
+            )
         robot_tag_views = [
             name for name, _path in CAMERAS if 0 in decoded_by_view[name]
         ]
-        if not robot_tag_views:
+        if 0 not in decoded_by_view["head_d435"]:
             raise RuntimeError(
-                "no robot-mounted camera decodes box-attached AprilTag 0; "
-                f"decoded IDs by view: {decoded_by_view}"
-            )
-        d405_names = {
-            name for name, _path in CAMERAS if name.endswith("wrist_d405")
-        }
-        d405_tag_views = d405_names.intersection(robot_tag_views)
-        if d405_tag_views != d405_names:
-            raise RuntimeError(
-                "both D405 task-pose frames must decode box-attached AprilTag 0; "
+                "head D435 must decode box-attached AprilTag 0 in the neutral pose; "
                 f"decoded IDs by view: {decoded_by_view}"
             )
 
         camera_paths = [
             (
                 name.replace("_", " ").upper()
-                + (" · TAG 0" if name in robot_tag_views else ""),
+                + (
+                    " · GRIPPER AXIS ↓"
+                    if name.endswith("wrist_d405")
+                    else (" · TAG 0" if name in robot_tag_views else "")
+                ),
                 saved[name],
             )
             for name, _path in CAMERAS
@@ -683,6 +733,7 @@ def main() -> int:
         _save_review_board(
             saved["overview"],
             saved["apriltag_box_closeup"],
+            saved["apriltag_table_closeup"],
             camera_paths,
             review_board,
         )
@@ -714,22 +765,45 @@ def main() -> int:
                 "family": "tag36h11",
                 "id": 0,
                 "decoded_ids_in_box_closeup": decoded_by_view["apriltag_box_closeup"],
-                "robot_camera_detection_required": True,
+                "head_d435_detection_required": True,
                 "robot_cameras_decoding_tag_0": robot_tag_views,
                 "size_m": 0.1,
                 "parent_prim": "/WheelBotBoxTransfer/BlueTransportBox",
-                "face_prim": tag_path,
+                "face_prim": BOX_TAG_FACE_PATH,
+            },
+            "apriltags": {
+                "box_tag_0": {
+                    "id": 0,
+                    "size_m": 0.1,
+                    "face_prim": BOX_TAG_FACE_PATH,
+                    "decoded_in": [
+                        "apriltag_box_closeup",
+                        *robot_tag_views,
+                    ],
+                },
+                "table_tag_1": {
+                    "id": 1,
+                    "size_m": 0.08,
+                    "face_prim": TABLE_TAG_FACE_PATHS[1],
+                    "decoded_in": ["apriltag_table_closeup"],
+                },
+                "table_tag_2": {
+                    "id": 2,
+                    "size_m": 0.08,
+                    "face_prim": TABLE_TAG_FACE_PATHS[2],
+                    "decoded_in": ["apriltag_table_closeup"],
+                },
             },
             "views": manifest_views,
             "camera_contract": {
                 "required_cameras": [name for name, _path in CAMERAS],
                 "all_four_rgb_frames_valid": True,
-                "tag_0_detected_by_robot_camera": bool(robot_tag_views),
-                "both_d405_cameras_decode_tag_0": True,
+                "tag_0_detected_by_head_d435": True,
+                "d405_views_follow_gripper_axis": True,
                 "cameras": camera_runtime_contract,
             },
             "robot_review_pose": review_pose,
-            "d405_alignment": d405_alignment,
+            "d405_gripper_alignment": d405_alignment,
             "review_board": review_board.name,
             "review_board_sha256": _sha256(review_board),
             "four_camera_contact_sheet": four_sheet.name,
@@ -744,13 +818,14 @@ def main() -> int:
         return 0
     except Exception as error:
         # SimulationApp shutdown can suppress the normal Python traceback on
-        # some Kit builds, so flush the actionable failure first.
+        # some Kit builds, so flush the actionable failure and preserve a
+        # non-zero CLI status before Kit's fast-shutdown path takes over.
         sys.__stderr__.write(
             f"capture_workcell_evidence failed: "
             f"{type(error).__name__}: {error}\n"
         )
         sys.__stderr__.flush()
-        raise
+        os._exit(1)
     finally:
         if world is not None:
             world.stop()

@@ -15,9 +15,9 @@ uv run isaacsim isaacsim.exp.compatibility_check
 
 ## 正式场景、物理与证据
 
-[`usd/scenes/warehouse_box_transfer.usda`](../usd/scenes/warehouse_box_transfer.usda) 是当前正式场景，不是 foundation 占位层。它以 NVIDIA Warehouse 作为只读环境，组合了 Unitree 式多工位仓储布局、Wheel Bot、蓝色运输箱、Tag 和放置工位。蓝箱正面绑定 `tag36h11` ID 0，结构检查结果为 [`warehouse_workcell.json`](../evidence/usd/2026-07-29/warehouse_workcell.json)。
+[`usd/scenes/warehouse_box_transfer.usda`](../usd/scenes/warehouse_box_transfer.usda) 是当前正式场景，不是 foundation 占位层。它以 NVIDIA Warehouse 作为只读环境，组合了 Unitree 式多工位仓储布局、Wheel Bot、蓝色运输箱、Tag 和放置工位。蓝箱正面绑定随箱移动的 `tag36h11` ID 0；主 PickTable 近侧两个对称桌角另有朝 `+Z` 的 80 mm ID 1（世界 `y≈-1.16 m`）和 ID 2（世界 `y≈+1.16 m`），作为不随箱移动的右、左静态工位定位基准。箱体标签与桌面双标签使用独立场景层和 prim，验证与检测结果必须按 ID/角色分开；三者的 composed-stage 验证见 [`warehouse_workcell.json`](../evidence/usd/2026-07-30/warehouse_workcell.json)。
 
-蓝箱保留 NVIDIA 的视觉资产，并只添加一个项目控制的 `PhysicsCollision` 代理；箱体是动态刚体。正式场景的重力、台面接触、Tag 跟随与 reset 均已通过 headless smoke，结果见 [`box_gravity_contact_reset.json`](../evidence/physics/2026-07-29/box_gravity_contact_reset.json)。这证明物理场景基础可用，但不等同于双臂抓取/搬运任务已经完成。
+蓝箱保留 NVIDIA 的视觉资产，并只添加一个项目控制的 `PhysicsCollision` 代理；箱体是动态刚体。正式场景的重力、台面接触、Tag 跟随与 reset 均已通过 headless smoke，结果见 [`box_gravity_contact_reset.json`](../evidence/physics/2026-07-30/box_gravity_contact_reset.json)。这证明物理场景基础可用，但不等同于双臂抓取/搬运任务已经完成。
 
 ```bash
 env -u PYTHONPATH -u CMAKE_PREFIX_PATH OMNI_KIT_ACCEPT_EULA=YES \
@@ -38,7 +38,7 @@ env -u PYTHONPATH -u CMAKE_PREFIX_PATH OMNI_KIT_ACCEPT_EULA=YES \
 
 ## 相机与 ROS 2 验证
 
-头、胸、左腕、右腕四个 RGB 相机均由真实机器人 link 承载，分辨率为 1280×720，clipping 为 `0.05–100 m`。正式场景的四路 RTX 图和总览位于 [`evidence/workcell/2026-07-29/final/`](../evidence/workcell/2026-07-29/final/)；`head_d435` 已在正式场景画面中解码 Tag 0。当前胸部和双腕画面已经有效，但未在现有任务姿态中覆盖标签，后续抓取姿态阶段再做检测覆盖率验收。
+头、胸、左腕、右腕四个 RGB 相机均由真实机器人 link 承载，分辨率为 1280×720，clipping 为 `0.05–100 m`。正式场景的四路 RTX 图和总览位于 [`evidence/workcell/2026-07-30/final/`](../evidence/workcell/2026-07-30/final/)；`head_d435` 已解码箱上 Tag 0，独立桌面近景已解码 Tag 1/2。双腕 D405 在自然下垂姿态中与夹爪方向同轴朝地；中立姿态不要求覆盖标签，抓取任务姿态再单独做检测覆盖率验收。
 
 `scripts/verify_ros2_camera_topics.py` 已实现严格同步：每个相机只有一对 `Image` 与 `CameraInfo` 的 `header.stamp.sec` 和 `header.stamp.nanosec` 完全一致时才通过。它尚未针对**最新正式场景**重新采集 live ROS 2、TF 和 Tag 位姿闭环证据；旧 `ros2_topics.json` 仅是历史采集，不得解读为当前同步门已通过。
 

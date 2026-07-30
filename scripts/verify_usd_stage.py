@@ -15,6 +15,9 @@ DEFAULT_REQUIRED_PRIMS = (
     "/WheelBotBoxTransfer",
     "/WheelBotBoxTransfer/WheelBot",
     "/WheelBotBoxTransfer/BlueTransportBox",
+    "/WheelBotBoxTransfer/BlueTransportBox/AprilTag_0",
+    "/WheelBotBoxTransfer/Workcell/PickTable/AprilTag_1",
+    "/WheelBotBoxTransfer/Workcell/PickTable/AprilTag_2",
     "/WheelBotBoxTransfer/DropZone",
     "/WheelBotBoxTransfer/PhysicsScene",
     "/WheelBotBoxTransfer/BlueTransportBox/PhysicsCollision",
@@ -24,6 +27,44 @@ ROBOT_PATH = "/WheelBotBoxTransfer/WheelBot"
 BOX_PATH = "/WheelBotBoxTransfer/BlueTransportBox"
 BOX_COLLISION_PATH = f"{BOX_PATH}/PhysicsCollision"
 BOX_MATERIAL_PATH = "/WheelBotBoxTransfer/PhysicsMaterials/BlueTransportBoxMaterial"
+BOX_APRILTAG_PATH = f"{BOX_PATH}/AprilTag_0"
+PICK_TABLE_APRILTAG_1_PATH = (
+    "/WheelBotBoxTransfer/Workcell/PickTable/AprilTag_1"
+)
+PICK_TABLE_APRILTAG_2_PATH = (
+    "/WheelBotBoxTransfer/Workcell/PickTable/AprilTag_2"
+)
+APRILTAG_EXPECTATIONS = {
+    "box_tag_0": {
+        "path": BOX_APRILTAG_PATH,
+        "id": 0,
+        "family": "tag36h11",
+        "size_m": 0.1,
+        "role": "box_pose_landmark",
+        "visible_normal": (-1.0, 0.0, 0.0),
+    },
+    "pick_table_tag_1": {
+        "path": PICK_TABLE_APRILTAG_1_PATH,
+        "id": 1,
+        "family": "tag36h11",
+        "size_m": 0.08,
+        "role": "pick_table_right_static_landmark",
+        # PickTable rotates only around world Z, so both unrotated boards remain
+        # upward-facing. Their table-local ±1.16 m X coordinates map to the
+        # symmetric formal workcell coordinates below.
+        "visible_normal": (0.0, 0.0, 1.0),
+        "origin_m": (0.95, -1.16, 0.9946),
+    },
+    "pick_table_tag_2": {
+        "path": PICK_TABLE_APRILTAG_2_PATH,
+        "id": 2,
+        "family": "tag36h11",
+        "size_m": 0.08,
+        "role": "pick_table_left_static_landmark",
+        "visible_normal": (0.0, 0.0, 1.0),
+        "origin_m": (0.95, 1.16, 0.9946),
+    },
+}
 CAMERA_PATHS = {
     "head_d435": (
         "/WheelBotBoxTransfer/WheelBot/head_d435_Link/"
@@ -51,6 +92,10 @@ CAMERA_OPTICAL_FRAME_PATHS = {
     "right_wrist_d405": (
         f"{ROBOT_PATH}/right_wrist_d405_Link/right_wrist_d405_optical_frame"
     ),
+}
+D405_WRIST_ROLL_PATHS = {
+    "left_wrist_d405": f"{ROBOT_PATH}/left_wrist_roll_Link",
+    "right_wrist_d405": f"{ROBOT_PATH}/right_wrist_roll_Link",
 }
 ROBOT_EXPECTED_COLLIDER_COUNT = 37
 GROUND_Z_M = 0.0
@@ -369,6 +414,138 @@ def validate_robot_collisions(stage) -> tuple[dict[str, object], list[str]]:
     return contract, failures
 
 
+def inspect_apriltag(stage, path: str, meters_per_unit: float) -> dict[str, object]:
+    """Return identity, pose, and official-material details for one composed tag."""
+
+    from pxr import Gf, Usd, UsdGeom, UsdShade
+
+    prim = stage.GetPrimAtPath(path)
+    if not prim.IsValid():
+        return {"prim_path": path, "valid": False}
+
+    def attribute_value(target, name: str):
+        attribute = target.GetAttribute(name)
+        return attribute.Get() if attribute.IsValid() else None
+
+    matrix = UsdGeom.XformCache(Usd.TimeCode.Default()).GetLocalToWorldTransform(prim)
+    origin = matrix.Transform(Gf.Vec3d(0, 0, 0))
+    normal = matrix.TransformDir(Gf.Vec3d(0, 0, 1)).GetNormalized()
+    face = stage.GetPrimAtPath(f"{path}/Face")
+    shader = stage.GetPrimAtPath(f"{path}/AprilTagMaterial/Shader")
+    face_vertex_counts: list[int] = []
+    face_vertex_indices: list[int] = []
+    edge_lengths_m: list[float] = []
+    geometric_normal: list[float] | None = None
+    authored_normal: list[float] | None = None
+    if face.IsValid() and face.GetTypeName() == "Mesh":
+        mesh = UsdGeom.Mesh(face)
+        points = list(mesh.GetPointsAttr().Get() or [])
+        face_vertex_counts = [
+            int(value) for value in (mesh.GetFaceVertexCountsAttr().Get() or [])
+        ]
+        face_vertex_indices = [
+            int(value) for value in (mesh.GetFaceVertexIndicesAttr().Get() or [])
+        ]
+        face_matrix = UsdGeom.XformCache(
+            Usd.TimeCode.Default()
+        ).GetLocalToWorldTransform(face)
+        world_points = [
+            face_matrix.Transform(
+                Gf.Vec3d(float(point[0]), float(point[1]), float(point[2]))
+            )
+            for point in points
+        ]
+        if face_vertex_counts == [4] and len(face_vertex_indices) == 4:
+            ordered_points = [world_points[index] for index in face_vertex_indices]
+            edges = [
+                ordered_points[(index + 1) % 4] - ordered_points[index]
+                for index in range(4)
+            ]
+            edge_lengths_m = [
+                float(edge.GetLength()) * meters_per_unit for edge in edges
+            ]
+            first, second = edges[:2]
+            normal_vector = Gf.Vec3d(
+                first[1] * second[2] - first[2] * second[1],
+                first[2] * second[0] - first[0] * second[2],
+                first[0] * second[1] - first[1] * second[0],
+            ).GetNormalized()
+            geometric_normal = [float(value) for value in normal_vector]
+        normals = list(mesh.GetNormalsAttr().Get() or [])
+        if len(normals) == 1:
+            normal_value = normals[0]
+            world_normal = face_matrix.TransformDir(
+                Gf.Vec3d(
+                    float(normal_value[0]),
+                    float(normal_value[1]),
+                    float(normal_value[2]),
+                )
+            ).GetNormalized()
+            authored_normal = [float(value) for value in world_normal]
+
+    material_path = None
+    if face.IsValid():
+        material, _relationship = UsdShade.MaterialBindingAPI(
+            face
+        ).ComputeBoundMaterial()
+        if material and material.GetPrim().IsValid():
+            material_path = str(material.GetPath())
+
+    st_values = attribute_value(face, "primvars:st") if face.IsValid() else None
+    mdl_source = (
+        attribute_value(shader, "info:mdl:sourceAsset") if shader.IsValid() else None
+    )
+    mdl_sub_identifier = (
+        attribute_value(shader, "info:mdl:sourceAsset:subIdentifier")
+        if shader.IsValid()
+        else None
+    )
+    mosaic = attribute_value(shader, "inputs:tag_mosaic") if shader.IsValid() else None
+    return {
+        "prim_path": path,
+        "valid": True,
+        "tag_id": attribute_value(prim, "apriltag:id"),
+        "shader_tag_id": (
+            attribute_value(shader, "inputs:tag_id") if shader.IsValid() else None
+        ),
+        "family": attribute_value(prim, "apriltag:family"),
+        "size_m": attribute_value(prim, "apriltag:sizeMeters"),
+        "role": attribute_value(prim, "scenario:role"),
+        "origin_m": [float(value) * meters_per_unit for value in origin],
+        "visible_normal": [float(value) for value in normal],
+        "face_prim": str(face.GetPath()) if face.IsValid() else None,
+        "bound_material": material_path,
+        "shader_prim": str(shader.GetPath()) if shader.IsValid() else None,
+        "mdl_source_asset": str(mdl_source) if mdl_source is not None else None,
+        "mdl_sub_identifier": (
+            str(mdl_sub_identifier) if mdl_sub_identifier is not None else None
+        ),
+        "mosaic_asset": str(mosaic) if mosaic is not None else None,
+        "shader_tag_size": (
+            attribute_value(shader, "inputs:tag_size") if shader.IsValid() else None
+        ),
+        "shader_tags_per_row": (
+            attribute_value(shader, "inputs:tags_per_row")
+            if shader.IsValid()
+            else None
+        ),
+        "shader_spacing": (
+            attribute_value(shader, "inputs:spacing") if shader.IsValid() else None
+        ),
+        "face_vertex_counts": face_vertex_counts,
+        "face_vertex_indices": face_vertex_indices,
+        "face_edge_lengths_m": edge_lengths_m,
+        "face_geometric_normal": geometric_normal,
+        "face_authored_normal": authored_normal,
+        "texture_coordinate_count": len(st_values or []),
+        "double_sided": (
+            bool(UsdGeom.Mesh(face).GetDoubleSidedAttr().Get())
+            if face.IsValid() and face.GetTypeName() == "Mesh"
+            else False
+        ),
+    }
+
+
 def validate_stage(stage, extra_paths: Sequence[str]) -> dict[str, object]:
     """Check required prims, stage units, up-axis, and task-asset scale."""
 
@@ -382,7 +559,7 @@ def validate_stage(stage, extra_paths: Sequence[str]) -> dict[str, object]:
     default_path = str(default_prim.GetPath())
     required_paths = resolve_required_prim_paths(default_path, extra_paths)
     missing = [path for path in required_paths if not stage.GetPrimAtPath(path).IsValid()]
-    from pxr import Gf, Usd, UsdGeom, UsdShade
+    from pxr import Gf, Usd, UsdGeom
 
     meters_per_unit = float(UsdGeom.GetStageMetersPerUnit(stage))
     up_axis = str(UsdGeom.GetStageUpAxis(stage))
@@ -423,47 +600,130 @@ def validate_stage(stage, extra_paths: Sequence[str]) -> dict[str, object]:
                 }
             )
 
-    tag_path = "/WheelBotBoxTransfer/BlueTransportBox/AprilTag_0"
-    tag_prim = stage.GetPrimAtPath(tag_path)
-    tag_pose: dict[str, list[float]] | None = None
-    tag_render_contract: dict[str, object] | None = None
-    if tag_prim.IsValid():
-        matrix = UsdGeom.XformCache(Usd.TimeCode.Default()).GetLocalToWorldTransform(
-            tag_prim
-        )
-        origin = matrix.Transform(Gf.Vec3d(0, 0, 0))
-        normal = matrix.TransformDir(Gf.Vec3d(0, 0, 1)).GetNormalized()
-        tag_pose = {
-            "origin_m": [float(value) * meters_per_unit for value in origin],
-            "visible_normal": [float(value) for value in normal],
-        }
-        face = stage.GetPrimAtPath(f"{tag_path}/Face")
-        if face.IsValid():
-            material, _relationship = UsdShade.MaterialBindingAPI(
-                face
-            ).ComputeBoundMaterial()
-            material_path = (
-                str(material.GetPath()) if material and material.GetPrim().IsValid() else None
+    apriltags = {
+        name: inspect_apriltag(stage, expectation["path"], meters_per_unit)
+        for name, expectation in APRILTAG_EXPECTATIONS.items()
+    }
+    apriltag_failures: list[str] = []
+    for name, expectation in APRILTAG_EXPECTATIONS.items():
+        contract = apriltags[name]
+        if not contract["valid"]:
+            apriltag_failures.append(f"{name}: missing prim {expectation['path']}")
+            continue
+        for key in ("id", "family", "role"):
+            actual_key = "tag_id" if key == "id" else key
+            if contract[actual_key] != expectation[key]:
+                apriltag_failures.append(
+                    f"{name}: {actual_key}={contract[actual_key]!r}, "
+                    f"expected {expectation[key]!r}"
+                )
+        if contract["shader_tag_id"] != expectation["id"]:
+            apriltag_failures.append(
+                f"{name}: shader_tag_id={contract['shader_tag_id']!r}, "
+                f"expected {expectation['id']}"
             )
-            shader_prim = stage.GetPrimAtPath(f"{tag_path}/AprilTagMaterial/Shader")
-            mosaic = shader_prim.GetAttribute("inputs:tag_mosaic").Get()
-            st_values = face.GetAttribute("primvars:st").Get()
-            tag_render_contract = {
-                "face_prim": str(face.GetPath()),
-                "bound_material": material_path,
-                "shader_prim": str(shader_prim.GetPath()),
-                "mdl_source_asset": str(
-                    shader_prim.GetAttribute("info:mdl:sourceAsset").Get()
-                ),
-                "mdl_sub_identifier": str(
-                    shader_prim.GetAttribute(
-                        "info:mdl:sourceAsset:subIdentifier"
-                    ).Get()
-                ),
-                "mosaic_asset": str(mosaic),
-                "texture_coordinate_count": len(st_values or []),
-                "double_sided": bool(UsdGeom.Mesh(face).GetDoubleSidedAttr().Get()),
-            }
+        if (
+            contract["size_m"] is None
+            or abs(float(contract["size_m"]) - float(expectation["size_m"])) > 1e-9
+        ):
+            apriltag_failures.append(
+                f"{name}: size_m={contract['size_m']!r}, "
+                f"expected {expectation['size_m']}"
+            )
+        actual_normal = Gf.Vec3d(*contract["visible_normal"]).GetNormalized()
+        expected_normal = Gf.Vec3d(*expectation["visible_normal"]).GetNormalized()
+        if float(actual_normal * expected_normal) < 0.999:
+            apriltag_failures.append(
+                f"{name}: visible_normal={contract['visible_normal']!r}, "
+                f"expected {expectation['visible_normal']}"
+            )
+        for normal_key in ("face_geometric_normal", "face_authored_normal"):
+            face_normal = contract[normal_key]
+            if (
+                face_normal is None
+                or float(Gf.Vec3d(*face_normal).GetNormalized() * expected_normal)
+                < 0.999
+            ):
+                apriltag_failures.append(
+                    f"{name}: {normal_key}={face_normal!r}, "
+                    f"expected {expectation['visible_normal']}"
+                )
+        edge_lengths = contract["face_edge_lengths_m"]
+        if len(edge_lengths) != 4 or any(
+            abs(float(length) - float(expectation["size_m"])) > 1e-6
+            for length in edge_lengths
+        ):
+            apriltag_failures.append(
+                f"{name}: face_edge_lengths_m={edge_lengths!r}, "
+                f"expected four {expectation['size_m']} m edges"
+            )
+        expected_origin = expectation.get("origin_m")
+        if expected_origin is not None and any(
+            abs(float(contract["origin_m"][index]) - float(expected_origin[index]))
+            > 1e-4
+            for index in range(3)
+        ):
+            apriltag_failures.append(
+                f"{name}: origin_m={contract['origin_m']!r}, "
+                f"expected {expected_origin}"
+            )
+        if (
+            not contract["face_prim"]
+            or contract["bound_material"]
+            != f"{expectation['path']}/AprilTagMaterial"
+            or contract["shader_prim"]
+            != f"{expectation['path']}/AprilTagMaterial/Shader"
+            or "Isaac/Materials/AprilTag/AprilTag.mdl"
+            not in (contract["mdl_source_asset"] or "")
+            or contract["mdl_sub_identifier"] != "AprilTag"
+            or "Isaac/Materials/AprilTag/Textures/tag36h11.png"
+            not in (contract["mosaic_asset"] or "")
+            or contract["shader_tag_size"] != 10
+            or contract["shader_tags_per_row"] != 24
+            or contract["shader_spacing"] != 1
+            or contract["face_vertex_counts"] != [4]
+            or contract["face_vertex_indices"] != [0, 1, 2, 3]
+            or contract["texture_coordinate_count"] != 4
+            or not contract["double_sided"]
+        ):
+            apriltag_failures.append(f"{name}: incomplete render contract")
+
+    tag_ids = [
+        contract["tag_id"]
+        for contract in apriltags.values()
+        if contract["valid"]
+    ]
+    if len(tag_ids) != len(set(tag_ids)):
+        apriltag_failures.append(f"AprilTag IDs must be unique, found {tag_ids}")
+
+    # Preserve the original Tag 0 evidence fields while adding the structured
+    # three-landmark contract below.
+    box_tag = apriltags["box_tag_0"]
+    tag_pose = (
+        {
+            "origin_m": box_tag["origin_m"],
+            "visible_normal": box_tag["visible_normal"],
+        }
+        if box_tag["valid"]
+        else None
+    )
+    tag_render_contract = (
+        {
+            key: box_tag[key]
+            for key in (
+                "face_prim",
+                "bound_material",
+                "shader_prim",
+                "mdl_source_asset",
+                "mdl_sub_identifier",
+                "mosaic_asset",
+                "texture_coordinate_count",
+                "double_sided",
+            )
+        }
+        if box_tag["valid"]
+        else None
+    )
 
     camera_contract: dict[str, dict[str, object]] = {}
     camera_failures: list[str] = []
@@ -488,6 +748,7 @@ def validate_stage(stage, extra_paths: Sequence[str]) -> dict[str, object]:
         )
         axis_dots: dict[str, float] | None = None
         d405_lens_axis_dot: float | None = None
+        d405_gripper_axis_dot: float | None = None
         if prim.IsValid() and optical_prim.IsValid():
             camera_matrix = xform_cache.GetLocalToWorldTransform(prim)
             optical_matrix = xform_cache.GetLocalToWorldTransform(optical_prim)
@@ -510,16 +771,31 @@ def validate_stage(stage, extra_paths: Sequence[str]) -> dict[str, object]:
                 housing_matrix = xform_cache.GetLocalToWorldTransform(
                     stage.GetPrimAtPath(housing_path)
                 )
+                # The physical dual-lens plane is the housing -Z face.  The
+                # corrected URDF fixed joint aligns it with wrist-roll -Z.
                 physical_lens_axis = housing_matrix.TransformDir(
                     Gf.Vec3d(0, 0, -1)
                 ).GetNormalized()
                 d405_lens_axis_dot = float(
                     camera_axes["forward"] * physical_lens_axis
                 )
+                wrist_matrix = xform_cache.GetLocalToWorldTransform(
+                    stage.GetPrimAtPath(D405_WRIST_ROLL_PATHS[name])
+                )
+                gripper_direction = wrist_matrix.TransformDir(
+                    Gf.Vec3d(0, 0, -1)
+                ).GetNormalized()
+                d405_gripper_axis_dot = float(
+                    camera_axes["forward"] * gripper_direction
+                )
         axes_valid = (
             axis_dots is not None
             and min(axis_dots.values()) >= 0.999
             and (d405_lens_axis_dot is None or d405_lens_axis_dot >= 0.999)
+            and (
+                d405_gripper_axis_dot is None
+                or d405_gripper_axis_dot >= 0.999
+            )
         )
         camera_contract[name] = {
             "prim_path": path,
@@ -530,6 +806,7 @@ def validate_stage(stage, extra_paths: Sequence[str]) -> dict[str, object]:
             "clipping_range_valid": valid_clipping,
             "usd_to_ros_axis_dots": axis_dots,
             "d405_camera_forward_to_housing_lens_axis_dot": d405_lens_axis_dot,
+            "d405_camera_forward_to_gripper_axis_dot": d405_gripper_axis_dot,
             "axes_valid": axes_valid,
         }
         if (
@@ -556,6 +833,7 @@ def validate_stage(stage, extra_paths: Sequence[str]) -> dict[str, object]:
             and not scale_failures
             and not physics_failures
             and not robot_collision_failures
+            and not apriltag_failures
             and not camera_failures
         ),
         "default_prim": default_path,
@@ -570,6 +848,8 @@ def validate_stage(stage, extra_paths: Sequence[str]) -> dict[str, object]:
         "physics_failures": physics_failures,
         "robot_collisions": robot_collisions,
         "robot_collision_failures": robot_collision_failures,
+        "apriltags": apriltags,
+        "apriltag_failures": apriltag_failures,
         "cameras": camera_contract,
         "camera_failures": camera_failures,
         "apriltag_pose": tag_pose,

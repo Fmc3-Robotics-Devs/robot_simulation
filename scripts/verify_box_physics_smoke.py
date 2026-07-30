@@ -17,12 +17,14 @@ BOX_PATH = "/WheelBotBoxTransfer/BlueTransportBox"
 BOX_COLLISION_PATH = f"{BOX_PATH}/PhysicsCollision"
 TAG_PATH = f"{BOX_PATH}/AprilTag_0"
 PICK_TABLE_PATH = "/WheelBotBoxTransfer/Workcell/PickTable"
+PICK_TABLE_MODEL_PATH = f"{PICK_TABLE_PATH}/Model"
 PHYSICS_SOURCE_FILES = (
     Path("scripts/verify_box_physics_smoke.py"),
     Path("usd/scenes/warehouse_box_transfer.usda"),
     Path("usd/scenes/warehouse_box_transfer_workcell.usda"),
     Path("usd/scenes/warehouse_box_transfer_physics.usda"),
     Path("usd/scenes/warehouse_box_transfer_apriltags.usda"),
+    Path("usd/scenes/warehouse_box_transfer_table_apriltags.usda"),
     Path("usd/assets/props/packing_table.usda"),
     Path("usd/assets/props/blue_transport_box.usda"),
     Path("usd/assets/tags/apriltag_36h11.usda"),
@@ -188,8 +190,10 @@ def run_smoke(scene: Path, *, steps: int) -> dict[str, object]:
         [UsdGeom.Tokens.default_, UsdGeom.Tokens.render, UsdGeom.Tokens.proxy],
     )
     meters_per_unit = float(UsdGeom.GetStageMetersPerUnit(stage))
+    # Bound only the referenced table model. Upward-facing AprilTag children
+    # sit slightly above the surface and must not redefine the contact plane.
     table_bound = bbox_cache.ComputeWorldBound(
-        stage.GetPrimAtPath(PICK_TABLE_PATH)
+        stage.GetPrimAtPath(PICK_TABLE_MODEL_PATH)
     ).ComputeAlignedBox()
     box_collision_bound = bbox_cache.ComputeWorldBound(
         stage.GetPrimAtPath(BOX_COLLISION_PATH)

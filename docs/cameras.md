@@ -15,10 +15,10 @@ Wheel Bot 的原始 `wheel_robot_4.0.urdf`（`origin/franzi`）已经包含 D435
 | --- | --- | --- |
 | 头部 D435 | `(0,0,0)` / `(180,0,-90)` | `(0,0,0)` / `(0,0,-90)` |
 | 胸部 D435 | `(0,0,0)` / `(180,0,-90)` | `(0,0,0)` / `(0,0,-90)` |
-| 左腕 D405 | `(0,0,-0.0235)` / `(0,0,0)` | `(0,0,-0.0235)` / `(180,0,0)` |
-| 右腕 D405 | `(0,0,-0.0235)` / `(0,0,0)` | `(0,0,-0.0235)` / `(180,0,0)` |
+| 左腕 D405 | `(0,0,-0.0235)` / `(0,0,90)` | `(0,0,-0.0235)` / `(180,0,90)` |
+| 右腕 D405 | `(0,0,-0.0235)` / `(0,0,90)` | `(0,0,-0.0235)` / `(180,0,90)` |
 
-双腕 D405 STL 的两个圆形镜头位于 housing local `-Z` 面，网格范围为 `z=[-0.023,0] m`。因此 USD Camera 的 `-Z` 光轴直接与壳体 `-Z` 对齐；当前单一 RGB Camera 明确建模为两镜头之间 `x=y=0` 的**虚拟双目中点**，位于镜头面外 0.5 mm，并不冒充某一个真实 RGB 镜头的已标定光心。这修复了旧配置把光轴错误转向 housing `+X` 的 90° 偏差，也避免射线从壳体内部出发。拿到正式机械图或内外参后，应标定完整 XYZ 平移和内参，但不再改变已由 STL 确认的 `-Z` 物理朝向。
+双腕 D405 STL 的两个圆形镜头位于 housing local `-Z` 面，网格范围为 `z=[-0.023,0] m`。项目交付 URDF 已把两条 D405 fixed joint 的 RPY 修正为 identity，使 housing `-Z` 与 wrist-roll/手指延伸方向 `-Z` 同轴；USD Camera 的 `-Z` 光轴再与壳体 `-Z` 对齐。因此夹爪自然下垂时，夹爪、实体镜头和相机观察方向都朝地。`Rz=90°` 只校正画面横竖方向，使左/右画面分别把机器人放在外侧边缘，不改变光轴。当前单一 RGB Camera 建模为两镜头之间 `x=y=0` 的**虚拟双目中点**，位于镜头面外 0.5 mm，并不冒充某一个真实 RGB 镜头的已标定光心。
 
 头部和胸部 D435 直接随原 URDF 的 `head_d435_joint` / `body_d435_joint` 固定位置运动；左右腕 D405 分别随同名 wrist fixed joint 运动，绝不交叉映射。
 
@@ -37,9 +37,9 @@ uv run python scripts/verify_optical_frame_tf.py
 
 `/WheelBotBoxTransfer/WheelBot/head_d435_Link/head_d435_camera_mount/camera`、`/WheelBotBoxTransfer/WheelBot/body_d435_Link/chest_d435_camera_mount/camera`、`/WheelBotBoxTransfer/WheelBot/left_wrist_d405_Link/left_wrist_d405_camera_mount/camera`、`/WheelBotBoxTransfer/WheelBot/right_wrist_d405_Link/right_wrist_d405_camera_mount/camera`。
 
-每路保存一张 viewport 截图，并确认头/胸画面面向前方，左右腕视角、箱体区域与逻辑名称对应。最新正式工位 RTX 截图与总览归档到 [`evidence/workcell/2026-07-30/final/`](../evidence/workcell/2026-07-30/final/)；证据脚本先应用可复现、满足 URDF 限位的双臂相机复核种子姿态，再同时检查双腕光轴与 housing `-Z` 的点积、图像上方向与重力投影的点积、指向 Tag 的点积，以及越过已知传感器支架 convex hull 后的远端射线是否先到箱体。远端射线不声称证明镜头起点到箱体全程无遮挡；端到端可见性由正式 RTX 帧直接解码 Tag 0 证明。该姿态只用于传感器取证，不代表 MoveIt 已规划出预抓轨迹。左右 D405 均在各自正式帧中直接解码 Tag 0，四路均通过非空和对比度门。
+每路保存一张 viewport 截图，并确认头/胸画面面向前方，左右腕画面与逻辑名称对应。最新正式工位 RTX 截图与总览归档到 [`evidence/workcell/2026-07-30/final/`](../evidence/workcell/2026-07-30/final/)；证据脚本使用双臂全零的自然下垂姿态，要求两侧 `camera forward == housing -Z == wrist-roll/夹爪 -Z == world down`，同时检查画面 roll，以及中心光轴前 0.3 m 内没有腕部或夹爪的首次碰撞。外侧画面边缘允许保留少量机器人本体结构，用于对应真实 D405 安装视角。中立腕相机不要求看见或解码任何 Tag。随箱移动的 Tag 0 和静态桌角 Tag 1/2 分别由独立近景或后续实际任务姿态验证，不绑定固定的左腕/右腕归属。该姿态只用于传感器取证，不代表 MoveIt 已规划出预抓轨迹。
 
-当前 `Image` / `CameraInfo` 的 header 使用 `*_optical_frame`。`franzi_sim.optical_frame_tf` 为每个 URDF 相机壳体 link 发布独立的 ROS optical 固定边：头/胸 D435 为 `(0,0,-90)`，双腕 D405 为 `(180,0,0)`（XYZ Euler 度）。这些是 `camera_sensors.usda` 中 sibling optical Xform 的值，不再错误复制 USD Camera mount；运动链其余部分仍由 URDF/robot-state publisher 发布。
+当前 `Image` / `CameraInfo` 的 header 使用 `*_optical_frame`。`franzi_sim.optical_frame_tf` 为每个 URDF 相机壳体 link 发布独立的 ROS optical 固定边：头/胸 D435 为 `(0,0,-90)`，双腕 D405 为 `(180,0,90)`（XYZ Euler 度）。双腕变换由 USD mount `(0,0,90)` 再乘局部 `Rx(180°)` 得到；运动链其余部分仍由 URDF/robot-state publisher 发布。
 
 在启用 ROS 2 bridge 后，以已有 `rclpy` node 调用：
 

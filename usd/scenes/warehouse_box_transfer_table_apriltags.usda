@@ -1,0 +1,70 @@
+#usda 1.0
+(
+    defaultPrim = "WheelBotBoxTransfer"
+    doc = "Static PickTable AprilTag overlay; symmetric tag36h11 IDs 1 and 2 are upward-facing tabletop localization landmarks."
+    metersPerUnit = 1
+    upAxis = "Z"
+)
+
+# Keep the fixed table landmarks separate from the box-local Tag 0 overlay:
+# the table poses are part of the workcell map, while Tag 0 moves with the box.
+over "WheelBotBoxTransfer"
+{
+    over "Workcell"
+    {
+        over "PickTable"
+        {
+            custom string apriltag:layerVersion = "1.0.0"
+
+            # The PickTable source bounds are 2.4736465 x 0.762 m with a
+            # 0.9940514 m tabletop.  These 80 mm boards sit inside the two free
+            # near corners, away from the box at table-local (0.38, 0.05).
+            # No rotation is authored: both local +Z normals remain world +Z.
+            def Xform "AprilTag_1" (
+                prepend references = @../assets/tags/apriltag_36h11.usda@
+            )
+            {
+                double3 xformOp:translate = (-1.16, 0.30, 0.9946)
+                double3 xformOp:scale = (0.8, 0.8, 0.8)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+                custom string apriltag:family = "tag36h11"
+                custom int apriltag:id = 1
+                custom double apriltag:sizeMeters = 0.08
+                custom string scenario:role = "pick_table_right_static_landmark"
+
+                # Referencing the common board preserves NVIDIA's Isaac 5.1
+                # MDL/mosaic contract; only the selected mosaic cell changes.
+                over "AprilTagMaterial"
+                {
+                    over "Shader"
+                    {
+                        int inputs:tag_id = 1
+                    }
+                }
+            }
+
+            # Mirror Tag 1 across the table-local YZ plane. PickTable's +90
+            # degree world-Z rotation maps the pair to world y=-1.16/+1.16 m.
+            def Xform "AprilTag_2" (
+                prepend references = @../assets/tags/apriltag_36h11.usda@
+            )
+            {
+                double3 xformOp:translate = (1.16, 0.30, 0.9946)
+                double3 xformOp:scale = (0.8, 0.8, 0.8)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+                custom string apriltag:family = "tag36h11"
+                custom int apriltag:id = 2
+                custom double apriltag:sizeMeters = 0.08
+                custom string scenario:role = "pick_table_left_static_landmark"
+
+                over "AprilTagMaterial"
+                {
+                    over "Shader"
+                    {
+                        int inputs:tag_id = 2
+                    }
+                }
+            }
+        }
+    }
+}

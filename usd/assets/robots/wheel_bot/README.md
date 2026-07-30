@@ -8,7 +8,7 @@ Rviz/src/franzi_description/urdf/wheel_robot_4.0.urdf
 Rviz/src/franzi_description/meshes/*.STL
 ```
 
-原始 URDF 保持不修改。由于 USD prim 名不能以数字开头，导入脚本只在临时副本中把 `2Dlidar_Link` / `2Dlidar_joint` 改为 `lidar_2d_Link` / `lidar_2d_joint`，避免 Isaac Sim 5.1 URDF importer 的 `Used null prim` 错误。
+`origin/franzi` 版本作为来源记录保留；项目交付的 URDF 仅把左右 `wrist_d405_joint` 的 RPY 从旧 `Rx(180°)` 修正为 identity，使 D405 实体镜头面 `-Z` 与 wrist-roll/夹爪 `-Z` 同轴。由于 USD prim 名不能以数字开头，导入脚本还会在临时副本中把 `2Dlidar_Link` / `2Dlidar_joint` 改为 `lidar_2d_Link` / `lidar_2d_joint`，避免 Isaac Sim 5.1 URDF importer 的 `Used null prim` 错误；这一临时重命名不回写项目 URDF。
 
 在已经完成 `uv sync --frozen` 的项目环境中重新生成：
 
@@ -16,7 +16,7 @@ Rviz/src/franzi_description/meshes/*.STL
 uv run python scripts/import_robot_urdf.py --headless
 ```
 
-`config.yaml` 记录源 commit、导入器版本、关节驱动和碰撞策略；其中只使用项目相对路径，不保留生成机器的绝对路径。当前固定底盘基线显式使用：
+`config.yaml` 记录源 commit、项目方向修正、Isaac Sim 5.1 原生 URDF importer 2.4.30、关节驱动和碰撞策略；其中只使用项目相对路径，不保留生成机器的绝对路径。`.asset_hash` 是交付 URDF 与该配置的 SHA-256 指纹。当前固定底盘基线显式使用：
 
 ```yaml
 fix_base: true

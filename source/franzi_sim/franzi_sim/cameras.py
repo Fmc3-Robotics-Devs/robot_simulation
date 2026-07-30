@@ -48,11 +48,12 @@ class CameraSpec:
 # frames use +Z forward and +Y down, so they are deliberately separate sibling
 # transforms: R(housing, optical) = R(housing, USD camera) * Rx(180 deg).
 #
-# Both D405 STL files place their two lenses on the housing local -Z face at
-# z=-23 mm.  The current single RGB sensor is an explicitly virtual stereo
-# midpoint at x=y=0, sitting 0.5 mm outside that face; it is not claimed as a
-# calibrated physical RGB-lens centre.  The USD mount rotation is identity, so
-# rays stay out of the mesh and follow its physical lens face instead of +X.
+# Each D405 mesh spans housing z=[-23, 0] mm; the physical dual-lens face is
+# local -Z.  The project-corrected URDF fixed joints keep housing -Z aligned
+# with the wrist-roll link's -Z gripper direction.  The virtual RGB sensor is
+# placed 0.5 mm outside that face and both sides use the same image orientation.
+# Consequently a naturally hanging gripper produces a downward-looking frame,
+# while any commanded gripper pose rotates the camera with the tool.
 CAMERAS: tuple[CameraSpec, ...] = (
     CameraSpec(
         name="head_d435",
@@ -105,8 +106,8 @@ CAMERAS: tuple[CameraSpec, ...] = (
         horizontal_aperture_mm=4.8,
         clipping_range_m=(0.05, 100.0),
         mount_xyz_m=(0.0, 0.0, -0.0235),
-        camera_mount_rpy_deg=(0.0, 0.0, 0.0),
-        optical_frame_rpy_deg=(180.0, 0.0, 0.0),
+        camera_mount_rpy_deg=(0.0, 0.0, 90.0),
+        optical_frame_rpy_deg=(180.0, 0.0, 90.0),
     ),
     CameraSpec(
         name="right_wrist_d405",
@@ -123,8 +124,9 @@ CAMERAS: tuple[CameraSpec, ...] = (
         horizontal_aperture_mm=4.8,
         clipping_range_m=(0.05, 100.0),
         mount_xyz_m=(0.0, 0.0, -0.0235),
-        camera_mount_rpy_deg=(0.0, 0.0, 0.0),
-        optical_frame_rpy_deg=(180.0, 0.0, 0.0),
+        camera_mount_rpy_deg=(0.0, 0.0, 90.0),
+        # Camera-to-ROS optical conversion is the usual local Rx(180).
+        optical_frame_rpy_deg=(180.0, 0.0, 90.0),
     ),
 )
 

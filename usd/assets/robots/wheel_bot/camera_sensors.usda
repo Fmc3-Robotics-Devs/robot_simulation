@@ -59,11 +59,12 @@ over "WheelBot"
     }
     over "left_wrist_d405_Link"
     {
-        # The D405 STL lens face is housing -Z, which is also USD Camera forward.
+        # The physical dual-lens plane is housing -Z at z=-23 mm.  The
+        # corrected URDF fixed joint aligns it with wrist-roll/gripper -Z.
         def Xform "left_wrist_d405_camera_mount"
         {
             double3 xformOp:translate = (0, 0, -0.0235)
-            float3 xformOp:rotateXYZ = (0, 0, 0)
+            float3 xformOp:rotateXYZ = (0, 0, 90)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
             def Camera "camera"
             {
@@ -80,17 +81,18 @@ over "WheelBot"
         def Xform "left_wrist_d405_optical_frame"
         {
             double3 xformOp:translate = (0, 0, -0.0235)
-            float3 xformOp:rotateXYZ = (180, 0, 0)
+            float3 xformOp:rotateXYZ = (180, 0, 90)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         }
     }
     over "right_wrist_d405_Link"
     {
-        # Left and right URDF housing bases are identical, not mirrored.
+        # Both physical housings and both virtual sensors share this transform;
+        # mirrored placement comes from the URDF link origins, not image roll.
         def Xform "right_wrist_d405_camera_mount"
         {
             double3 xformOp:translate = (0, 0, -0.0235)
-            float3 xformOp:rotateXYZ = (0, 0, 0)
+            float3 xformOp:rotateXYZ = (0, 0, 90)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
             def Camera "camera"
             {
@@ -107,7 +109,7 @@ over "WheelBot"
         def Xform "right_wrist_d405_optical_frame"
         {
             double3 xformOp:translate = (0, 0, -0.0235)
-            float3 xformOp:rotateXYZ = (180, 0, 0)
+            float3 xformOp:rotateXYZ = (180, 0, 90)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         }
     }

@@ -10,6 +10,12 @@
 
 当前正式截图使用的 NVIDIA `PackingTable/packing_table.usd` 在独立依赖扫描中会报告 13 个纸箱纹理缺失；Isaac 5.1 RTX 实际渲染仍可正常显示工位，`OmniPBR.mdl` 由 Kit 搜索路径解析。该提示属于本地官方素材包的背景道具依赖，不影响项目自有蓝箱、AprilTag、机器人或主作业台，但不得据此宣称第三方资产依赖“完全无缺失”。若后续这些纸箱成为任务对象，应改用依赖完整的项目包装层或补齐经授权的官方素材后重新采证。
 
+## AprilTag 身份与桌面基准
+
+项目 AprilTag 板统一引用 `usd/assets/tags/apriltag_36h11.usda`；该资产沿用 Isaac Sim 5.1 官方 `AprilTag.mdl` 和 `tag36h11.png` mosaic，场景层只覆盖 ID、尺寸与位姿。蓝箱的 **Tag 0** 是 `box_pose_landmark`，父级为动态 `BlueTransportBox`，必须随抓取、搬运与 reset 运动。PickTable 的 **Tag 1** / **Tag 2** 分别是 `pick_table_right_static_landmark` / `pick_table_left_static_landmark`，独立层为 `usd/scenes/warehouse_box_transfer_table_apriltags.usda`，父级均为静态 PickTable。
+
+Tag 1 / Tag 2 的印刷面均为 80 mm，PickTable 局部坐标分别为 `(-1.16, 0.30, 0.9946) m` 与 `(1.16, 0.30, 0.9946) m`，对应正式场景世界坐标约 `(0.95, -1.16, 0.9946) m` 与 `(0.95, 1.16, 0.9946) m`。两者都没有旋转操作，因此在仅绕世界 Z 轴旋转的 PickTable 下仍朝世界 `+Z`；两个位置各给桌边保留约 35–39 mm 的 backing 余量，并远离蓝箱的桌面投影。Tag 1/2 是静态工位定位基准，其可见性由独立桌面近景或实际任务姿态评估，不构成中立腕相机验收，也不绑定固定的左右腕。新增其他桌角标签时必须使用尚未占用的 `tag36h11` ID，不得复用 0、1 或 2。
+
 `report/手机放置槽.STL` 是 3 列 × 6 行、18 槽的泡沫箱源模型。它是用户资料，工程代码不得修改它。导入后生成的项目 USD 放入 `usd/assets/foam_box_18_slots.usda`，STL 以毫米输入、USD 以米为单位。
 
 `report/i17_AIR_DUMMY_stls/` 是当前手机 STL 来源，包含机身与镜头等 5 个组件；尺寸、碰撞和装箱姿态均以这些 STL 为准。后续导入的派生 USD 和简化碰撞资产应交付到 `usd/assets/`，原始资料保持只读。

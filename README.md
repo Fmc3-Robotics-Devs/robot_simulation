@@ -4,9 +4,9 @@ Wheel Bot 的 Isaac Sim 工程基线：项目 `.venv` 使用 **Python 3.11.14**�
 
 ## 当前可验证状态（2026-07-30）
 
-正式入口为 [`usd/scenes/warehouse_box_transfer.usda`](usd/scenes/warehouse_box_transfer.usda)：一个 Unitree 风格的多工位仓储工位，基于 NVIDIA 官方 Warehouse，包含 Wheel Bot、两张作业台、三处背景工位、蓝色运输箱和放置区。蓝箱正面贴有项目自有的 `tag36h11` **ID 0** AprilTag；正式场景由 [`warehouse_workcell.json`](evidence/usd/2026-07-30/warehouse_workcell.json) 验证。
+正式入口为 [`usd/scenes/warehouse_box_transfer.usda`](usd/scenes/warehouse_box_transfer.usda)：一个 Unitree 风格的多工位仓储工位，基于 NVIDIA 官方 Warehouse，包含 Wheel Bot、两张作业台、三处背景工位、蓝色运输箱和放置区。蓝箱正面的 `tag36h11` **ID 0** 随箱移动，用于箱体位姿；主 PickTable 近侧右、左两个对称空闲角分别放置朝上的 80 mm **ID 1** 与 **ID 2**，作为静态桌面定位基准。箱体层为 `warehouse_box_transfer_apriltags.usda`，桌面双标签层为 `warehouse_box_transfer_table_apriltags.usda`，三者不能混作同一个检测目标。三处标记的 composed-stage 结构、ID、尺寸、法向与工位坐标见 [`warehouse_workcell.json`](evidence/usd/2026-07-30/warehouse_workcell.json)。
 
-四路相机（头部、胸部、左腕、右腕）均为 1280×720、`0.05–100 m` clipping，已从该正式场景取得有效 RTX 图像；复核板见 [`workcell_review_board.png`](evidence/workcell/2026-07-30/final/workcell_review_board.png)。D405 的 USD 光轴已从错误的 housing `+X` 修正为 STL 镜头面的 housing `-Z`，并把 USD Camera frame 与 ROS optical frame 分离；左右腕 D405 均在限位内的相机复核种子姿态中直接解码蓝箱 Tag 0。该姿态只用于传感器取证，不冒充运动规划得到的预抓轨迹。
+四路相机（头部、胸部、左腕、右腕）均为 1280×720、`0.05–100 m` clipping，已从该正式场景取得有效 RTX 图像；复核板见 [`workcell_review_board.png`](evidence/workcell/2026-07-30/final/workcell_review_board.png)。D405 的实体镜头面是 housing `-Z`；项目修正版 URDF 令它与 wrist-roll/夹爪 `-Z` 同轴，USD Camera `-Z` 也沿同一方向。自然下垂全零姿态下，两侧夹爪和 D405 都朝地，左、右画面分别把机器人保留在外侧边缘；该中立姿态不以看见 AprilTag 为通过条件。箱上 Tag 0 与桌角 Tag 1/2 由独立近景验证。
 
 机器人导入资产当前有 **37 个有效碰撞体，全部为 `convexHull`**，不是 `convexDecomposition`。固定底盘场景按最低轮面实测值把机器人根节点抬高到 `z=0.0873 m`：三轮最低碰撞点距仓库 `z=0` 地面约 `0.034 mm`，底盘本体净空约 `34.7 mm`。验证脚本会遍历 instance proxy，检查碰撞数量、近似类型、三轮同高和地面间隙，避免只看可见网格误判。
 
@@ -54,7 +54,9 @@ env -u PYTHONPATH -u CMAKE_PREFIX_PATH OMNI_KIT_ACCEPT_EULA=YES \
   --output evidence/usd/$(date +%F)/warehouse_workcell.json
 ```
 
-重新采集正式场景的总览、AprilTag 近景和四路 RTX 画面：
+验证结果的 `apriltags.box_tag_0`、`apriltags.pick_table_tag_1` 和 `apriltags.pick_table_tag_2` 分别记录动态箱体标记、右侧静态桌面标记和左侧静态桌面标记；`apriltag_failures` 会检查三者 ID 唯一、材质 shader ID、尺寸、角色、法向，以及 Tag 1/2 的对称正式工位坐标。
+
+重新采集正式场景的总览、箱体 Tag 0 近景、桌角 Tag 1/2 近景和四路 RTX 画面。双腕中立画面的目标是验证“夹爪朝向 = D405 观察方向”，不强制解码 Tag：
 
 ```bash
 env -u PYTHONPATH -u CMAKE_PREFIX_PATH OMNI_KIT_ACCEPT_EULA=YES \

@@ -43,13 +43,13 @@ def test_usd_overlay_covers_every_declared_camera() -> None:
 
 
 def test_d405_render_axis_matches_the_stl_lens_face() -> None:
-    """Both D405 meshes have a -Z lens face, so the USD mount is identity."""
+    """Both D405s look through physical -Z lens faces along the gripper."""
 
     for name in ("left_wrist_d405", "right_wrist_d405"):
         camera = camera_by_name(name)
         assert camera.mount_xyz_m == (0.0, 0.0, -0.0235)
-        assert camera.camera_mount_rpy_deg == (0.0, 0.0, 0.0)
-        assert camera.optical_frame_rpy_deg == (180.0, 0.0, 0.0)
+        assert camera.camera_mount_rpy_deg == (0.0, 0.0, 90.0)
+        assert camera.optical_frame_rpy_deg == (180.0, 0.0, 90.0)
 
 
 def test_complete_robot_entry_uses_only_relative_layers() -> None:
@@ -59,6 +59,27 @@ def test_complete_robot_entry_uses_only_relative_layers() -> None:
     assert "@camera_sensors.usda@" in entry
     assert "@wheel_bot.usd@" in entry
     assert "/home/" not in entry
+
+
+def test_native_urdf_import_keeps_the_corrected_robot_asset_reproducible() -> None:
+    """The generator pins Isaac 5.1 settings and hashes the true camera layers."""
+
+    importer = Path("scripts/import_robot_urdf.py").read_text(encoding="utf-8")
+    capture = Path("scripts/capture_workcell_evidence.py").read_text(
+        encoding="utf-8"
+    )
+
+    assert "Isaac Sim 5.1 native URDF importer 2.4.30" in importer
+    assert "import_config.set_convex_decomp(False)" in importer
+    assert "import_config.set_merge_fixed_joints(False)" in importer
+    assert "isaaclab.sim.converters" not in importer
+    for dependency in (
+        "configuration/wheel_bot_base.usd",
+        "configuration/wheel_bot_physics.usd",
+        "configuration/wheel_bot_robot.usd",
+        "configuration/wheel_bot_sensor.usd",
+    ):
+        assert dependency in capture
 
 
 def test_urdf_and_usd_camera_files_pass_the_cross_format_contract() -> None:

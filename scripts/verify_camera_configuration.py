@@ -57,6 +57,11 @@ def validate_files(urdf_path: Path, overlay_path: Path, robot_entry_path: Path) 
         if joint.attrib.get("type") == "fixed"
         if (child := joint.find("child")) is not None
     }
+    joints_by_child = {
+        child.attrib["link"]: joint
+        for joint in root.findall("joint")
+        if (child := joint.find("child")) is not None
+    }
     overlay = overlay_path.read_text(encoding="utf-8")
     robot_entry = robot_entry_path.read_text(encoding="utf-8")
 
@@ -65,6 +70,28 @@ def validate_files(urdf_path: Path, overlay_path: Path, robot_entry_path: Path) 
             raise ValueError(f"URDF camera housing link is absent: {camera.parent_link}")
         if camera.parent_link not in fixed_joint_children:
             raise ValueError(f"URDF camera housing is not attached by a fixed joint: {camera.parent_link}")
+        if camera.name.endswith("wrist_d405"):
+            mount_joint = joints_by_child[camera.parent_link]
+            origin = mount_joint.find("origin")
+            parent = mount_joint.find("parent")
+            expected_parent = camera.parent_link.replace("d405_Link", "roll_Link")
+            rpy = tuple(
+                float(value)
+                for value in (
+                    origin.attrib.get("rpy", "0 0 0")
+                    if origin is not None
+                    else "0 0 0"
+                ).split()
+            )
+            if (
+                parent is None
+                or parent.attrib["link"] != expected_parent
+                or rpy != (0.0, 0.0, 0.0)
+            ):
+                raise ValueError(
+                    f"{camera.name} housing -Z must remain aligned with "
+                    f"{expected_parent} gripper -Z"
+                )
         for expected in (
             camera.parent_link,
             camera.camera_mount_prim,

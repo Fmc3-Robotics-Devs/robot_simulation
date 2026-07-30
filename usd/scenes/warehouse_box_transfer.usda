@@ -6,6 +6,7 @@
     subLayers = [
         @warehouse_box_transfer_workcell.usda@,
         @warehouse_box_transfer_apriltags.usda@,
+        @warehouse_box_transfer_table_apriltags.usda@,
         @warehouse_box_transfer_physics.usda@
     ]
     upAxis = "Z"

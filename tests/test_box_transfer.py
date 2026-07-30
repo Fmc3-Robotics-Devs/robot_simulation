@@ -42,20 +42,16 @@ def test_reset_clears_runtime_state() -> None:
 
 
 def test_camera_review_pose_is_deterministic_and_dual_arm() -> None:
-    """The evidence pose drives both arms and preserves the reviewed D405 view."""
+    """The evidence pose keeps both arms in the mirrored neutral configuration."""
 
     positions = dict(BOX_TRANSFER_CAMERA_REVIEW_POSE_RAD)
-    assert len(positions) == len(BOX_TRANSFER_CAMERA_REVIEW_POSE_RAD) == 12
-    assert positions["left_shoulder_pitch_joint"] == -1.62772
-    assert positions["left_shoulder_roll_joint"] == -0.5
-    assert positions["left_shoulder_yaw_joint"] == 0.16625
-    assert positions["left_elbow_pitch_joint"] == -2.52086
-    assert positions["right_shoulder_pitch_joint"] == -1.2
-    assert positions["right_elbow_pitch_joint"] == -2.4
-    for side in ("left", "right"):
-        assert f"{side}_wrist_yaw_joint" in positions
-        assert f"{side}_wrist_pitch_joint" in positions
-        assert f"{side}_wrist_roll_joint" in positions
+    assert len(positions) == len(BOX_TRANSFER_CAMERA_REVIEW_POSE_RAD) == 14
+    assert set(positions.values()) == {0.0}
+    for left_name, left_position in positions.items():
+        if not left_name.startswith("left_"):
+            continue
+        right_name = left_name.replace("left_", "right_", 1)
+        assert positions[right_name] == left_position
 
 
 def test_camera_review_pose_respects_urdf_joint_limits() -> None:
