@@ -1,0 +1,325 @@
+{
+  "ok": true,
+  "implementation_level": "controlled-attachment software-in-the-loop demo",
+  "acceptance_thresholds": {
+    "maximum_grip_point_error_m": 0.03,
+    "minimum_tool_axis_dot": 0.995,
+    "maximum_finger_command_error_m": 1e-06,
+    "maximum_pre_attach_box_drift_m": 0.02,
+    "maximum_attachment_follow_error_m": 0.002,
+    "minimum_transport_clearance_above_table_m": 0.25,
+    "minimum_attached_box_root_z_m": 0.9940513610839844,
+    "maximum_delivery_xy_error_m": 0.03,
+    "maximum_final_height_error_m": 0.003,
+    "maximum_final_orientation_error_rad": 0.03490658503988659,
+    "maximum_settled_linear_velocity_m_s": 0.02,
+    "maximum_settled_angular_velocity_rad_s": 0.02,
+    "maximum_joint_tracking_error_rad": 0.01,
+    "minimum_frame_standard_deviation": 4.0,
+    "minimum_frame_mean": 2.0
+  },
+  "formal_scene": "usd/scenes/warehouse_box_transfer.usda",
+  "formal_scene_sha256": "7b0f2ae203472b59af899eab7a175b00cc56e400f73d25cce399c09ff8951dff",
+  "renderer": {
+    "isaac_sim_version": "5.1.0.0",
+    "mode": "RaytracedLighting",
+    "rt_subframes": 4
+  },
+  "capture": {
+    "fps": 15,
+    "duration_s": 21.0,
+    "frame_count": 316,
+    "resolution": [
+      1280,
+      720
+    ],
+    "views": [
+      "overview",
+      "head",
+      "chest",
+      "left",
+      "right"
+    ],
+    "frame_synchronous": true
+  },
+  "motion": {
+    "segments": [
+      {
+        "name": "home",
+        "duration_s": 0.75,
+        "carries_box": false,
+        "holds_box_at_target": false
+      },
+      {
+        "name": "approach",
+        "duration_s": 2.5,
+        "carries_box": false,
+        "holds_box_at_target": false
+      },
+      {
+        "name": "pregrasp",
+        "duration_s": 2.5,
+        "carries_box": false,
+        "holds_box_at_target": false
+      },
+      {
+        "name": "grasp",
+        "duration_s": 1.0,
+        "carries_box": false,
+        "holds_box_at_target": false
+      },
+      {
+        "name": "lift",
+        "duration_s": 2.25,
+        "carries_box": true,
+        "holds_box_at_target": false
+      },
+      {
+        "name": "transport",
+        "duration_s": 3.0,
+        "carries_box": true,
+        "holds_box_at_target": false
+      },
+      {
+        "name": "lower",
+        "duration_s": 2.25,
+        "carries_box": true,
+        "holds_box_at_target": false
+      },
+      {
+        "name": "release",
+        "duration_s": 1.0,
+        "carries_box": true,
+        "holds_box_at_target": false
+      },
+      {
+        "name": "withdraw",
+        "duration_s": 1.25,
+        "carries_box": false,
+        "holds_box_at_target": true
+      },
+      {
+        "name": "retreat",
+        "duration_s": 1.25,
+        "carries_box": false,
+        "holds_box_at_target": false
+      },
+      {
+        "name": "return_home",
+        "duration_s": 2.5,
+        "carries_box": false,
+        "holds_box_at_target": false
+      },
+      {
+        "name": "complete",
+        "duration_s": 0.75,
+        "carries_box": false,
+        "holds_box_at_target": false
+      }
+    ],
+    "whole_body_components": [
+      "kinematic mobile base",
+      "three steering pods and wheel roll",
+      "dual 7-DOF arms",
+      "four gripper fingers",
+      "head pitch"
+    ]
+  },
+  "runtime_checks": {
+    "grasp_gate_passed": true,
+    "pre_attach_box_drift_bounded": true,
+    "attachment_follow_error_bounded": true,
+    "target_hold_error_bounded": true,
+    "transport_clearance_reached": true,
+    "attached_box_not_below_table_support": true,
+    "released_before_retreat": true,
+    "delivered_to_opposite_corner": true,
+    "final_height_on_table": true,
+    "final_orientation_upright": true,
+    "final_linear_velocity_settled": true,
+    "final_angular_velocity_settled": true,
+    "joint_tracking_error_bounded": true,
+    "all_five_frame_sequences_valid": true
+  },
+  "frame_count": 316,
+  "physics_substeps_per_frame": 8,
+  "minimum_joint_limit_margin": 0.0,
+  "maximum_joint_tracking_error": 1.1886884720979651e-07,
+  "pixel_summaries": {
+    "overview": {
+      "minimum_standard_deviation": 51.12879995685065,
+      "minimum_mean": 96.07447844328703,
+      "maximum_mean": 99.01251302083334
+    },
+    "head": {
+      "minimum_standard_deviation": 52.599203551679835,
+      "minimum_mean": 100.26206344039352,
+      "maximum_mean": 135.65443721064815
+    },
+    "chest": {
+      "minimum_standard_deviation": 36.19668566427268,
+      "minimum_mean": 80.92845703125,
+      "maximum_mean": 133.81007414641203
+    },
+    "left": {
+      "minimum_standard_deviation": 25.284098484496184,
+      "minimum_mean": 40.121411313657404,
+      "maximum_mean": 166.012861328125
+    },
+    "right": {
+      "minimum_standard_deviation": 26.30846878375485,
+      "minimum_mean": 42.77575086805555,
+      "maximum_mean": 182.64598705150462
+    }
+  },
+  "grasp_gate": {
+    "valid": true,
+    "grip_point_error_m": {
+      "left": 0.012445783848373183,
+      "right": 0.012593924375397747
+    },
+    "tool_forward_to_box_front_dot": {
+      "left": 0.996217830899861,
+      "right": 0.9959733732532622
+    },
+    "finger_command_error_m": 0.0,
+    "thresholds": {
+      "maximum_grip_point_error_m": 0.03,
+      "minimum_tool_axis_dot": 0.995,
+      "maximum_finger_command_error_m": 1e-06
+    }
+  },
+  "attachment": {
+    "method": "dual-gripper midpoint during carry, then controlled target hold until the open hands clear",
+    "attach_time_s": 6.758333333333333,
+    "target_hold_time_s": 15.258333333333335,
+    "release_time_s": 16.508333333333333,
+    "pre_attach_box_drift_m": 0.009447525721974458,
+    "maximum_follow_error_m": 1.0301498170453417e-07,
+    "maximum_target_hold_error_m": 5.581235848245848e-08,
+    "minimum_attached_box_z_m": 0.995,
+    "minimum_transport_box_z_m": 1.2645120450477962
+  },
+  "result": {
+    "initial_box_position_m": [
+      1.2000000476837158,
+      0.3799999952316284,
+      0.9950000047683716
+    ],
+    "target_box_position_m": [
+      1.2,
+      -0.72,
+      0.995
+    ],
+    "final_box_position_m": [
+      1.200000286102295,
+      -0.7200000882148743,
+      0.9940509796142578
+    ],
+    "final_position_error_m": 0.0009490204329679257,
+    "final_xy_error_m": 2.9939336537692375e-07,
+    "final_orientation_error_rad": 1.931411236050088e-07,
+    "final_linear_velocity_m_s": [
+      6.216964720806573e-06,
+      2.865759961423464e-05,
+      -7.169909622462001e-06
+    ],
+    "final_angular_velocity_rad_s": [
+      -2.3189453713712282e-05,
+      1.0052066500065848e-05,
+      -8.238663212978281e-06
+    ]
+  },
+  "git": {
+    "revision": "af20421c18e7759e1a443fd53c8839f51859f4fb",
+    "working_tree_dirty_at_capture": false
+  },
+  "project_source_sha256": {
+    "Rviz/src/franzi_description/urdf/wheel_robot_4.0.urdf": "f9df1ab8618faf6f14b9baff7fd80e74aa57d10c82d05592deb37cb03f4ae348",
+    "scripts/record_box_transfer_demo.py": "43b7ca581f85c9e5de64985b149fe3e3b5c42780eb13420e9676b33d70c88e0b",
+    "scripts/compose_multiview_video.py": "c3531f013effa85a577c71ece8a156a1220b938c6f298547a48fc80f102e2859",
+    "source/franzi_sim/franzi_sim/cameras.py": "ad61bfe688483b00fa64bbbcc47a7638d7eb2ce0cdb96f7087849da10ee87091",
+    "source/franzi_sim/franzi_sim/scenarios/box_transfer_demo.py": "75661237b0e3b5fee2214741b01e04c73209e39cd1200882a903c9e58fb8455b",
+    "usd/scenes/warehouse_box_transfer.usda": "7b0f2ae203472b59af899eab7a175b00cc56e400f73d25cce399c09ff8951dff",
+    "usd/scenes/warehouse_box_transfer_workcell.usda": "abb7bc43dfaf412cfe01f28f0af594b2fd8e3340062eda0cc4a469b87b8e84cf",
+    "usd/scenes/warehouse_box_transfer_apriltags.usda": "56418d48697aceba2c8933c368272c65dc065ffe2d468067a9138320946ce60f",
+    "usd/scenes/warehouse_box_transfer_table_apriltags.usda": "0a339bd956be38acee303aeeee2a929c6712a02421b821f1b7a219e0d749280c",
+    "usd/scenes/warehouse_box_transfer_physics.usda": "db61f1c0ca53d6bcd886981cdc0be2ed01e1ad80dcd6345ab3e62a2930d928b0",
+    "usd/assets/props/blue_transport_box.usda": "8ab5c43e25872a5a50d9abb0e2212d8a6a93c4f6a2d3978aa9b9a7d4e93727f7",
+    "usd/assets/robots/wheel_bot/.asset_hash": "b650fe315677b01a2677862ef9cde54e9154815746e64af29687b4d06895fd99",
+    "usd/assets/robots/wheel_bot/wheel_bot.usd": "04eb7d092a822773e3b6f1745196a5aa94d1a76ba9ca26c3fbe41cda92480d69",
+    "usd/assets/robots/wheel_bot/configuration/wheel_bot_base.usd": "85d65ddb6f667997fa4369ded696d7d81946f5adaca057eb3d866a0ee78e63dc",
+    "usd/assets/robots/wheel_bot/configuration/wheel_bot_physics.usd": "97aae7d6f40e89a1427a05f302845e2f54c07f5f8c6ca40bb43bf5f575e299f4",
+    "usd/assets/robots/wheel_bot/configuration/wheel_bot_robot.usd": "7acc5a2afb91dfa61064bebb63d70fefdfb0386d8dfcd815d113d3282f6580ac",
+    "usd/assets/robots/wheel_bot/configuration/wheel_bot_sensor.usd": "66177340fdbf2438701cc7af76d74674e29393392cc79abe60887687f9374813",
+    "usd/assets/robots/wheel_bot/wheel_bot_with_cameras.usda": "d67de31271798ef683b2bb19d4b7f410f0007c62f7c72c68487fb3a931de8207",
+    "usd/assets/robots/wheel_bot/camera_sensors.usda": "288f2e4374b27469a52b77094e2b214b9a6aec4fd66f787dd07c19ed36895b9b"
+  },
+  "project_source_bundle_sha256": "220aa746f37dcd3d3ccde58e0bf24d25efe76cfce5381723981df11eb3c3c5e3",
+  "artifacts": {
+    "keyframes/01_approach.png": {
+      "sha256": "e32b1a9ccd2b24dc874d1b08efb89cfdfe5982f1629ce3cb670484a0d7dc3190",
+      "size_bytes": 1895517
+    },
+    "keyframes/02_pregrasp.png": {
+      "sha256": "12fd4827853adf553de7aa0bcb8de3463f744e4bc5590ca4627ce7478bfb688a",
+      "size_bytes": 1966631
+    },
+    "keyframes/03_grasp.png": {
+      "sha256": "7a46f7bc3ee0787ee9a559d1a8bc3d8aa87db2f5f5da6b3433a2533bd654dea3",
+      "size_bytes": 1974528
+    },
+    "keyframes/04_lift.png": {
+      "sha256": "1ec4833e1a34883bef25e17ea3a4882e0cbc78077eedc564d9c821a91526cc7b",
+      "size_bytes": 1916083
+    },
+    "keyframes/05_transport.png": {
+      "sha256": "32da424845022bd86f7df3721f30a4fe7cf4f98b5a925c06ca8d36ed670ad93a",
+      "size_bytes": 1889642
+    },
+    "keyframes/06_lower.png": {
+      "sha256": "9e645466564fd1515d63551a70273e5c52391e58019a2b40a6abcc67210adc7c",
+      "size_bytes": 1984301
+    },
+    "keyframes/07_release.png": {
+      "sha256": "ce7322a5c628bd25a3b881cafee0757bdd15973f85e6775501e0a02c74f357d1",
+      "size_bytes": 1999159
+    },
+    "keyframes/08_complete.png": {
+      "sha256": "46328248ce74b00620e74cd06333c2c155080ca835d6bf5179650703d728eea3",
+      "size_bytes": 1875538
+    },
+    "thumbnail.png": {
+      "sha256": "32da424845022bd86f7df3721f30a4fe7cf4f98b5a925c06ca8d36ed670ad93a",
+      "size_bytes": 1889642
+    },
+    "timeline.json": {
+      "sha256": "ef03325308c1dca8287acf4e96039cc62d387fe6f95a410ad29006eacb9ff381",
+      "size_bytes": 122669
+    },
+    "videos/chest.mp4": {
+      "sha256": "3eaf9891d5db356f6565c74f5289d770d03db7902e0d970d2227868799d26948",
+      "size_bytes": 9254750
+    },
+    "videos/head.mp4": {
+      "sha256": "7f165c7866bca1f7a7f5ff8af97f05671edc8355bc1f3c84b4e98b6b15403fe8",
+      "size_bytes": 8756236
+    },
+    "videos/left.mp4": {
+      "sha256": "b7340e7b17960d973e5bd08f085fc4843311ec179e05d5b4562c2658110fe917",
+      "size_bytes": 8036158
+    },
+    "videos/overview.mp4": {
+      "sha256": "d6b67435bf6e6b6c1399dc5876f9b51dafb86ce283448272444f461dbe7f2635",
+      "size_bytes": 3785958
+    },
+    "videos/right.mp4": {
+      "sha256": "489d852b5e5851bc4de7f43c880828366472f492cc560681a5cffd94d7cba5ac",
+      "size_bytes": 6452837
+    },
+    "videos/wheelbot_box_transfer_multiview.mp4": {
+      "sha256": "6c7555b52d5630706dc40742f42c134cc437db7a6bbc9244265f45a8731662b8",
+      "size_bytes": 8761728
+    }
+  }
+}

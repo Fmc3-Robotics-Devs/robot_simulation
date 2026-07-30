@@ -1,0 +1,6008 @@
+{
+  "frames": [
+    {
+      "frame_index": 0,
+      "time_s": 0.0,
+      "stage": "home",
+      "stage_progress": 0.0,
+      "progress": 0.0,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.0,
+        -0.0,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 1,
+      "time_s": 0.066667,
+      "stage": "home",
+      "stage_progress": 0.088889,
+      "progress": 0.003175,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.0,
+        -0.0,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 2,
+      "time_s": 0.133333,
+      "stage": "home",
+      "stage_progress": 0.177778,
+      "progress": 0.006349,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.0,
+        -0.0,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 3,
+      "time_s": 0.2,
+      "stage": "home",
+      "stage_progress": 0.266667,
+      "progress": 0.009524,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.0,
+        -0.0,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 4,
+      "time_s": 0.266667,
+      "stage": "home",
+      "stage_progress": 0.355556,
+      "progress": 0.012698,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.0,
+        -0.0,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 5,
+      "time_s": 0.333333,
+      "stage": "home",
+      "stage_progress": 0.444444,
+      "progress": 0.015873,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.0,
+        -0.0,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 6,
+      "time_s": 0.4,
+      "stage": "home",
+      "stage_progress": 0.533333,
+      "progress": 0.019048,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.0,
+        -0.0,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 7,
+      "time_s": 0.466667,
+      "stage": "home",
+      "stage_progress": 0.622222,
+      "progress": 0.022222,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.0,
+        -0.0,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 8,
+      "time_s": 0.533333,
+      "stage": "home",
+      "stage_progress": 0.711111,
+      "progress": 0.025397,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.0,
+        -0.0,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 9,
+      "time_s": 0.6,
+      "stage": "home",
+      "stage_progress": 0.8,
+      "progress": 0.028571,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.0,
+        -0.0,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 10,
+      "time_s": 0.666667,
+      "stage": "home",
+      "stage_progress": 0.888889,
+      "progress": 0.031746,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.0,
+        -0.0,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 11,
+      "time_s": 0.733333,
+      "stage": "home",
+      "stage_progress": 0.977778,
+      "progress": 0.034921,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.0,
+        -0.0,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 12,
+      "time_s": 0.8,
+      "stage": "approach",
+      "stage_progress": 0.02,
+      "progress": 0.038095,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        4.8e-05,
+        2.9e-05,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 13,
+      "time_s": 0.866667,
+      "stage": "approach",
+      "stage_progress": 0.046667,
+      "progress": 0.04127,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.000585,
+        0.00036,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 14,
+      "time_s": 0.933333,
+      "stage": "approach",
+      "stage_progress": 0.073333,
+      "progress": 0.044444,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.002177,
+        0.001339,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 15,
+      "time_s": 1.0,
+      "stage": "approach",
+      "stage_progress": 0.1,
+      "progress": 0.047619,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.00529,
+        0.003253,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 16,
+      "time_s": 1.066667,
+      "stage": "approach",
+      "stage_progress": 0.126667,
+      "progress": 0.050794,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.010294,
+        0.00633,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 17,
+      "time_s": 1.133333,
+      "stage": "approach",
+      "stage_progress": 0.153333,
+      "progress": 0.053968,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.017469,
+        0.010742,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 18,
+      "time_s": 1.2,
+      "stage": "approach",
+      "stage_progress": 0.18,
+      "progress": 0.057143,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.027011,
+        0.016609,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 19,
+      "time_s": 1.266667,
+      "stage": "approach",
+      "stage_progress": 0.206667,
+      "progress": 0.060317,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.039038,
+        0.024004,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 20,
+      "time_s": 1.333333,
+      "stage": "approach",
+      "stage_progress": 0.233333,
+      "progress": 0.063492,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.053595,
+        0.032955,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 21,
+      "time_s": 1.4,
+      "stage": "approach",
+      "stage_progress": 0.26,
+      "progress": 0.066667,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.070664,
+        0.04345,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 22,
+      "time_s": 1.466667,
+      "stage": "approach",
+      "stage_progress": 0.286667,
+      "progress": 0.069841,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.090162,
+        0.05544,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 23,
+      "time_s": 1.533333,
+      "stage": "approach",
+      "stage_progress": 0.313333,
+      "progress": 0.073016,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.111958,
+        0.068841,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 24,
+      "time_s": 1.6,
+      "stage": "approach",
+      "stage_progress": 0.34,
+      "progress": 0.07619,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.135868,
+        0.083543,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 25,
+      "time_s": 1.666667,
+      "stage": "approach",
+      "stage_progress": 0.366667,
+      "progress": 0.079365,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.161668,
+        0.099408,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 26,
+      "time_s": 1.733333,
+      "stage": "approach",
+      "stage_progress": 0.393333,
+      "progress": 0.08254,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.189099,
+        0.116274,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 27,
+      "time_s": 1.8,
+      "stage": "approach",
+      "stage_progress": 0.42,
+      "progress": 0.085714,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.21787,
+        0.133965,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 28,
+      "time_s": 1.866667,
+      "stage": "approach",
+      "stage_progress": 0.446667,
+      "progress": 0.088889,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.247667,
+        0.152287,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 29,
+      "time_s": 1.933333,
+      "stage": "approach",
+      "stage_progress": 0.473333,
+      "progress": 0.092063,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.278159,
+        0.171036,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 30,
+      "time_s": 2.0,
+      "stage": "approach",
+      "stage_progress": 0.5,
+      "progress": 0.095238,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.309,
+        0.19,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 31,
+      "time_s": 2.066667,
+      "stage": "approach",
+      "stage_progress": 0.526667,
+      "progress": 0.098413,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.339841,
+        0.208964,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 32,
+      "time_s": 2.133333,
+      "stage": "approach",
+      "stage_progress": 0.553333,
+      "progress": 0.101587,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.370333,
+        0.227713,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 33,
+      "time_s": 2.2,
+      "stage": "approach",
+      "stage_progress": 0.58,
+      "progress": 0.104762,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.40013,
+        0.246035,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 34,
+      "time_s": 2.266667,
+      "stage": "approach",
+      "stage_progress": 0.606667,
+      "progress": 0.107937,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.428901,
+        0.263726,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 35,
+      "time_s": 2.333333,
+      "stage": "approach",
+      "stage_progress": 0.633333,
+      "progress": 0.111111,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.456332,
+        0.280592,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 36,
+      "time_s": 2.4,
+      "stage": "approach",
+      "stage_progress": 0.66,
+      "progress": 0.114286,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.482132,
+        0.296457,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 37,
+      "time_s": 2.466667,
+      "stage": "approach",
+      "stage_progress": 0.686667,
+      "progress": 0.11746,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.506042,
+        0.311159,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 38,
+      "time_s": 2.533333,
+      "stage": "approach",
+      "stage_progress": 0.713333,
+      "progress": 0.120635,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.527838,
+        0.32456,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 39,
+      "time_s": 2.6,
+      "stage": "approach",
+      "stage_progress": 0.74,
+      "progress": 0.12381,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.547336,
+        0.33655,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 40,
+      "time_s": 2.666667,
+      "stage": "approach",
+      "stage_progress": 0.766667,
+      "progress": 0.126984,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.564405,
+        0.347045,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 41,
+      "time_s": 2.733333,
+      "stage": "approach",
+      "stage_progress": 0.793333,
+      "progress": 0.130159,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.578962,
+        0.355996,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 42,
+      "time_s": 2.8,
+      "stage": "approach",
+      "stage_progress": 0.82,
+      "progress": 0.133333,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.590989,
+        0.363391,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 43,
+      "time_s": 2.866667,
+      "stage": "approach",
+      "stage_progress": 0.846667,
+      "progress": 0.136508,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.600531,
+        0.369258,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 44,
+      "time_s": 2.933333,
+      "stage": "approach",
+      "stage_progress": 0.873333,
+      "progress": 0.139683,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.607706,
+        0.37367,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 45,
+      "time_s": 3.0,
+      "stage": "approach",
+      "stage_progress": 0.9,
+      "progress": 0.142857,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.61271,
+        0.376747,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 46,
+      "time_s": 3.066667,
+      "stage": "approach",
+      "stage_progress": 0.926667,
+      "progress": 0.146032,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.615823,
+        0.378661,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 47,
+      "time_s": 3.133333,
+      "stage": "approach",
+      "stage_progress": 0.953333,
+      "progress": 0.149206,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.617415,
+        0.37964,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 48,
+      "time_s": 3.2,
+      "stage": "approach",
+      "stage_progress": 0.98,
+      "progress": 0.152381,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.617952,
+        0.37997,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 49,
+      "time_s": 3.266667,
+      "stage": "pregrasp",
+      "stage_progress": 0.006667,
+      "progress": 0.155556,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 50,
+      "time_s": 3.333333,
+      "stage": "pregrasp",
+      "stage_progress": 0.033333,
+      "progress": 0.15873,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 51,
+      "time_s": 3.4,
+      "stage": "pregrasp",
+      "stage_progress": 0.06,
+      "progress": 0.161905,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 52,
+      "time_s": 3.466667,
+      "stage": "pregrasp",
+      "stage_progress": 0.086667,
+      "progress": 0.165079,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 53,
+      "time_s": 3.533333,
+      "stage": "pregrasp",
+      "stage_progress": 0.113333,
+      "progress": 0.168254,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 54,
+      "time_s": 3.6,
+      "stage": "pregrasp",
+      "stage_progress": 0.14,
+      "progress": 0.171429,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 55,
+      "time_s": 3.666667,
+      "stage": "pregrasp",
+      "stage_progress": 0.166667,
+      "progress": 0.174603,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 56,
+      "time_s": 3.733333,
+      "stage": "pregrasp",
+      "stage_progress": 0.193333,
+      "progress": 0.177778,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 57,
+      "time_s": 3.8,
+      "stage": "pregrasp",
+      "stage_progress": 0.22,
+      "progress": 0.180952,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 58,
+      "time_s": 3.866667,
+      "stage": "pregrasp",
+      "stage_progress": 0.246667,
+      "progress": 0.184127,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 59,
+      "time_s": 3.933333,
+      "stage": "pregrasp",
+      "stage_progress": 0.273333,
+      "progress": 0.187302,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 60,
+      "time_s": 4.0,
+      "stage": "pregrasp",
+      "stage_progress": 0.3,
+      "progress": 0.190476,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 61,
+      "time_s": 4.066667,
+      "stage": "pregrasp",
+      "stage_progress": 0.326667,
+      "progress": 0.193651,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 62,
+      "time_s": 4.133333,
+      "stage": "pregrasp",
+      "stage_progress": 0.353333,
+      "progress": 0.196825,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 63,
+      "time_s": 4.2,
+      "stage": "pregrasp",
+      "stage_progress": 0.38,
+      "progress": 0.2,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 64,
+      "time_s": 4.266667,
+      "stage": "pregrasp",
+      "stage_progress": 0.406667,
+      "progress": 0.203175,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 65,
+      "time_s": 4.333333,
+      "stage": "pregrasp",
+      "stage_progress": 0.433333,
+      "progress": 0.206349,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 66,
+      "time_s": 4.4,
+      "stage": "pregrasp",
+      "stage_progress": 0.46,
+      "progress": 0.209524,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 67,
+      "time_s": 4.466667,
+      "stage": "pregrasp",
+      "stage_progress": 0.486667,
+      "progress": 0.212698,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 68,
+      "time_s": 4.533333,
+      "stage": "pregrasp",
+      "stage_progress": 0.513333,
+      "progress": 0.215873,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 69,
+      "time_s": 4.6,
+      "stage": "pregrasp",
+      "stage_progress": 0.54,
+      "progress": 0.219048,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 70,
+      "time_s": 4.666667,
+      "stage": "pregrasp",
+      "stage_progress": 0.566667,
+      "progress": 0.222222,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 71,
+      "time_s": 4.733333,
+      "stage": "pregrasp",
+      "stage_progress": 0.593333,
+      "progress": 0.225397,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 72,
+      "time_s": 4.8,
+      "stage": "pregrasp",
+      "stage_progress": 0.62,
+      "progress": 0.228571,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 73,
+      "time_s": 4.866667,
+      "stage": "pregrasp",
+      "stage_progress": 0.646667,
+      "progress": 0.231746,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 74,
+      "time_s": 4.933333,
+      "stage": "pregrasp",
+      "stage_progress": 0.673333,
+      "progress": 0.234921,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 75,
+      "time_s": 5.0,
+      "stage": "pregrasp",
+      "stage_progress": 0.7,
+      "progress": 0.238095,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 76,
+      "time_s": 5.066667,
+      "stage": "pregrasp",
+      "stage_progress": 0.726667,
+      "progress": 0.24127,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 77,
+      "time_s": 5.133333,
+      "stage": "pregrasp",
+      "stage_progress": 0.753333,
+      "progress": 0.244444,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        0.38,
+        0.994317
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 78,
+      "time_s": 5.2,
+      "stage": "pregrasp",
+      "stage_progress": 0.78,
+      "progress": 0.247619,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.199227,
+        0.380845,
+        1.008102
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 79,
+      "time_s": 5.266667,
+      "stage": "pregrasp",
+      "stage_progress": 0.806667,
+      "progress": 0.250794,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.198774,
+        0.380126,
+        1.007235
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 80,
+      "time_s": 5.333333,
+      "stage": "pregrasp",
+      "stage_progress": 0.833333,
+      "progress": 0.253968,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.208199,
+        0.381461,
+        1.009582
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 81,
+      "time_s": 5.4,
+      "stage": "pregrasp",
+      "stage_progress": 0.86,
+      "progress": 0.257143,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.207141,
+        0.380543,
+        1.009344
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 82,
+      "time_s": 5.466667,
+      "stage": "pregrasp",
+      "stage_progress": 0.886667,
+      "progress": 0.260317,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2047,
+        0.380234,
+        1.005322
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 83,
+      "time_s": 5.533333,
+      "stage": "pregrasp",
+      "stage_progress": 0.913333,
+      "progress": 0.263492,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.214629,
+        0.379799,
+        0.995845
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 84,
+      "time_s": 5.6,
+      "stage": "pregrasp",
+      "stage_progress": 0.94,
+      "progress": 0.266667,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.215086,
+        0.379757,
+        0.996161
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 85,
+      "time_s": 5.666667,
+      "stage": "pregrasp",
+      "stage_progress": 0.966667,
+      "progress": 0.269841,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.215214,
+        0.379795,
+        0.99614
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 86,
+      "time_s": 5.733333,
+      "stage": "pregrasp",
+      "stage_progress": 0.993333,
+      "progress": 0.273016,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.215277,
+        0.379834,
+        0.996154
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 87,
+      "time_s": 5.8,
+      "stage": "grasp",
+      "stage_progress": 0.05,
+      "progress": 0.27619,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.215205,
+        0.379857,
+        0.996153
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 88,
+      "time_s": 5.866667,
+      "stage": "grasp",
+      "stage_progress": 0.116667,
+      "progress": 0.279365,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.215168,
+        0.37988,
+        0.996157
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 89,
+      "time_s": 5.933333,
+      "stage": "grasp",
+      "stage_progress": 0.183333,
+      "progress": 0.28254,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.215169,
+        0.379902,
+        0.996165
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 90,
+      "time_s": 6.0,
+      "stage": "grasp",
+      "stage_progress": 0.25,
+      "progress": 0.285714,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.215174,
+        0.379886,
+        0.996171
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 91,
+      "time_s": 6.066667,
+      "stage": "grasp",
+      "stage_progress": 0.316667,
+      "progress": 0.288889,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.215254,
+        0.379875,
+        0.996192
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 92,
+      "time_s": 6.133333,
+      "stage": "grasp",
+      "stage_progress": 0.383333,
+      "progress": 0.292063,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.215415,
+        0.379865,
+        0.996219
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 93,
+      "time_s": 6.2,
+      "stage": "grasp",
+      "stage_progress": 0.45,
+      "progress": 0.295238,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.215455,
+        0.379867,
+        0.996231
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 94,
+      "time_s": 6.266667,
+      "stage": "grasp",
+      "stage_progress": 0.516667,
+      "progress": 0.298413,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.215469,
+        0.379856,
+        0.996237
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 95,
+      "time_s": 6.333333,
+      "stage": "grasp",
+      "stage_progress": 0.583333,
+      "progress": 0.301587,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.215465,
+        0.379853,
+        0.996244
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 96,
+      "time_s": 6.4,
+      "stage": "grasp",
+      "stage_progress": 0.65,
+      "progress": 0.304762,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.204977,
+        0.380061,
+        0.994808
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 97,
+      "time_s": 6.466667,
+      "stage": "grasp",
+      "stage_progress": 0.716667,
+      "progress": 0.307937,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.205483,
+        0.380182,
+        0.994861
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 98,
+      "time_s": 6.533333,
+      "stage": "grasp",
+      "stage_progress": 0.783333,
+      "progress": 0.311111,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.205579,
+        0.38021,
+        0.994861
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 99,
+      "time_s": 6.6,
+      "stage": "grasp",
+      "stage_progress": 0.85,
+      "progress": 0.314286,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.206547,
+        0.380153,
+        0.994989
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 100,
+      "time_s": 6.666667,
+      "stage": "grasp",
+      "stage_progress": 0.916667,
+      "progress": 0.31746,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.206741,
+        0.380117,
+        0.995005
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 101,
+      "time_s": 6.733333,
+      "stage": "grasp",
+      "stage_progress": 0.983333,
+      "progress": 0.320635,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.206787,
+        0.380117,
+        0.995006
+      ],
+      "robot_base_position_m": [
+        0.618,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 102,
+      "time_s": 6.8,
+      "stage": "lift",
+      "stage_progress": 0.022222,
+      "progress": 0.32381,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.197448,
+        0.380051,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.617989,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 103,
+      "time_s": 6.866667,
+      "stage": "lift",
+      "stage_progress": 0.051852,
+      "progress": 0.326984,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.197595,
+        0.380046,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.617871,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 104,
+      "time_s": 6.933333,
+      "stage": "lift",
+      "stage_progress": 0.081481,
+      "progress": 0.330159,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198097,
+        0.380052,
+        0.995208
+      ],
+      "robot_base_position_m": [
+        0.617523,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 105,
+      "time_s": 7.0,
+      "stage": "lift",
+      "stage_progress": 0.111111,
+      "progress": 0.333333,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198873,
+        0.380173,
+        0.996171
+      ],
+      "robot_base_position_m": [
+        0.616847,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 106,
+      "time_s": 7.066667,
+      "stage": "lift",
+      "stage_progress": 0.140741,
+      "progress": 0.336508,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.200422,
+        0.380388,
+        0.997411
+      ],
+      "robot_base_position_m": [
+        0.615768,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 107,
+      "time_s": 7.133333,
+      "stage": "lift",
+      "stage_progress": 0.17037,
+      "progress": 0.339683,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.202501,
+        0.380595,
+        0.999089
+      ],
+      "robot_base_position_m": [
+        0.614232,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 108,
+      "time_s": 7.2,
+      "stage": "lift",
+      "stage_progress": 0.2,
+      "progress": 0.342857,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.205423,
+        0.380592,
+        1.002854
+      ],
+      "robot_base_position_m": [
+        0.612208,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 109,
+      "time_s": 7.266667,
+      "stage": "lift",
+      "stage_progress": 0.22963,
+      "progress": 0.346032,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.208899,
+        0.380558,
+        1.008491
+      ],
+      "robot_base_position_m": [
+        0.609679,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 110,
+      "time_s": 7.333333,
+      "stage": "lift",
+      "stage_progress": 0.259259,
+      "progress": 0.349206,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.212815,
+        0.380665,
+        1.015264
+      ],
+      "robot_base_position_m": [
+        0.606648,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 111,
+      "time_s": 7.4,
+      "stage": "lift",
+      "stage_progress": 0.288889,
+      "progress": 0.352381,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.217038,
+        0.381516,
+        1.022073
+      ],
+      "robot_base_position_m": [
+        0.603131,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 112,
+      "time_s": 7.466667,
+      "stage": "lift",
+      "stage_progress": 0.318519,
+      "progress": 0.355556,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.221406,
+        0.383247,
+        1.030353
+      ],
+      "robot_base_position_m": [
+        0.599157,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 113,
+      "time_s": 7.533333,
+      "stage": "lift",
+      "stage_progress": 0.348148,
+      "progress": 0.35873,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.225643,
+        0.383823,
+        1.041077
+      ],
+      "robot_base_position_m": [
+        0.59477,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 114,
+      "time_s": 7.6,
+      "stage": "lift",
+      "stage_progress": 0.377778,
+      "progress": 0.361905,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.229843,
+        0.382555,
+        1.053417
+      ],
+      "robot_base_position_m": [
+        0.59002,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 115,
+      "time_s": 7.666667,
+      "stage": "lift",
+      "stage_progress": 0.407407,
+      "progress": 0.365079,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.233689,
+        0.380632,
+        1.067062
+      ],
+      "robot_base_position_m": [
+        0.584968,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 116,
+      "time_s": 7.733333,
+      "stage": "lift",
+      "stage_progress": 0.437037,
+      "progress": 0.368254,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.236682,
+        0.379979,
+        1.0817
+      ],
+      "robot_base_position_m": [
+        0.579681,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 117,
+      "time_s": 7.8,
+      "stage": "lift",
+      "stage_progress": 0.466667,
+      "progress": 0.371429,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.2386,
+        0.379762,
+        1.096756
+      ],
+      "robot_base_position_m": [
+        0.574232,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 118,
+      "time_s": 7.866667,
+      "stage": "lift",
+      "stage_progress": 0.496296,
+      "progress": 0.374603,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.23951,
+        0.379688,
+        1.112417
+      ],
+      "robot_base_position_m": [
+        0.568694,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 119,
+      "time_s": 7.933333,
+      "stage": "lift",
+      "stage_progress": 0.525926,
+      "progress": 0.377778,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.239406,
+        0.379692,
+        1.12841
+      ],
+      "robot_base_position_m": [
+        0.563148,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 120,
+      "time_s": 8.0,
+      "stage": "lift",
+      "stage_progress": 0.555556,
+      "progress": 0.380952,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.238276,
+        0.379733,
+        1.144488
+      ],
+      "robot_base_position_m": [
+        0.557669,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 121,
+      "time_s": 8.066667,
+      "stage": "lift",
+      "stage_progress": 0.585185,
+      "progress": 0.384127,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.236204,
+        0.379779,
+        1.160453
+      ],
+      "robot_base_position_m": [
+        0.552334,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 122,
+      "time_s": 8.133333,
+      "stage": "lift",
+      "stage_progress": 0.614815,
+      "progress": 0.387302,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.233311,
+        0.379786,
+        1.175879
+      ],
+      "robot_base_position_m": [
+        0.547217,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 123,
+      "time_s": 8.2,
+      "stage": "lift",
+      "stage_progress": 0.644444,
+      "progress": 0.390476,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.229773,
+        0.379791,
+        1.190407
+      ],
+      "robot_base_position_m": [
+        0.542386,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 124,
+      "time_s": 8.266667,
+      "stage": "lift",
+      "stage_progress": 0.674074,
+      "progress": 0.393651,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.225734,
+        0.379791,
+        1.203953
+      ],
+      "robot_base_position_m": [
+        0.537903,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 125,
+      "time_s": 8.333333,
+      "stage": "lift",
+      "stage_progress": 0.703704,
+      "progress": 0.396825,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.221455,
+        0.379803,
+        1.216306
+      ],
+      "robot_base_position_m": [
+        0.533821,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 126,
+      "time_s": 8.4,
+      "stage": "lift",
+      "stage_progress": 0.733333,
+      "progress": 0.4,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.217157,
+        0.379832,
+        1.227283
+      ],
+      "robot_base_position_m": [
+        0.530187,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 127,
+      "time_s": 8.466667,
+      "stage": "lift",
+      "stage_progress": 0.762963,
+      "progress": 0.403175,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.213057,
+        0.379856,
+        1.236693
+      ],
+      "robot_base_position_m": [
+        0.527032,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 128,
+      "time_s": 8.533333,
+      "stage": "lift",
+      "stage_progress": 0.792593,
+      "progress": 0.406349,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.209333,
+        0.380019,
+        1.2446
+      ],
+      "robot_base_position_m": [
+        0.524377,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 129,
+      "time_s": 8.6,
+      "stage": "lift",
+      "stage_progress": 0.822222,
+      "progress": 0.409524,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.206134,
+        0.380084,
+        1.251039
+      ],
+      "robot_base_position_m": [
+        0.522227,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 130,
+      "time_s": 8.666667,
+      "stage": "lift",
+      "stage_progress": 0.851852,
+      "progress": 0.412698,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.203541,
+        0.380109,
+        1.256077
+      ],
+      "robot_base_position_m": [
+        0.520572,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 131,
+      "time_s": 8.733333,
+      "stage": "lift",
+      "stage_progress": 0.881481,
+      "progress": 0.415873,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.201607,
+        0.380126,
+        1.259758
+      ],
+      "robot_base_position_m": [
+        0.519383,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 132,
+      "time_s": 8.8,
+      "stage": "lift",
+      "stage_progress": 0.911111,
+      "progress": 0.419048,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.200304,
+        0.38014,
+        1.262211
+      ],
+      "robot_base_position_m": [
+        0.518612,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 133,
+      "time_s": 8.866667,
+      "stage": "lift",
+      "stage_progress": 0.940741,
+      "progress": 0.422222,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.199563,
+        0.380149,
+        1.263632
+      ],
+      "robot_base_position_m": [
+        0.51819,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 134,
+      "time_s": 8.933333,
+      "stage": "lift",
+      "stage_progress": 0.97037,
+      "progress": 0.425397,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.199247,
+        0.380153,
+        1.26428
+      ],
+      "robot_base_position_m": [
+        0.518025,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 135,
+      "time_s": 9.0,
+      "stage": "lift",
+      "stage_progress": 1.0,
+      "progress": 0.428571,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.199169,
+        0.380155,
+        1.264496
+      ],
+      "robot_base_position_m": [
+        0.518,
+        0.38,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 136,
+      "time_s": 9.066667,
+      "stage": "transport",
+      "stage_progress": 0.022222,
+      "progress": 0.431746,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.199136,
+        0.38004,
+        1.264617
+      ],
+      "robot_base_position_m": [
+        0.518,
+        0.379883,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 137,
+      "time_s": 9.133333,
+      "stage": "transport",
+      "stage_progress": 0.044444,
+      "progress": 0.434921,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.199105,
+        0.379256,
+        1.264719
+      ],
+      "robot_base_position_m": [
+        0.518,
+        0.379098,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 138,
+      "time_s": 9.2,
+      "stage": "transport",
+      "stage_progress": 0.066667,
+      "progress": 0.438095,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.199076,
+        0.377218,
+        1.264808
+      ],
+      "robot_base_position_m": [
+        0.518,
+        0.377058,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 139,
+      "time_s": 9.266667,
+      "stage": "transport",
+      "stage_progress": 0.088889,
+      "progress": 0.44127,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.199051,
+        0.373431,
+        1.264892
+      ],
+      "robot_base_position_m": [
+        0.518,
+        0.373268,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 140,
+      "time_s": 9.333333,
+      "stage": "transport",
+      "stage_progress": 0.111111,
+      "progress": 0.444444,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.19903,
+        0.36748,
+        1.264963
+      ],
+      "robot_base_position_m": [
+        0.518,
+        0.367314,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 141,
+      "time_s": 9.4,
+      "stage": "transport",
+      "stage_progress": 0.133333,
+      "progress": 0.447619,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.199011,
+        0.35903,
+        1.265026
+      ],
+      "robot_base_position_m": [
+        0.518,
+        0.358863,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 142,
+      "time_s": 9.466667,
+      "stage": "transport",
+      "stage_progress": 0.155556,
+      "progress": 0.450794,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198994,
+        0.347824,
+        1.265081
+      ],
+      "robot_base_position_m": [
+        0.518,
+        0.347655,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 143,
+      "time_s": 9.533333,
+      "stage": "transport",
+      "stage_progress": 0.177778,
+      "progress": 0.453968,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198979,
+        0.333673,
+        1.265128
+      ],
+      "robot_base_position_m": [
+        0.518,
+        0.333504,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 144,
+      "time_s": 9.6,
+      "stage": "transport",
+      "stage_progress": 0.2,
+      "progress": 0.457143,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198965,
+        0.316512,
+        1.265161
+      ],
+      "robot_base_position_m": [
+        0.518,
+        0.316288,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 145,
+      "time_s": 9.666667,
+      "stage": "transport",
+      "stage_progress": 0.222222,
+      "progress": 0.460317,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198947,
+        0.296216,
+        1.2652
+      ],
+      "robot_base_position_m": [
+        0.518,
+        0.295948,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 146,
+      "time_s": 9.733333,
+      "stage": "transport",
+      "stage_progress": 0.244444,
+      "progress": 0.463492,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198925,
+        0.272806,
+        1.265238
+      ],
+      "robot_base_position_m": [
+        0.518,
+        0.272482,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 147,
+      "time_s": 9.8,
+      "stage": "transport",
+      "stage_progress": 0.266667,
+      "progress": 0.466667,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198905,
+        0.246314,
+        1.265275
+      ],
+      "robot_base_position_m": [
+        0.518,
+        0.245944,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 148,
+      "time_s": 9.866667,
+      "stage": "transport",
+      "stage_progress": 0.288889,
+      "progress": 0.469841,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198889,
+        0.216832,
+        1.265298
+      ],
+      "robot_base_position_m": [
+        0.518,
+        0.216436,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 149,
+      "time_s": 9.933333,
+      "stage": "transport",
+      "stage_progress": 0.311111,
+      "progress": 0.473016,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198875,
+        0.184513,
+        1.265321
+      ],
+      "robot_base_position_m": [
+        0.518,
+        0.184104,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 150,
+      "time_s": 10.0,
+      "stage": "transport",
+      "stage_progress": 0.333333,
+      "progress": 0.47619,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198862,
+        0.149553,
+        1.26534
+      ],
+      "robot_base_position_m": [
+        0.518,
+        0.149136,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 151,
+      "time_s": 10.066667,
+      "stage": "transport",
+      "stage_progress": 0.355556,
+      "progress": 0.479365,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198851,
+        0.112179,
+        1.265357
+      ],
+      "robot_base_position_m": [
+        0.518,
+        0.111756,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 152,
+      "time_s": 10.133333,
+      "stage": "transport",
+      "stage_progress": 0.377778,
+      "progress": 0.48254,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198842,
+        0.072647,
+        1.26537
+      ],
+      "robot_base_position_m": [
+        0.518,
+        0.072221,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 153,
+      "time_s": 10.2,
+      "stage": "transport",
+      "stage_progress": 0.4,
+      "progress": 0.485714,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198833,
+        0.031243,
+        1.265382
+      ],
+      "robot_base_position_m": [
+        0.518,
+        0.030816,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 154,
+      "time_s": 10.266667,
+      "stage": "transport",
+      "stage_progress": 0.422222,
+      "progress": 0.488889,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198825,
+        -0.011725,
+        1.265392
+      ],
+      "robot_base_position_m": [
+        0.518,
+        -0.012152,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 155,
+      "time_s": 10.333333,
+      "stage": "transport",
+      "stage_progress": 0.444444,
+      "progress": 0.492063,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198817,
+        -0.05593,
+        1.265405
+      ],
+      "robot_base_position_m": [
+        0.518,
+        -0.056356,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 156,
+      "time_s": 10.4,
+      "stage": "transport",
+      "stage_progress": 0.466667,
+      "progress": 0.495238,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198811,
+        -0.101029,
+        1.265417
+      ],
+      "robot_base_position_m": [
+        0.518,
+        -0.101453,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 157,
+      "time_s": 10.466667,
+      "stage": "transport",
+      "stage_progress": 0.488889,
+      "progress": 0.498413,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198807,
+        -0.146668,
+        1.265427
+      ],
+      "robot_base_position_m": [
+        0.518,
+        -0.147091,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 158,
+      "time_s": 10.533333,
+      "stage": "transport",
+      "stage_progress": 0.511111,
+      "progress": 0.501587,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198803,
+        -0.192487,
+        1.265435
+      ],
+      "robot_base_position_m": [
+        0.518,
+        -0.192909,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 159,
+      "time_s": 10.6,
+      "stage": "transport",
+      "stage_progress": 0.533333,
+      "progress": 0.504762,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.1988,
+        -0.238123,
+        1.265442
+      ],
+      "robot_base_position_m": [
+        0.518,
+        -0.238547,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 160,
+      "time_s": 10.666667,
+      "stage": "transport",
+      "stage_progress": 0.555556,
+      "progress": 0.507937,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198797,
+        -0.283219,
+        1.26545
+      ],
+      "robot_base_position_m": [
+        0.518,
+        -0.283644,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 161,
+      "time_s": 10.733333,
+      "stage": "transport",
+      "stage_progress": 0.577778,
+      "progress": 0.511111,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198795,
+        -0.327421,
+        1.265457
+      ],
+      "robot_base_position_m": [
+        0.518,
+        -0.327848,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 162,
+      "time_s": 10.8,
+      "stage": "transport",
+      "stage_progress": 0.6,
+      "progress": 0.514286,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198795,
+        -0.370385,
+        1.26546
+      ],
+      "robot_base_position_m": [
+        0.518,
+        -0.370816,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 163,
+      "time_s": 10.866667,
+      "stage": "transport",
+      "stage_progress": 0.622222,
+      "progress": 0.51746,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198793,
+        -0.411786,
+        1.265465
+      ],
+      "robot_base_position_m": [
+        0.518,
+        -0.412221,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 164,
+      "time_s": 10.933333,
+      "stage": "transport",
+      "stage_progress": 0.644444,
+      "progress": 0.520635,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198792,
+        -0.451316,
+        1.265471
+      ],
+      "robot_base_position_m": [
+        0.518,
+        -0.451756,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 165,
+      "time_s": 11.0,
+      "stage": "transport",
+      "stage_progress": 0.666667,
+      "progress": 0.52381,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198791,
+        -0.488692,
+        1.265478
+      ],
+      "robot_base_position_m": [
+        0.518,
+        -0.489136,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 166,
+      "time_s": 11.066667,
+      "stage": "transport",
+      "stage_progress": 0.688889,
+      "progress": 0.526984,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.19879,
+        -0.523656,
+        1.265485
+      ],
+      "robot_base_position_m": [
+        0.518,
+        -0.524104,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 167,
+      "time_s": 11.133333,
+      "stage": "transport",
+      "stage_progress": 0.711111,
+      "progress": 0.530159,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198791,
+        -0.555986,
+        1.265491
+      ],
+      "robot_base_position_m": [
+        0.518,
+        -0.556436,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 168,
+      "time_s": 11.2,
+      "stage": "transport",
+      "stage_progress": 0.733333,
+      "progress": 0.533333,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198792,
+        -0.585492,
+        1.265496
+      ],
+      "robot_base_position_m": [
+        0.518,
+        -0.585944,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 169,
+      "time_s": 11.266667,
+      "stage": "transport",
+      "stage_progress": 0.755556,
+      "progress": 0.536508,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198794,
+        -0.61203,
+        1.2655
+      ],
+      "robot_base_position_m": [
+        0.518,
+        -0.612482,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 170,
+      "time_s": 11.333333,
+      "stage": "transport",
+      "stage_progress": 0.777778,
+      "progress": 0.539683,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198795,
+        -0.635503,
+        1.265502
+      ],
+      "robot_base_position_m": [
+        0.518,
+        -0.635948,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 171,
+      "time_s": 11.4,
+      "stage": "transport",
+      "stage_progress": 0.8,
+      "progress": 0.542857,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198799,
+        -0.65588,
+        1.265504
+      ],
+      "robot_base_position_m": [
+        0.518,
+        -0.656288,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 172,
+      "time_s": 11.466667,
+      "stage": "transport",
+      "stage_progress": 0.822222,
+      "progress": 0.546032,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198806,
+        -0.673144,
+        1.265506
+      ],
+      "robot_base_position_m": [
+        0.518,
+        -0.673504,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 173,
+      "time_s": 11.533333,
+      "stage": "transport",
+      "stage_progress": 0.844444,
+      "progress": 0.549206,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198821,
+        -0.687382,
+        1.265496
+      ],
+      "robot_base_position_m": [
+        0.518,
+        -0.687655,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 174,
+      "time_s": 11.6,
+      "stage": "transport",
+      "stage_progress": 0.866667,
+      "progress": 0.552381,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198833,
+        -0.698631,
+        1.265479
+      ],
+      "robot_base_position_m": [
+        0.518,
+        -0.698863,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 175,
+      "time_s": 11.666667,
+      "stage": "transport",
+      "stage_progress": 0.888889,
+      "progress": 0.555556,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198838,
+        -0.707105,
+        1.265473
+      ],
+      "robot_base_position_m": [
+        0.518,
+        -0.707314,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 176,
+      "time_s": 11.733333,
+      "stage": "transport",
+      "stage_progress": 0.911111,
+      "progress": 0.55873,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198843,
+        -0.71307,
+        1.26547
+      ],
+      "robot_base_position_m": [
+        0.518,
+        -0.713268,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 177,
+      "time_s": 11.8,
+      "stage": "transport",
+      "stage_progress": 0.933333,
+      "progress": 0.561905,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198848,
+        -0.716865,
+        1.265466
+      ],
+      "robot_base_position_m": [
+        0.518,
+        -0.717058,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 178,
+      "time_s": 11.866667,
+      "stage": "transport",
+      "stage_progress": 0.955556,
+      "progress": 0.565079,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198852,
+        -0.718905,
+        1.265463
+      ],
+      "robot_base_position_m": [
+        0.518,
+        -0.719098,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 179,
+      "time_s": 11.933333,
+      "stage": "transport",
+      "stage_progress": 0.977778,
+      "progress": 0.568254,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198855,
+        -0.719691,
+        1.265458
+      ],
+      "robot_base_position_m": [
+        0.518,
+        -0.719883,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 180,
+      "time_s": 12.0,
+      "stage": "transport",
+      "stage_progress": 1.0,
+      "progress": 0.571429,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198858,
+        -0.719808,
+        1.265453
+      ],
+      "robot_base_position_m": [
+        0.518,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 181,
+      "time_s": 12.066667,
+      "stage": "lower",
+      "stage_progress": 0.02963,
+      "progress": 0.574603,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.1989,
+        -0.719807,
+        1.265378
+      ],
+      "robot_base_position_m": [
+        0.518025,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 182,
+      "time_s": 12.133333,
+      "stage": "lower",
+      "stage_progress": 0.059259,
+      "progress": 0.577778,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.199171,
+        -0.719807,
+        1.2649
+      ],
+      "robot_base_position_m": [
+        0.51819,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 183,
+      "time_s": 12.2,
+      "stage": "lower",
+      "stage_progress": 0.088889,
+      "progress": 0.580952,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.199863,
+        -0.719805,
+        1.263674
+      ],
+      "robot_base_position_m": [
+        0.518612,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 184,
+      "time_s": 12.266667,
+      "stage": "lower",
+      "stage_progress": 0.118519,
+      "progress": 0.584127,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.201115,
+        -0.7198,
+        1.261421
+      ],
+      "robot_base_position_m": [
+        0.519383,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 185,
+      "time_s": 12.333333,
+      "stage": "lower",
+      "stage_progress": 0.148148,
+      "progress": 0.587302,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.203011,
+        -0.719797,
+        1.257922
+      ],
+      "robot_base_position_m": [
+        0.520572,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 186,
+      "time_s": 12.4,
+      "stage": "lower",
+      "stage_progress": 0.177778,
+      "progress": 0.590476,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.205573,
+        -0.71979,
+        1.253011
+      ],
+      "robot_base_position_m": [
+        0.522227,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 187,
+      "time_s": 12.466667,
+      "stage": "lower",
+      "stage_progress": 0.207407,
+      "progress": 0.593651,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.208766,
+        -0.71978,
+        1.246591
+      ],
+      "robot_base_position_m": [
+        0.524377,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 188,
+      "time_s": 12.533333,
+      "stage": "lower",
+      "stage_progress": 0.237037,
+      "progress": 0.596825,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.2125,
+        -0.71977,
+        1.23858
+      ],
+      "robot_base_position_m": [
+        0.527032,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 189,
+      "time_s": 12.6,
+      "stage": "lower",
+      "stage_progress": 0.266667,
+      "progress": 0.6,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.216597,
+        -0.719837,
+        1.228988
+      ],
+      "robot_base_position_m": [
+        0.530187,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 190,
+      "time_s": 12.666667,
+      "stage": "lower",
+      "stage_progress": 0.296296,
+      "progress": 0.603175,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.220877,
+        -0.719956,
+        1.217841
+      ],
+      "robot_base_position_m": [
+        0.533821,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 191,
+      "time_s": 12.733333,
+      "stage": "lower",
+      "stage_progress": 0.325926,
+      "progress": 0.606349,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.225143,
+        -0.720041,
+        1.205233
+      ],
+      "robot_base_position_m": [
+        0.537903,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 192,
+      "time_s": 12.8,
+      "stage": "lower",
+      "stage_progress": 0.355556,
+      "progress": 0.609524,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.229162,
+        -0.720096,
+        1.191359
+      ],
+      "robot_base_position_m": [
+        0.542386,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 193,
+      "time_s": 12.866667,
+      "stage": "lower",
+      "stage_progress": 0.385185,
+      "progress": 0.612698,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.232703,
+        -0.720138,
+        1.17646
+      ],
+      "robot_base_position_m": [
+        0.547217,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 194,
+      "time_s": 12.933333,
+      "stage": "lower",
+      "stage_progress": 0.414815,
+      "progress": 0.615873,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.235548,
+        -0.720164,
+        1.16082
+      ],
+      "robot_base_position_m": [
+        0.552334,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 195,
+      "time_s": 13.0,
+      "stage": "lower",
+      "stage_progress": 0.444444,
+      "progress": 0.619048,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.237561,
+        -0.720181,
+        1.144734
+      ],
+      "robot_base_position_m": [
+        0.557669,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 196,
+      "time_s": 13.066667,
+      "stage": "lower",
+      "stage_progress": 0.474074,
+      "progress": 0.622222,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.23861,
+        -0.720205,
+        1.128455
+      ],
+      "robot_base_position_m": [
+        0.563148,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 197,
+      "time_s": 13.133333,
+      "stage": "lower",
+      "stage_progress": 0.503704,
+      "progress": 0.625397,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.238632,
+        -0.720236,
+        1.112347
+      ],
+      "robot_base_position_m": [
+        0.568694,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 198,
+      "time_s": 13.2,
+      "stage": "lower",
+      "stage_progress": 0.533333,
+      "progress": 0.628571,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.237667,
+        -0.720269,
+        1.096702
+      ],
+      "robot_base_position_m": [
+        0.574232,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 199,
+      "time_s": 13.266667,
+      "stage": "lower",
+      "stage_progress": 0.562963,
+      "progress": 0.631746,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.235785,
+        -0.720299,
+        1.081779
+      ],
+      "robot_base_position_m": [
+        0.579681,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 200,
+      "time_s": 13.333333,
+      "stage": "lower",
+      "stage_progress": 0.592593,
+      "progress": 0.634921,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.233098,
+        -0.720301,
+        1.067821
+      ],
+      "robot_base_position_m": [
+        0.584968,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 201,
+      "time_s": 13.4,
+      "stage": "lower",
+      "stage_progress": 0.622222,
+      "progress": 0.638095,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.229625,
+        -0.719742,
+        1.054369
+      ],
+      "robot_base_position_m": [
+        0.59002,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 202,
+      "time_s": 13.466667,
+      "stage": "lower",
+      "stage_progress": 0.651852,
+      "progress": 0.64127,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.225479,
+        -0.71943,
+        1.041772
+      ],
+      "robot_base_position_m": [
+        0.59477,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 203,
+      "time_s": 13.533333,
+      "stage": "lower",
+      "stage_progress": 0.681481,
+      "progress": 0.644444,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.221182,
+        -0.718756,
+        1.031198
+      ],
+      "robot_base_position_m": [
+        0.599157,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 204,
+      "time_s": 13.6,
+      "stage": "lower",
+      "stage_progress": 0.711111,
+      "progress": 0.647619,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.216763,
+        -0.717081,
+        1.021479
+      ],
+      "robot_base_position_m": [
+        0.603131,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 205,
+      "time_s": 13.666667,
+      "stage": "lower",
+      "stage_progress": 0.740741,
+      "progress": 0.650794,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.212451,
+        -0.71568,
+        1.013864
+      ],
+      "robot_base_position_m": [
+        0.606648,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 206,
+      "time_s": 13.733333,
+      "stage": "lower",
+      "stage_progress": 0.77037,
+      "progress": 0.653968,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.208457,
+        -0.715397,
+        1.007224
+      ],
+      "robot_base_position_m": [
+        0.609679,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 207,
+      "time_s": 13.8,
+      "stage": "lower",
+      "stage_progress": 0.8,
+      "progress": 0.657143,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.205079,
+        -0.715478,
+        1.001664
+      ],
+      "robot_base_position_m": [
+        0.612208,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 208,
+      "time_s": 13.866667,
+      "stage": "lower",
+      "stage_progress": 0.82963,
+      "progress": 0.660317,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.202076,
+        -0.715962,
+        0.997673
+      ],
+      "robot_base_position_m": [
+        0.614232,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 209,
+      "time_s": 13.933333,
+      "stage": "lower",
+      "stage_progress": 0.859259,
+      "progress": 0.663492,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.199897,
+        -0.718184,
+        0.996511
+      ],
+      "robot_base_position_m": [
+        0.615768,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 210,
+      "time_s": 14.0,
+      "stage": "lower",
+      "stage_progress": 0.888889,
+      "progress": 0.666667,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198659,
+        -0.719651,
+        0.995419
+      ],
+      "robot_base_position_m": [
+        0.616847,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 211,
+      "time_s": 14.066667,
+      "stage": "lower",
+      "stage_progress": 0.918519,
+      "progress": 0.669841,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.198104,
+        -0.719921,
+        0.995168
+      ],
+      "robot_base_position_m": [
+        0.617523,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 212,
+      "time_s": 14.133333,
+      "stage": "lower",
+      "stage_progress": 0.948148,
+      "progress": 0.673016,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.197631,
+        -0.719949,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.617871,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 213,
+      "time_s": 14.2,
+      "stage": "lower",
+      "stage_progress": 0.977778,
+      "progress": 0.67619,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.197435,
+        -0.71995,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.617989,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 214,
+      "time_s": 14.266667,
+      "stage": "release",
+      "stage_progress": 0.016667,
+      "progress": 0.679365,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.197413,
+        -0.719951,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.618,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 215,
+      "time_s": 14.333333,
+      "stage": "release",
+      "stage_progress": 0.083333,
+      "progress": 0.68254,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.197416,
+        -0.71994,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.618,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 216,
+      "time_s": 14.4,
+      "stage": "release",
+      "stage_progress": 0.15,
+      "progress": 0.685714,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.197415,
+        -0.719891,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.618,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 217,
+      "time_s": 14.466667,
+      "stage": "release",
+      "stage_progress": 0.216667,
+      "progress": 0.688889,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.197659,
+        -0.7199,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.618,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 218,
+      "time_s": 14.533333,
+      "stage": "release",
+      "stage_progress": 0.283333,
+      "progress": 0.692063,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.197692,
+        -0.719766,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.618,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 219,
+      "time_s": 14.6,
+      "stage": "release",
+      "stage_progress": 0.35,
+      "progress": 0.695238,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.19659,
+        -0.719458,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.618,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 220,
+      "time_s": 14.666667,
+      "stage": "release",
+      "stage_progress": 0.416667,
+      "progress": 0.698413,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.196759,
+        -0.719739,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.618,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 221,
+      "time_s": 14.733333,
+      "stage": "release",
+      "stage_progress": 0.483333,
+      "progress": 0.701587,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.195364,
+        -0.720902,
+        0.995468
+      ],
+      "robot_base_position_m": [
+        0.618,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 222,
+      "time_s": 14.8,
+      "stage": "release",
+      "stage_progress": 0.55,
+      "progress": 0.704762,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.192558,
+        -0.719676,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.618,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 223,
+      "time_s": 14.866667,
+      "stage": "release",
+      "stage_progress": 0.616667,
+      "progress": 0.707937,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.192333,
+        -0.720138,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.618,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 224,
+      "time_s": 14.933333,
+      "stage": "release",
+      "stage_progress": 0.683333,
+      "progress": 0.711111,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.192376,
+        -0.72051,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.618,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 225,
+      "time_s": 15.0,
+      "stage": "release",
+      "stage_progress": 0.75,
+      "progress": 0.714286,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.192387,
+        -0.720838,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.618,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 226,
+      "time_s": 15.066667,
+      "stage": "release",
+      "stage_progress": 0.816667,
+      "progress": 0.71746,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.192408,
+        -0.721136,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.618,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 227,
+      "time_s": 15.133333,
+      "stage": "release",
+      "stage_progress": 0.883333,
+      "progress": 0.720635,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.192444,
+        -0.721375,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.618,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 228,
+      "time_s": 15.2,
+      "stage": "release",
+      "stage_progress": 0.95,
+      "progress": 0.72381,
+      "box_attached": true,
+      "box_control_mode": "gripper",
+      "box_position_m": [
+        1.192488,
+        -0.721569,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.618,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 229,
+      "time_s": 15.266667,
+      "stage": "withdraw",
+      "stage_progress": 0.013333,
+      "progress": 0.726984,
+      "box_attached": false,
+      "box_control_mode": "target_hold",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.617994,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 230,
+      "time_s": 15.333333,
+      "stage": "withdraw",
+      "stage_progress": 0.066667,
+      "progress": 0.730159,
+      "box_attached": false,
+      "box_control_mode": "target_hold",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.617283,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 231,
+      "time_s": 15.4,
+      "stage": "withdraw",
+      "stage_progress": 0.12,
+      "progress": 0.733333,
+      "box_attached": false,
+      "box_control_mode": "target_hold",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.614163,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 232,
+      "time_s": 15.466667,
+      "stage": "withdraw",
+      "stage_progress": 0.173333,
+      "progress": 0.736508,
+      "box_attached": false,
+      "box_control_mode": "target_hold",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.607421,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 233,
+      "time_s": 15.533333,
+      "stage": "withdraw",
+      "stage_progress": 0.226667,
+      "progress": 0.739683,
+      "box_attached": false,
+      "box_control_mode": "target_hold",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.596439,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 234,
+      "time_s": 15.6,
+      "stage": "withdraw",
+      "stage_progress": 0.28,
+      "progress": 0.742857,
+      "box_attached": false,
+      "box_control_mode": "target_hold",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.58111,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 235,
+      "time_s": 15.666667,
+      "stage": "withdraw",
+      "stage_progress": 0.333333,
+      "progress": 0.746032,
+      "box_attached": false,
+      "box_control_mode": "target_hold",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.561753,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 236,
+      "time_s": 15.733333,
+      "stage": "withdraw",
+      "stage_progress": 0.386667,
+      "progress": 0.749206,
+      "box_attached": false,
+      "box_control_mode": "target_hold",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.539029,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 237,
+      "time_s": 15.8,
+      "stage": "withdraw",
+      "stage_progress": 0.44,
+      "progress": 0.752381,
+      "box_attached": false,
+      "box_control_mode": "target_hold",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.513862,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 238,
+      "time_s": 15.866667,
+      "stage": "withdraw",
+      "stage_progress": 0.493333,
+      "progress": 0.755556,
+      "box_attached": false,
+      "box_control_mode": "target_hold",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.48735,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 239,
+      "time_s": 15.933333,
+      "stage": "withdraw",
+      "stage_progress": 0.546667,
+      "progress": 0.75873,
+      "box_attached": false,
+      "box_control_mode": "target_hold",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.460686,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 240,
+      "time_s": 16.0,
+      "stage": "withdraw",
+      "stage_progress": 0.6,
+      "progress": 0.761905,
+      "box_attached": false,
+      "box_control_mode": "target_hold",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.435074,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 241,
+      "time_s": 16.066667,
+      "stage": "withdraw",
+      "stage_progress": 0.653333,
+      "progress": 0.765079,
+      "box_attached": false,
+      "box_control_mode": "target_hold",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.411644,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 242,
+      "time_s": 16.133333,
+      "stage": "withdraw",
+      "stage_progress": 0.706667,
+      "progress": 0.768254,
+      "box_attached": false,
+      "box_control_mode": "target_hold",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.391372,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 243,
+      "time_s": 16.2,
+      "stage": "withdraw",
+      "stage_progress": 0.76,
+      "progress": 0.771429,
+      "box_attached": false,
+      "box_control_mode": "target_hold",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.374991,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 244,
+      "time_s": 16.266667,
+      "stage": "withdraw",
+      "stage_progress": 0.813333,
+      "progress": 0.774603,
+      "box_attached": false,
+      "box_control_mode": "target_hold",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.362915,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 245,
+      "time_s": 16.333333,
+      "stage": "withdraw",
+      "stage_progress": 0.866667,
+      "progress": 0.777778,
+      "box_attached": false,
+      "box_control_mode": "target_hold",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.35515,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 246,
+      "time_s": 16.4,
+      "stage": "withdraw",
+      "stage_progress": 0.92,
+      "progress": 0.780952,
+      "box_attached": false,
+      "box_control_mode": "target_hold",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.351213,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 247,
+      "time_s": 16.466667,
+      "stage": "withdraw",
+      "stage_progress": 0.973333,
+      "progress": 0.784127,
+      "box_attached": false,
+      "box_control_mode": "target_hold",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.995
+      ],
+      "robot_base_position_m": [
+        0.350049,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 248,
+      "time_s": 16.533333,
+      "stage": "retreat",
+      "stage_progress": 0.026667,
+      "progress": 0.787302,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.349982,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 249,
+      "time_s": 16.6,
+      "stage": "retreat",
+      "stage_progress": 0.08,
+      "progress": 0.790476,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.349548,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 250,
+      "time_s": 16.666667,
+      "stage": "retreat",
+      "stage_progress": 0.133333,
+      "progress": 0.793651,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.348078,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 251,
+      "time_s": 16.733333,
+      "stage": "retreat",
+      "stage_progress": 0.186667,
+      "progress": 0.796825,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.345181,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 252,
+      "time_s": 16.8,
+      "stage": "retreat",
+      "stage_progress": 0.24,
+      "progress": 0.8,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.340675,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 253,
+      "time_s": 16.866667,
+      "stage": "retreat",
+      "stage_progress": 0.293333,
+      "progress": 0.803175,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.334563,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 254,
+      "time_s": 16.933333,
+      "stage": "retreat",
+      "stage_progress": 0.346667,
+      "progress": 0.806349,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.326998,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 255,
+      "time_s": 17.0,
+      "stage": "retreat",
+      "stage_progress": 0.4,
+      "progress": 0.809524,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.318256,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 256,
+      "time_s": 17.066667,
+      "stage": "retreat",
+      "stage_progress": 0.453333,
+      "progress": 0.812698,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.308699,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 257,
+      "time_s": 17.133333,
+      "stage": "retreat",
+      "stage_progress": 0.506667,
+      "progress": 0.815873,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.29875,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 258,
+      "time_s": 17.2,
+      "stage": "retreat",
+      "stage_progress": 0.56,
+      "progress": 0.819048,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.288858,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 259,
+      "time_s": 17.266667,
+      "stage": "retreat",
+      "stage_progress": 0.613333,
+      "progress": 0.822222,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.279467,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 260,
+      "time_s": 17.333333,
+      "stage": "retreat",
+      "stage_progress": 0.666667,
+      "progress": 0.825397,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.270988,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 261,
+      "time_s": 17.4,
+      "stage": "retreat",
+      "stage_progress": 0.72,
+      "progress": 0.828571,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.263765,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 262,
+      "time_s": 17.466667,
+      "stage": "retreat",
+      "stage_progress": 0.773333,
+      "progress": 0.831746,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.258045,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 263,
+      "time_s": 17.533333,
+      "stage": "retreat",
+      "stage_progress": 0.826667,
+      "progress": 0.834921,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.253948,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 264,
+      "time_s": 17.6,
+      "stage": "retreat",
+      "stage_progress": 0.88,
+      "progress": 0.838095,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.251432,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 265,
+      "time_s": 17.666667,
+      "stage": "retreat",
+      "stage_progress": 0.933333,
+      "progress": 0.84127,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.250267,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 266,
+      "time_s": 17.733333,
+      "stage": "retreat",
+      "stage_progress": 0.986667,
+      "progress": 0.844444,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.250002,
+        -0.72,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 267,
+      "time_s": 17.8,
+      "stage": "return_home",
+      "stage_progress": 0.02,
+      "progress": 0.847619,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.249981,
+        -0.719944,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 268,
+      "time_s": 17.866667,
+      "stage": "return_home",
+      "stage_progress": 0.046667,
+      "progress": 0.850794,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.249763,
+        -0.719319,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 269,
+      "time_s": 17.933333,
+      "stage": "return_home",
+      "stage_progress": 0.073333,
+      "progress": 0.853968,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.249119,
+        -0.717464,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 270,
+      "time_s": 18.0,
+      "stage": "return_home",
+      "stage_progress": 0.1,
+      "progress": 0.857143,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.24786,
+        -0.713837,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 271,
+      "time_s": 18.066667,
+      "stage": "return_home",
+      "stage_progress": 0.126667,
+      "progress": 0.860317,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.245836,
+        -0.708007,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 272,
+      "time_s": 18.133333,
+      "stage": "return_home",
+      "stage_progress": 0.153333,
+      "progress": 0.863492,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.242933,
+        -0.699648,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 273,
+      "time_s": 18.2,
+      "stage": "return_home",
+      "stage_progress": 0.18,
+      "progress": 0.866667,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.239073,
+        -0.688531,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 274,
+      "time_s": 18.266667,
+      "stage": "return_home",
+      "stage_progress": 0.206667,
+      "progress": 0.869841,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.234208,
+        -0.674519,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 275,
+      "time_s": 18.333333,
+      "stage": "return_home",
+      "stage_progress": 0.233333,
+      "progress": 0.873016,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.228319,
+        -0.657559,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 276,
+      "time_s": 18.4,
+      "stage": "return_home",
+      "stage_progress": 0.26,
+      "progress": 0.87619,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.221414,
+        -0.637673,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 277,
+      "time_s": 18.466667,
+      "stage": "return_home",
+      "stage_progress": 0.286667,
+      "progress": 0.879365,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.213527,
+        -0.614956,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 278,
+      "time_s": 18.533333,
+      "stage": "return_home",
+      "stage_progress": 0.313333,
+      "progress": 0.88254,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.20471,
+        -0.589564,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 279,
+      "time_s": 18.6,
+      "stage": "return_home",
+      "stage_progress": 0.34,
+      "progress": 0.885714,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.195037,
+        -0.561707,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 280,
+      "time_s": 18.666667,
+      "stage": "return_home",
+      "stage_progress": 0.366667,
+      "progress": 0.888889,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.1846,
+        -0.531649,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 281,
+      "time_s": 18.733333,
+      "stage": "return_home",
+      "stage_progress": 0.393333,
+      "progress": 0.892063,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.173504,
+        -0.499691,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 282,
+      "time_s": 18.8,
+      "stage": "return_home",
+      "stage_progress": 0.42,
+      "progress": 0.895238,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.161865,
+        -0.466171,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 283,
+      "time_s": 18.866667,
+      "stage": "return_home",
+      "stage_progress": 0.446667,
+      "progress": 0.898413,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.149811,
+        -0.431456,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 284,
+      "time_s": 18.933333,
+      "stage": "return_home",
+      "stage_progress": 0.473333,
+      "progress": 0.901587,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.137476,
+        -0.395932,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 285,
+      "time_s": 19.0,
+      "stage": "return_home",
+      "stage_progress": 0.5,
+      "progress": 0.904762,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.125,
+        -0.36,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 286,
+      "time_s": 19.066667,
+      "stage": "return_home",
+      "stage_progress": 0.526667,
+      "progress": 0.907937,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.112524,
+        -0.324068,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 287,
+      "time_s": 19.133333,
+      "stage": "return_home",
+      "stage_progress": 0.553333,
+      "progress": 0.911111,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.100189,
+        -0.288544,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 288,
+      "time_s": 19.2,
+      "stage": "return_home",
+      "stage_progress": 0.58,
+      "progress": 0.914286,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.088135,
+        -0.253829,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 289,
+      "time_s": 19.266667,
+      "stage": "return_home",
+      "stage_progress": 0.606667,
+      "progress": 0.91746,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.076496,
+        -0.220309,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 290,
+      "time_s": 19.333333,
+      "stage": "return_home",
+      "stage_progress": 0.633333,
+      "progress": 0.920635,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.0654,
+        -0.188351,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 291,
+      "time_s": 19.4,
+      "stage": "return_home",
+      "stage_progress": 0.66,
+      "progress": 0.92381,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.054963,
+        -0.158293,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 292,
+      "time_s": 19.466667,
+      "stage": "return_home",
+      "stage_progress": 0.686667,
+      "progress": 0.926984,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.04529,
+        -0.130436,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 293,
+      "time_s": 19.533333,
+      "stage": "return_home",
+      "stage_progress": 0.713333,
+      "progress": 0.930159,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.036474,
+        -0.105044,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 294,
+      "time_s": 19.6,
+      "stage": "return_home",
+      "stage_progress": 0.74,
+      "progress": 0.933333,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.028586,
+        -0.082327,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 295,
+      "time_s": 19.666667,
+      "stage": "return_home",
+      "stage_progress": 0.766667,
+      "progress": 0.936508,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.021681,
+        -0.062441,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 296,
+      "time_s": 19.733333,
+      "stage": "return_home",
+      "stage_progress": 0.793333,
+      "progress": 0.939683,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.015792,
+        -0.045481,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 297,
+      "time_s": 19.8,
+      "stage": "return_home",
+      "stage_progress": 0.82,
+      "progress": 0.942857,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.010927,
+        -0.031469,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 298,
+      "time_s": 19.866667,
+      "stage": "return_home",
+      "stage_progress": 0.846667,
+      "progress": 0.946032,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.007067,
+        -0.020352,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 299,
+      "time_s": 19.933333,
+      "stage": "return_home",
+      "stage_progress": 0.873333,
+      "progress": 0.949206,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.004164,
+        -0.011993,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 300,
+      "time_s": 20.0,
+      "stage": "return_home",
+      "stage_progress": 0.9,
+      "progress": 0.952381,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.00214,
+        -0.006163,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 301,
+      "time_s": 20.066667,
+      "stage": "return_home",
+      "stage_progress": 0.926667,
+      "progress": 0.955556,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.000881,
+        -0.002536,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 302,
+      "time_s": 20.133333,
+      "stage": "return_home",
+      "stage_progress": 0.953333,
+      "progress": 0.95873,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.000237,
+        -0.000681,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 303,
+      "time_s": 20.2,
+      "stage": "return_home",
+      "stage_progress": 0.98,
+      "progress": 0.961905,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        1.9e-05,
+        -5.6e-05,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 304,
+      "time_s": 20.266667,
+      "stage": "complete",
+      "stage_progress": 0.022222,
+      "progress": 0.965079,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.0,
+        -0.0,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 305,
+      "time_s": 20.333333,
+      "stage": "complete",
+      "stage_progress": 0.111111,
+      "progress": 0.968254,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.0,
+        -0.0,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 306,
+      "time_s": 20.4,
+      "stage": "complete",
+      "stage_progress": 0.2,
+      "progress": 0.971429,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.0,
+        -0.0,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 307,
+      "time_s": 20.466667,
+      "stage": "complete",
+      "stage_progress": 0.288889,
+      "progress": 0.974603,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.0,
+        -0.0,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 308,
+      "time_s": 20.533333,
+      "stage": "complete",
+      "stage_progress": 0.377778,
+      "progress": 0.977778,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.0,
+        -0.0,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 309,
+      "time_s": 20.6,
+      "stage": "complete",
+      "stage_progress": 0.466667,
+      "progress": 0.980952,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.0,
+        -0.0,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 310,
+      "time_s": 20.666667,
+      "stage": "complete",
+      "stage_progress": 0.555556,
+      "progress": 0.984127,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.0,
+        -0.0,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 311,
+      "time_s": 20.733333,
+      "stage": "complete",
+      "stage_progress": 0.644444,
+      "progress": 0.987302,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.0,
+        -0.0,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 312,
+      "time_s": 20.8,
+      "stage": "complete",
+      "stage_progress": 0.733333,
+      "progress": 0.990476,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.0,
+        -0.0,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 313,
+      "time_s": 20.866667,
+      "stage": "complete",
+      "stage_progress": 0.822222,
+      "progress": 0.993651,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.0,
+        -0.0,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 314,
+      "time_s": 20.933333,
+      "stage": "complete",
+      "stage_progress": 0.911111,
+      "progress": 0.996825,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.0,
+        -0.0,
+        0.0873
+      ]
+    },
+    {
+      "frame_index": 315,
+      "time_s": 21.0,
+      "stage": "complete",
+      "stage_progress": 1.0,
+      "progress": 1.0,
+      "box_attached": false,
+      "box_control_mode": "dynamic",
+      "box_position_m": [
+        1.2,
+        -0.72,
+        0.994051
+      ],
+      "robot_base_position_m": [
+        0.0,
+        -0.0,
+        0.0873
+      ]
+    }
+  ]
+}
