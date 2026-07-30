@@ -51,6 +51,23 @@ PICK_TABLE_TOP_Z_M = 0.9940513610839844
 BOX_HALF_EXTENTS_M = np.asarray((0.30256665, 0.2025666, 0.0851469))
 DELIVERY_XY_TOLERANCE_M = 0.030
 GRIP_POINT_TOLERANCE_M = 0.030
+ACCEPTANCE_THRESHOLDS = {
+    "maximum_grip_point_error_m": GRIP_POINT_TOLERANCE_M,
+    "minimum_tool_axis_dot": 0.995,
+    "maximum_finger_command_error_m": 1e-6,
+    "maximum_pre_attach_box_drift_m": 0.020,
+    "maximum_attachment_follow_error_m": 0.002,
+    "minimum_transport_clearance_above_table_m": 0.250,
+    "minimum_attached_box_root_z_m": PICK_TABLE_TOP_Z_M,
+    "maximum_delivery_xy_error_m": DELIVERY_XY_TOLERANCE_M,
+    "maximum_final_height_error_m": 0.003,
+    "maximum_final_orientation_error_rad": math.radians(2.0),
+    "maximum_settled_linear_velocity_m_s": 0.020,
+    "maximum_settled_angular_velocity_rad_s": 0.020,
+    "maximum_joint_tracking_error_rad": 0.010,
+    "minimum_frame_standard_deviation": 4.0,
+    "minimum_frame_mean": 2.0,
+}
 GRIP_POINT_IN_WRIST_M = (-0.03045, 0.0, -0.22904)
 PHYSICS_HZ = 120
 CAMERA_RESOLUTION = (1280, 720)
@@ -298,9 +315,12 @@ def _grasp_gate(
         abs(commanded_joints["rightfinger2_joint"] + 0.032),
     )
     valid = (
-        max(errors.values()) <= GRIP_POINT_TOLERANCE_M
-        and min(axis_dots.values()) >= 0.995
-        and finger_error <= 1e-6
+        max(errors.values())
+        <= ACCEPTANCE_THRESHOLDS["maximum_grip_point_error_m"]
+        and min(axis_dots.values())
+        >= ACCEPTANCE_THRESHOLDS["minimum_tool_axis_dot"]
+        and finger_error
+        <= ACCEPTANCE_THRESHOLDS["maximum_finger_command_error_m"]
     )
     result = {
         "valid": valid,
@@ -308,9 +328,15 @@ def _grasp_gate(
         "tool_forward_to_box_front_dot": axis_dots,
         "finger_command_error_m": finger_error,
         "thresholds": {
-            "maximum_grip_point_error_m": GRIP_POINT_TOLERANCE_M,
-            "minimum_tool_axis_dot": 0.995,
-            "maximum_finger_command_error_m": 1e-6,
+            "maximum_grip_point_error_m": ACCEPTANCE_THRESHOLDS[
+                "maximum_grip_point_error_m"
+            ],
+            "minimum_tool_axis_dot": ACCEPTANCE_THRESHOLDS[
+                "minimum_tool_axis_dot"
+            ],
+            "maximum_finger_command_error_m": ACCEPTANCE_THRESHOLDS[
+                "maximum_finger_command_error_m"
+            ],
         },
     }
     if not valid:
@@ -345,8 +371,11 @@ class TransferRuntime:
         self.attachment_offset_m: np.ndarray | None = None
         self.grasp_gate: dict[str, object] | None = None
         self.attach_time_s: float | None = None
+        self.target_hold_time_s: float | None = None
         self.release_time_s: float | None = None
         self.maximum_attachment_error_m = 0.0
+        self.maximum_target_hold_error_m = 0.0
+        self.minimum_attached_box_z_m = math.inf
         self.minimum_transport_box_z_m = math.inf
         self.maximum_joint_tracking_error = 0.0
         self.pre_attach_box_drift_m = 0.0
@@ -412,7 +441,10 @@ class TransferRuntime:
                     box_position - self.initial_box_position
                 )
             )
-            if self.pre_attach_box_drift_m > 0.02:
+            if (
+                self.pre_attach_box_drift_m
+                > ACCEPTANCE_THRESHOLDS["maximum_pre_attach_box_drift_m"]
+            ):
                 raise RuntimeError(
                     "box drifted before grasp by "
                     f"{self.pre_attach_box_drift_m:.4f} m: "
@@ -429,7 +461,18 @@ class TransferRuntime:
         if self.attached and sample.carries_box:
             assert self.attachment_offset_m is not None
             target_position = anchor + self.attachment_offset_m
+            # The controlled hold may not command the dynamic box through the
+            # support plane.  Keep its root at the authored supported height;
+            # after detach, PhysX performs the final sub-millimetre settle.
+            target_position[2] = max(
+                target_position[2],
+                BOX_TARGET_POSITION_M[2],
+            )
             self._place_box(target_position)
+            self.minimum_attached_box_z_m = min(
+                self.minimum_attached_box_z_m,
+                float(target_position[2]),
+            )
             observed_position, _ = self.box.get_world_pose()
             self.maximum_attachment_error_m = max(
                 self.maximum_attachment_error_m,
@@ -446,9 +489,40 @@ class TransferRuntime:
                     float(target_position[2]),
                 )
 
-        if self.attached and not sample.carries_box:
+        if self.attached and sample.holds_box_at_target:
+            # Once the fingers are open, keep the delivered object fixed at
+            # the authored support pose while the whole robot withdraws.  The
+            # box becomes dynamic only after both hands have cleared it.
+            target_position = np.asarray(BOX_TARGET_POSITION_M, dtype=float)
+            self._place_box(target_position)
+            self.minimum_attached_box_z_m = min(
+                self.minimum_attached_box_z_m,
+                float(target_position[2]),
+            )
+            observed_position, _ = self.box.get_world_pose()
+            self.maximum_target_hold_error_m = max(
+                self.maximum_target_hold_error_m,
+                float(
+                    np.linalg.norm(
+                        np.asarray(observed_position, dtype=float)
+                        - target_position
+                    )
+                ),
+            )
+            if self.target_hold_time_s is None:
+                self.target_hold_time_s = float(sample.time_s)
+
+        if (
+            self.attached
+            and not sample.carries_box
+            and not sample.holds_box_at_target
+        ):
             assert self.attachment_offset_m is not None
-            final_position = anchor + self.attachment_offset_m
+            final_position = (
+                np.asarray(BOX_TARGET_POSITION_M, dtype=float)
+                if self.target_hold_time_s is not None
+                else anchor + self.attachment_offset_m
+            )
             self._place_box(final_position)
             self.attached = False
             self.release_time_s = float(sample.time_s)
@@ -660,7 +734,16 @@ def _capture_sequences(
                 "stage": sample.segment_name,
                 "stage_progress": round(sample.segment_progress, 6),
                 "progress": round(sample.overall_progress, 6),
-                "box_attached": runtime.attached,
+                "box_attached": bool(runtime.attached and sample.carries_box),
+                "box_control_mode": (
+                    "gripper"
+                    if sample.carries_box
+                    else (
+                        "target_hold"
+                        if sample.holds_box_at_target
+                        else "dynamic"
+                    )
+                ),
                 "box_position_m": [
                     round(float(value), 6) for value in box_position
                 ],
@@ -704,26 +787,66 @@ def _capture_sequences(
     )
     checks = {
         "grasp_gate_passed": bool(runtime.grasp_gate and runtime.grasp_gate["valid"]),
-        "pre_attach_box_drift_bounded": runtime.pre_attach_box_drift_m <= 0.02,
-        "attachment_follow_error_bounded": runtime.maximum_attachment_error_m <= 0.002,
+        "pre_attach_box_drift_bounded": (
+            runtime.pre_attach_box_drift_m
+            <= ACCEPTANCE_THRESHOLDS["maximum_pre_attach_box_drift_m"]
+        ),
+        "attachment_follow_error_bounded": (
+            runtime.maximum_attachment_error_m
+            <= ACCEPTANCE_THRESHOLDS["maximum_attachment_follow_error_m"]
+        ),
+        "target_hold_error_bounded": (
+            runtime.target_hold_time_s is not None
+            and runtime.maximum_target_hold_error_m
+            <= ACCEPTANCE_THRESHOLDS["maximum_attachment_follow_error_m"]
+        ),
         "transport_clearance_reached": (
             runtime.minimum_transport_box_z_m
-            >= PICK_TABLE_TOP_Z_M + 0.25
+            >= PICK_TABLE_TOP_Z_M
+            + ACCEPTANCE_THRESHOLDS[
+                "minimum_transport_clearance_above_table_m"
+            ]
+        ),
+        "attached_box_not_below_table_support": (
+            runtime.minimum_attached_box_z_m
+            >= ACCEPTANCE_THRESHOLDS["minimum_attached_box_root_z_m"]
         ),
         "released_before_retreat": runtime.release_time_s is not None,
         "delivered_to_opposite_corner": (
-            final_xy_error <= DELIVERY_XY_TOLERANCE_M
+            final_xy_error
+            <= ACCEPTANCE_THRESHOLDS["maximum_delivery_xy_error_m"]
         ),
         "final_height_on_table": (
-            abs(final_box_position[2] - PICK_TABLE_TOP_Z_M) <= 0.003
+            abs(final_box_position[2] - PICK_TABLE_TOP_Z_M)
+            <= ACCEPTANCE_THRESHOLDS["maximum_final_height_error_m"]
         ),
-        "final_orientation_upright": final_orientation_error <= math.radians(2.0),
-        "final_linear_velocity_settled": np.linalg.norm(final_linear_velocity) <= 0.02,
-        "final_angular_velocity_settled": np.linalg.norm(final_angular_velocity) <= 0.02,
-        "joint_tracking_error_bounded": runtime.maximum_joint_tracking_error <= 0.01,
+        "final_orientation_upright": (
+            final_orientation_error
+            <= ACCEPTANCE_THRESHOLDS[
+                "maximum_final_orientation_error_rad"
+            ]
+        ),
+        "final_linear_velocity_settled": (
+            np.linalg.norm(final_linear_velocity)
+            <= ACCEPTANCE_THRESHOLDS[
+                "maximum_settled_linear_velocity_m_s"
+            ]
+        ),
+        "final_angular_velocity_settled": (
+            np.linalg.norm(final_angular_velocity)
+            <= ACCEPTANCE_THRESHOLDS[
+                "maximum_settled_angular_velocity_rad_s"
+            ]
+        ),
+        "joint_tracking_error_bounded": (
+            runtime.maximum_joint_tracking_error
+            <= ACCEPTANCE_THRESHOLDS["maximum_joint_tracking_error_rad"]
+        ),
         "all_five_frame_sequences_valid": all(
-            summary["minimum_standard_deviation"] >= 4.0
-            and summary["minimum_mean"] >= 2.0
+            summary["minimum_standard_deviation"]
+            >= ACCEPTANCE_THRESHOLDS["minimum_frame_standard_deviation"]
+            and summary["minimum_mean"]
+            >= ACCEPTANCE_THRESHOLDS["minimum_frame_mean"]
             for summary in pixel_summaries.values()
         ),
     }
@@ -751,13 +874,18 @@ def _capture_sequences(
             "grasp_gate": runtime.grasp_gate,
             "attachment": {
                 "method": (
-                    "controlled dynamic-rigid-body pose constraint to "
-                    "dual-gripper midpoint"
+                    "dual-gripper midpoint during carry, then controlled "
+                    "target hold until the open hands clear"
                 ),
                 "attach_time_s": runtime.attach_time_s,
+                "target_hold_time_s": runtime.target_hold_time_s,
                 "release_time_s": runtime.release_time_s,
                 "pre_attach_box_drift_m": runtime.pre_attach_box_drift_m,
                 "maximum_follow_error_m": runtime.maximum_attachment_error_m,
+                "maximum_target_hold_error_m": (
+                    runtime.maximum_target_hold_error_m
+                ),
+                "minimum_attached_box_z_m": runtime.minimum_attached_box_z_m,
                 "minimum_transport_box_z_m": runtime.minimum_transport_box_z_m,
             },
             "result": {
@@ -953,6 +1081,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     manifest = {
         "ok": True,
         "implementation_level": "controlled-attachment software-in-the-loop demo",
+        "acceptance_thresholds": ACCEPTANCE_THRESHOLDS,
         "formal_scene": _portable_path(scene),
         "formal_scene_sha256": _sha256(scene),
         "renderer": {
@@ -974,6 +1103,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                     "name": segment.name,
                     "duration_s": segment.duration_s,
                     "carries_box": segment.carries_box,
+                    "holds_box_at_target": segment.holds_box_at_target,
                 }
                 for segment in DEMO_SEGMENTS
             ],

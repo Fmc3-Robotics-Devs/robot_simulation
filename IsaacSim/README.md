@@ -17,7 +17,7 @@ uv run isaacsim isaacsim.exp.compatibility_check
 
 [`usd/scenes/warehouse_box_transfer.usda`](../usd/scenes/warehouse_box_transfer.usda) 是当前正式场景，不是 foundation 占位层。它以 NVIDIA Warehouse 作为只读环境，组合了 Unitree 式多工位仓储布局、Wheel Bot、蓝色运输箱、Tag 和放置工位。蓝箱正面绑定随箱移动的 `tag36h11` ID 0；主 PickTable 近侧两个对称桌角另有朝 `+Z` 的 80 mm ID 1（世界 `y≈-1.16 m`）和 ID 2（世界 `y≈+1.16 m`），作为不随箱移动的右、左静态工位定位基准。箱体标签与桌面双标签使用独立场景层和 prim，验证与检测结果必须按 ID/角色分开；三者的 composed-stage 验证见 [`warehouse_workcell.json`](../evidence/usd/2026-07-30/warehouse_workcell.json)。
 
-蓝箱保留 NVIDIA 的视觉资产，并只添加一个项目控制的 `PhysicsCollision` 代理；箱体是动态刚体。正式场景的重力、台面接触、Tag 跟随与 reset 均已通过 headless smoke，结果见 [`box_gravity_contact_reset.json`](../evidence/physics/2026-07-30/box_gravity_contact_reset.json)。软件在环搬箱演示还会在双手门槛通过后对该动态刚体施加受控位姿约束，释放后停止约束并让 PhysX 完成桌面接触。它证明任务动作与记录链可运行，但不等同于 MoveIt 闭环或纯摩擦抓取。
+蓝箱保留 NVIDIA 的视觉资产，并只添加一个项目控制的 `PhysicsCollision` 代理；箱体是动态刚体。正式场景的重力、台面接触、Tag 跟随与 reset 均已通过 headless smoke，结果见 [`box_gravity_contact_reset.json`](../evidence/physics/2026-07-30/box_gravity_contact_reset.json)。软件在环搬箱演示会在双手门槛通过后对该动态刚体施加受控位姿约束；夹爪张开后箱体保持在目标支撑位，待双手撤离再停止约束并让 PhysX 落稳。时间线和视频明确标注 `GRIPPER`、`TARGET HOLD`、`DYNAMIC`，不把目标保持误报为纯物理抓取。它证明任务动作与记录链可运行，但不等同于 MoveIt 闭环或纯摩擦抓取。
 
 ```bash
 env -u PYTHONPATH -u CMAKE_PREFIX_PATH OMNI_KIT_ACCEPT_EULA=YES \

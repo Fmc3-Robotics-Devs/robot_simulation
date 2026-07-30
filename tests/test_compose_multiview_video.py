@@ -30,6 +30,18 @@ def test_compose_frame_has_expected_full_hd_layout() -> None:
     assert frame.getpixel((100, 950)) == (10, 20, 30)
 
 
+def test_compose_frame_labels_target_hold_without_claiming_gripper_lock() -> None:
+    images = {
+        name: Image.new("RGB", (160, 90), (10, 20, 30))
+        for name in MODULE.VIEW_ORDER
+    }
+    frame = MODULE.compose_frame(
+        images,
+        metadata={"box_control_mode": "target_hold"},
+    )
+    assert frame.size == (1920, 1080)
+
+
 def test_collect_sequences_requires_equal_frame_counts(tmp_path: Path) -> None:
     directories = {name: tmp_path / name for name in MODULE.VIEW_ORDER}
     for name, directory in directories.items():

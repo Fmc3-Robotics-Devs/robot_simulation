@@ -85,6 +85,7 @@ class DemoSegment:
     start: DemoPose
     end: DemoPose
     carries_box: bool
+    holds_box_at_target: bool = False
 
 
 @dataclass(frozen=True)
@@ -98,6 +99,7 @@ class DemoSample:
     base_position_m: tuple[float, float, float]
     joint_positions: tuple[tuple[str, float], ...]
     carries_box: bool
+    holds_box_at_target: bool
 
     def joint_map(self) -> dict[str, float]:
         """Return sampled positions keyed by articulation DOF name."""
@@ -235,7 +237,7 @@ DEMO_SEGMENTS = (
     # Pull the open hands straight away with the mobile base before folding
     # the arms.  This prevents the joint-space return arc from brushing the
     # released box and changing its final orientation.
-    DemoSegment("withdraw", 1.25, RELEASE, WITHDRAW, False),
+    DemoSegment("withdraw", 1.25, RELEASE, WITHDRAW, False, True),
     DemoSegment("retreat", 1.25, WITHDRAW, RETREAT, False),
     DemoSegment("return_home", 2.50, RETREAT, HOME, False),
     DemoSegment("complete", 0.75, HOME, HOME, False),
@@ -333,4 +335,5 @@ def sample_demo(time_s: float) -> DemoSample:
         base_position_m=base_position,
         joint_positions=tuple(joints.items()),
         carries_box=segment.carries_box,
+        holds_box_at_target=segment.holds_box_at_target,
     )

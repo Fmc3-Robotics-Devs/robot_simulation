@@ -12,7 +12,7 @@ Wheel Bot 的 Isaac Sim 工程基线：项目 `.venv` 使用 **Python 3.11.14**�
 
 蓝箱采用 NVIDIA 视觉资产叠加项目**单一** `PhysicsCollision` 代理；刚体、质量和摩擦参数由项目物理层提供。正式场景的 gravity、接触落稳、Tag 随箱、reset 冒烟测试已通过，见 [`box_gravity_contact_reset.json`](evidence/physics/2026-07-30/box_gravity_contact_reset.json)。
 
-当前已增加一个可复现的**软件在环搬箱演示**：120 Hz 关键帧驱动底盘、转向轮、头部、双臂与夹爪；双手位置、夹爪闭合量和工具轴方向通过门槛后，蓝箱受控跟随双夹爪中点，释放后恢复为自由动态刚体并在桌面落稳。它用于验证任务流程、全身动作、正式 USD 和五路录像链路，不等同于 MoveIt 闭环或纯摩擦物理抓取。P3/P4 尚未完成的范围仍包括 MoveIt/ROS 2 执行器、真实接触抓取、批量成功率与稳定性门。ROS 2 的 Image/CameraInfo **精确同时间戳**验证器已经实现；但最新正式场景的 live ROS 2 与 TF/Tag 位姿闭环尚未重新采集，历史 ROS 证据不能当作该门已通过。
+当前已增加一个可复现的**软件在环搬箱演示**：120 Hz 关键帧驱动底盘、转向轮、头部、双臂与夹爪；双手位置、夹爪闭合量和工具轴方向通过门槛后，蓝箱受控跟随双夹爪中点。夹爪张开后，箱体先保持在目标支撑位、双手撤离，再恢复为自由动态刚体并由 PhysX 落稳。逐帧时间线明确记录 `GRIPPER`、`TARGET HOLD`、`DYNAMIC` 三种模式；它用于验证任务流程、全身动作、正式 USD 和五路录像链路，不等同于 MoveIt 闭环或纯摩擦物理抓取。P3/P4 尚未完成的范围仍包括 MoveIt/ROS 2 执行器、真实接触抓取、批量成功率与稳定性门。ROS 2 的 Image/CameraInfo **精确同时间戳**验证器已经实现；但最新正式场景的 live ROS 2 与 TF/Tag 位姿闭环尚未重新采集，历史 ROS 证据不能当作该门已通过。
 
 实施范围、阶段门和接口约定见 [实施计划](docs/implementation_plan.md)；汇报材料为 [PPT v0.2](report/WheelBot仿真项目计划汇报_v0.2.pptx) 与 [PDF v0.2](report/WheelBot仿真项目计划汇报_v0.2.pdf)。运行时、素材挂载与 ROS 边界见 [Isaac Sim 说明](IsaacSim/README.md)。
 

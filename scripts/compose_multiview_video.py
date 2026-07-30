@@ -113,6 +113,21 @@ def compose_frame(
     elapsed_s = float(metadata.get("time_s", 0.0))
     progress = min(1.0, max(0.0, float(metadata.get("progress", 0.0))))
     attached = bool(metadata.get("box_attached", False))
+    control_mode = str(
+        metadata.get(
+            "box_control_mode",
+            "gripper" if attached else "dynamic",
+        )
+    )
+    control_labels = {
+        "gripper": ("GRIPPER", "#61d6a4"),
+        "target_hold": ("TARGET HOLD", "#51a7e8"),
+        "dynamic": ("DYNAMIC", "#f0bd68"),
+    }
+    control_label, control_color = control_labels.get(
+        control_mode,
+        (control_mode.upper(), "#f0bd68"),
+    )
     draw.text((1320, 70), "WHEEL BOT", fill="white", font=_font(42, bold=True))
     draw.text((1320, 125), "BOX TRANSFER", fill="#9fc9eb", font=_font(28, bold=True))
     draw.text((1320, 208), "CURRENT STAGE", fill="#8295a8", font=_font(18, bold=True))
@@ -125,8 +140,8 @@ def compose_frame(
     )
     draw.text(
         (1320, 365),
-        "CONTROLLED GRASP: " + ("LOCKED" if attached else "OPEN"),
-        fill="#61d6a4" if attached else "#f0bd68",
+        "BOX CONTROL: " + control_label,
+        fill=control_color,
         font=_font(20, bold=True),
     )
     box_position = metadata.get("box_position_m")

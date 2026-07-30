@@ -152,6 +152,7 @@ def test_demo_opens_then_withdraws_before_folding_arms() -> None:
 
     assert release.carries_box is True
     assert withdraw.carries_box is False
+    assert withdraw.holds_box_at_target is True
     assert withdraw.start.joint_positions == withdraw.end.joint_positions
     assert withdraw.end.base_position_m[0] < withdraw.start.base_position_m[0]
     assert retreat.start == withdraw.end

@@ -74,5 +74,13 @@ def test_recorder_uses_documented_delivery_gate_and_zero_time_capture() -> None:
     source = SCRIPT.read_text(encoding="utf-8")
     assert MODULE.DELIVERY_XY_TOLERANCE_M == pytest.approx(0.030)
     assert MODULE.GRIP_POINT_TOLERANCE_M == pytest.approx(0.030)
+    assert MODULE.ACCEPTANCE_THRESHOLDS["maximum_delivery_xy_error_m"] == pytest.approx(
+        0.030
+    )
+    assert MODULE.ACCEPTANCE_THRESHOLDS["minimum_attached_box_root_z_m"] == pytest.approx(
+        MODULE.PICK_TABLE_TOP_Z_M
+    )
+    assert "acceptance_thresholds" in source
+    assert "target_position[2] = max(" in source
     assert "delta_time=0.0" in source
     assert source.index("manifest_path.write_text") < source.index("app.close()")
