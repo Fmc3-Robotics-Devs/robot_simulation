@@ -6,6 +6,26 @@ from dataclasses import dataclass
 from enum import Enum
 
 
+# Deterministic, limit-compliant seed used only for camera and workcell review.
+# The elbows fold the wrists back toward the task while D405 rays remain
+# aligned with the physical lens faces.  This is not a motion-planned pre-grasp;
+# runtime planners will replace the teleported review seed in P3.
+BOX_TRANSFER_CAMERA_REVIEW_POSE_RAD: tuple[tuple[str, float], ...] = (
+    ("left_shoulder_pitch_joint", -1.62772),
+    ("left_shoulder_roll_joint", -0.5),
+    ("left_shoulder_yaw_joint", 0.16625),
+    ("right_shoulder_pitch_joint", -1.2),
+    ("left_elbow_pitch_joint", -2.52086),
+    ("right_elbow_pitch_joint", -2.4),
+    ("left_wrist_yaw_joint", -1.65108),
+    ("right_wrist_yaw_joint", -2.25762),
+    ("left_wrist_pitch_joint", -0.39265),
+    ("right_wrist_pitch_joint", -0.30325),
+    ("left_wrist_roll_joint", 0.09479),
+    ("right_wrist_roll_joint", 0.60289),
+)
+
+
 class TransferStage(str, Enum):
     """Ordered stages of one box-transfer run."""
 

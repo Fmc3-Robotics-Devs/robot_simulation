@@ -26,8 +26,8 @@ def _message() -> SimpleNamespace:
     )
 
 
-def test_static_optical_frames_mirror_all_camera_usd_mounts() -> None:
-    """Each CameraInfo frame gets one fixed edge from its physical URDF link."""
+def test_static_optical_frames_use_ros_axes_not_usd_camera_axes() -> None:
+    """Each CameraInfo frame gets the separate ROS-convention fixed edge."""
 
     validate_optical_frame_transforms()
     transforms = optical_frame_transforms()
@@ -35,7 +35,12 @@ def test_static_optical_frames_mirror_all_camera_usd_mounts() -> None:
         (camera.parent_link, camera.frame_id) for camera in CAMERAS
     ]
     assert [item.translation_m for item in transforms] == [camera.mount_xyz_m for camera in CAMERAS]
-    assert [item.rotation_rpy_deg for item in transforms] == [camera.mount_rpy_deg for camera in CAMERAS]
+    assert [item.rotation_rpy_deg for item in transforms] == [
+        camera.optical_frame_rpy_deg for camera in CAMERAS
+    ]
+    assert [item.rotation_rpy_deg for item in transforms] != [
+        camera.camera_mount_rpy_deg for camera in CAMERAS
+    ]
     for item in transforms:
         assert sum(component * component for component in item.rotation_xyzw) == pytest.approx(1.0)
 

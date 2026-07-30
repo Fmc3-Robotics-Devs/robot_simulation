@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import re
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
@@ -13,6 +14,25 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_URDF = PROJECT_ROOT / "Rviz/src/franzi_description/urdf/wheel_robot_4.0.urdf"
 DEFAULT_OVERLAY = PROJECT_ROOT / "usd/assets/robots/wheel_bot/camera_sensors.usda"
 DEFAULT_ROBOT_ENTRY = PROJECT_ROOT / "usd/assets/robots/wheel_bot/wheel_bot_with_cameras.usda"
+
+
+def _parse_xform(overlay: str, prim_name: str) -> tuple[tuple[float, ...], tuple[float, ...]]:
+    """Read an authored translate/rotate pair from the small USDA overlay."""
+
+    vector = r"([-+0-9.eE, ]+)"
+    match = re.search(
+        rf'def Xform "{re.escape(prim_name)}"\s*\{{\s*'
+        rf"double3 xformOp:translate\s*=\s*\({vector}\)\s*"
+        rf"float3 xformOp:rotateXYZ\s*=\s*\({vector}\)",
+        overlay,
+    )
+    if match is None:
+        raise ValueError(f"USD camera overlay is missing Xform values for {prim_name}")
+
+    def values(group: str) -> tuple[float, ...]:
+        return tuple(float(value.strip()) for value in group.split(","))
+
+    return values(match.group(1)), values(match.group(2))
 
 
 def parse_args() -> argparse.Namespace:
@@ -47,13 +67,30 @@ def validate_files(urdf_path: Path, overlay_path: Path, robot_entry_path: Path) 
             raise ValueError(f"URDF camera housing is not attached by a fixed joint: {camera.parent_link}")
         for expected in (
             camera.parent_link,
-            camera.sensor_prim,
+            camera.camera_mount_prim,
+            camera.optical_frame_prim,
             camera.frame_id,
             camera.topic,
             camera.camera_info_topic,
         ):
             if expected not in overlay:
                 raise ValueError(f"USD camera overlay is missing {camera.name} value: {expected}")
+        camera_xyz, camera_rpy = _parse_xform(
+            overlay,
+            camera.camera_mount_prim,
+        )
+        optical_xyz, optical_rpy = _parse_xform(
+            overlay,
+            camera.optical_frame_prim,
+        )
+        if camera_xyz != camera.mount_xyz_m or camera_rpy != camera.camera_mount_rpy_deg:
+            raise ValueError(
+                f"{camera.name} USD camera mount does not match cameras.py"
+            )
+        if optical_xyz != camera.mount_xyz_m or optical_rpy != camera.optical_frame_rpy_deg:
+            raise ValueError(
+                f"{camera.name} USD optical frame does not match cameras.py"
+            )
     expected_clipping = "float2 clippingRange = (0.05, 100)"
     if overlay.count(expected_clipping) != len(CAMERAS):
         raise ValueError(

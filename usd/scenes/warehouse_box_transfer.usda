@@ -27,8 +27,13 @@ def Xform "WheelBotBoxTransfer" (
         prepend references = @../assets/robots/wheel_bot/wheel_bot_with_cameras.usda@
     )
     {
-        double3 xformOp:translate = (0, 0, 0)
+        # The imported fixed-base root origin is 87.266 mm above the wheel
+        # contact plane.  Spawn at that measured offset so all three wheels
+        # touch the z=0 warehouse floor instead of penetrating it.
+        double3 xformOp:translate = (0, 0, 0.0873)
         uniform token[] xformOpOrder = ["xformOp:translate"]
+        custom string physics:colliderPolicy = "37 explicit URDF meshes; convexHull"
+        custom double physics:measuredWheelContactOffset = 0.0872656
     }
 
     # The project-owned metre wrapper keeps NVIDIA's crate visuals separate
@@ -37,10 +42,14 @@ def Xform "WheelBotBoxTransfer" (
         prepend references = @../assets/props/blue_transport_box.usda@
     )
     {
-        double3 xformOp:translate = (1.05, 0.38, 0.995)
+        # Keep the 605 mm box fully supported by the 762 mm-wide PickTable.
+        # x=1.20 leaves 28 mm at the near edge; the former x=1.05 overhung by
+        # 124 mm and could receive a lateral contact impulse at first landing.
+        double3 xformOp:translate = (1.20, 0.38, 0.995)
         uniform token[] xformOpOrder = ["xformOp:translate"]
         custom string scenario:role = "pick_object"
         custom string scenario:status = "official_asset_with_project_wrapper"
+        custom double physics:minimumTableSupportMargin = 0.028
     }
 
     # The delivery marker now sits on a real packing table, not on the floor.

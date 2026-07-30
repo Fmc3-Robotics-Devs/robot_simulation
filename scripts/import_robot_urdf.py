@@ -66,6 +66,9 @@ source_commit: {source_commit}
 importer: Isaac Sim 5.1 / Isaac Lab 2.3.2 UrdfConverter
 fix_base: true
 merge_fixed_joints: false
+collision_from_visuals: false
+collider_type: convex_hull
+self_collision: false
 joint_drive:
   target_type: position
   stiffness: 100.0
@@ -98,6 +101,9 @@ def main() -> int:
                 usd_file_name=output.name,
                 fix_base=True,
                 merge_fixed_joints=False,
+                collision_from_visuals=False,
+                collider_type="convex_hull",
+                self_collision=False,
                 force_usd_conversion=True,
                 joint_drive=UrdfConverterCfg.JointDriveCfg(
                     gains=UrdfConverterCfg.JointDriveCfg.PDGainsCfg(stiffness=100.0, damping=1.0),

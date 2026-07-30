@@ -16,4 +16,13 @@ Rviz/src/franzi_description/meshes/*.STL
 uv run python scripts/import_robot_urdf.py --headless
 ```
 
-`config.yaml` 记录源 commit、导入器版本和关节驱动参数；其中只使用项目相对路径，不保留生成机器的绝对路径。
+`config.yaml` 记录源 commit、导入器版本、关节驱动和碰撞策略；其中只使用项目相对路径，不保留生成机器的绝对路径。当前固定底盘基线显式使用：
+
+```yaml
+fix_base: true
+collision_from_visuals: false
+collider_type: convex_hull
+self_collision: false
+```
+
+原 URDF 为 37 个 link 提供独立 collision mesh，正式组合场景实测为 37 个 enabled `CollisionAPI`，全部 `physics:approximation=convexHull`。不要把整机直接改为 `convex_decomposition`：移动底盘阶段优先为三轮建立 cylinder/单凸包代理，为底座和手臂建立少量简化凸体，只在夹指等接触敏感部位局部提高精度。依据见 [NVIDIA Physics Fundamentals](https://docs.isaacsim.omniverse.nvidia.com/5.1.0/physics/simulation_fundamentals.html)。

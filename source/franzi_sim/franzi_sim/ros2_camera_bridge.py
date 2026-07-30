@@ -28,7 +28,10 @@ def add_ros2_camera_publishers(
         render_node = f"Render_{suffix}"
         image_node = f"Image_{suffix}"
         info_node = f"Info_{suffix}"
-        camera_path = f"{robot_prim_path}/{camera.parent_link}/{camera.sensor_prim}/camera"
+        camera_path = (
+            f"{robot_prim_path}/{camera.parent_link}/"
+            f"{camera.camera_mount_prim}/camera"
+        )
 
         nodes.extend(
             [

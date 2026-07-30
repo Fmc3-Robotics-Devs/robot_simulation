@@ -25,7 +25,7 @@ class StaticTransformSpec:
 
     @property
     def rotation_xyzw(self) -> tuple[float, float, float, float]:
-        """Convert the USD-authored XYZ Euler rotation into a ROS quaternion."""
+        """Convert the ROS optical-frame XYZ Euler rotation into a quaternion."""
 
         roll, pitch, yaw = (radians(value) for value in self.rotation_rpy_deg)
         cr, sr = cos(roll / 2), sin(roll / 2)
@@ -40,7 +40,7 @@ class StaticTransformSpec:
 
 
 def optical_frame_transforms(cameras: tuple[CameraSpec, ...] = CAMERAS) -> tuple[StaticTransformSpec, ...]:
-    """Return the fixed TF edges that exactly mirror the camera USD layer."""
+    """Return housing-to-ROS-optical TF edges from the camera specification."""
 
     validate_camera_specs(cameras)
     return tuple(
@@ -48,7 +48,7 @@ def optical_frame_transforms(cameras: tuple[CameraSpec, ...] = CAMERAS) -> tuple
             parent_frame=camera.parent_link,
             child_frame=camera.frame_id,
             translation_m=camera.mount_xyz_m,
-            rotation_rpy_deg=camera.mount_rpy_deg,
+            rotation_rpy_deg=camera.optical_frame_rpy_deg,
         )
         for camera in cameras
     )

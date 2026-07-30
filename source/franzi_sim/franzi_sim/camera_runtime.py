@@ -16,7 +16,10 @@ def add_camera_sensors(stage: object, robot_prim_path: str) -> None:
 
     validate_camera_specs()
     for spec in CAMERAS:
-        camera_path = f"{robot_prim_path}/{spec.parent_link}/{spec.sensor_prim}/camera"
+        camera_path = (
+            f"{robot_prim_path}/{spec.parent_link}/"
+            f"{spec.camera_mount_prim}/camera"
+        )
         if stage.GetPrimAtPath(camera_path).IsValid():
             # The complete robot asset already authors these sensors; avoid
             # duplicate xform ops when the runtime helper is called defensively.
@@ -32,15 +35,28 @@ def _add_one_camera(
     sdf: object,
     usd_geom: object,
 ) -> None:
-    """Create one optical-frame transform and camera below its physical housing link."""
+    """Create separate USD-camera and ROS-optical frames below one housing."""
 
     parent_path = f"{robot_prim_path}/{spec.parent_link}"
     if not stage.GetPrimAtPath(parent_path).IsValid():
         raise ValueError(f"URDF camera housing link is absent: {parent_path}")
-    frame = usd_geom.Xform.Define(stage, f"{parent_path}/{spec.sensor_prim}")
-    frame.AddTranslateOp().Set(gf.Vec3d(*spec.mount_xyz_m))
-    frame.AddRotateXYZOp().Set(gf.Vec3f(*spec.mount_rpy_deg))
-    camera = usd_geom.Camera.Define(stage, f"{frame.GetPath()}/camera")
+    camera_mount = usd_geom.Xform.Define(
+        stage,
+        f"{parent_path}/{spec.camera_mount_prim}",
+    )
+    camera_mount.AddTranslateOp().Set(gf.Vec3d(*spec.mount_xyz_m))
+    camera_mount.AddRotateXYZOp().Set(
+        gf.Vec3f(*spec.camera_mount_rpy_deg)
+    )
+    optical_frame = usd_geom.Xform.Define(
+        stage,
+        f"{parent_path}/{spec.optical_frame_prim}",
+    )
+    optical_frame.AddTranslateOp().Set(gf.Vec3d(*spec.mount_xyz_m))
+    optical_frame.AddRotateXYZOp().Set(
+        gf.Vec3f(*spec.optical_frame_rpy_deg)
+    )
+    camera = usd_geom.Camera.Define(stage, f"{camera_mount.GetPath()}/camera")
     camera.CreateFocalLengthAttr(spec.focal_length_mm)
     camera.CreateHorizontalApertureAttr(spec.horizontal_aperture_mm)
     camera.CreateVerticalApertureAttr(spec.horizontal_aperture_mm * spec.height_px / spec.width_px)

@@ -31,7 +31,8 @@ def test_usd_overlay_covers_every_declared_camera() -> None:
     overlay = Path("usd/assets/robots/wheel_bot/camera_sensors.usda").read_text()
     for camera in CAMERAS:
         assert camera.parent_link in overlay
-        assert camera.sensor_prim in overlay
+        assert camera.camera_mount_prim in overlay
+        assert camera.optical_frame_prim in overlay
         assert camera.frame_id in overlay
         assert camera.topic in overlay
         assert camera.camera_info_topic in overlay
@@ -39,6 +40,16 @@ def test_usd_overlay_covers_every_declared_camera() -> None:
     assert overlay.count("float2 clippingRange = (0.05, 100)") == len(CAMERAS)
     assert overlay.count('over "left_wrist_d405_Link"') == 1
     assert overlay.count('over "right_wrist_d405_Link"') == 1
+
+
+def test_d405_render_axis_matches_the_stl_lens_face() -> None:
+    """Both D405 meshes have a -Z lens face, so the USD mount is identity."""
+
+    for name in ("left_wrist_d405", "right_wrist_d405"):
+        camera = camera_by_name(name)
+        assert camera.mount_xyz_m == (0.0, 0.0, -0.0235)
+        assert camera.camera_mount_rpy_deg == (0.0, 0.0, 0.0)
+        assert camera.optical_frame_rpy_deg == (180.0, 0.0, 0.0)
 
 
 def test_complete_robot_entry_uses_only_relative_layers() -> None:

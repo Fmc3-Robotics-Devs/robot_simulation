@@ -7,6 +7,9 @@ source_commit: 7457a17ead2a7ab199c84a281f0ab90824abc7ef
 importer: Isaac Sim 5.1 / Isaac Lab 2.3.2 UrdfConverter
 fix_base: true
 merge_fixed_joints: false
+collision_from_visuals: false
+collider_type: convex_hull
+self_collision: false
 joint_drive:
   target_type: position
   stiffness: 100.0

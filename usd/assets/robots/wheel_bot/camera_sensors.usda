@@ -7,7 +7,7 @@ over "WheelBot"
 {
     over "head_d435_Link"
     {
-        def Xform "head_d435_optical_frame"
+        def Xform "head_d435_camera_mount"
         {
             double3 xformOp:translate = (0, 0, 0)
             float3 xformOp:rotateXYZ = (180, 0, -90)
@@ -24,10 +24,16 @@ over "WheelBot"
                 custom int[] render:resolution = [1280, 720]
             }
         }
+        def Xform "head_d435_optical_frame"
+        {
+            double3 xformOp:translate = (0, 0, 0)
+            float3 xformOp:rotateXYZ = (0, 0, -90)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
     }
     over "body_d435_Link"
     {
-        def Xform "chest_d435_optical_frame"
+        def Xform "chest_d435_camera_mount"
         {
             double3 xformOp:translate = (0, 0, 0)
             float3 xformOp:rotateXYZ = (180, 0, -90)
@@ -44,13 +50,20 @@ over "WheelBot"
                 custom int[] render:resolution = [1280, 720]
             }
         }
+        def Xform "chest_d435_optical_frame"
+        {
+            double3 xformOp:translate = (0, 0, 0)
+            float3 xformOp:rotateXYZ = (0, 0, -90)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
     }
     over "left_wrist_d405_Link"
     {
-        def Xform "left_wrist_d405_optical_frame"
+        # The D405 STL lens face is housing -Z, which is also USD Camera forward.
+        def Xform "left_wrist_d405_camera_mount"
         {
-            double3 xformOp:translate = (0, 0, 0)
-            float3 xformOp:rotateXYZ = (-90, 0, 90)
+            double3 xformOp:translate = (0, 0, -0.0235)
+            float3 xformOp:rotateXYZ = (0, 0, 0)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
             def Camera "camera"
             {
@@ -64,13 +77,20 @@ over "WheelBot"
                 custom int[] render:resolution = [1280, 720]
             }
         }
+        def Xform "left_wrist_d405_optical_frame"
+        {
+            double3 xformOp:translate = (0, 0, -0.0235)
+            float3 xformOp:rotateXYZ = (180, 0, 0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
     }
     over "right_wrist_d405_Link"
     {
-        def Xform "right_wrist_d405_optical_frame"
+        # Left and right URDF housing bases are identical, not mirrored.
+        def Xform "right_wrist_d405_camera_mount"
         {
-            double3 xformOp:translate = (0, 0, 0)
-            float3 xformOp:rotateXYZ = (-90, 0, 90)
+            double3 xformOp:translate = (0, 0, -0.0235)
+            float3 xformOp:rotateXYZ = (0, 0, 0)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
             def Camera "camera"
             {
@@ -83,6 +103,12 @@ over "WheelBot"
                 custom string ros:camera_info_topic = "/franzi/camera/right_wrist_d405/color/camera_info"
                 custom int[] render:resolution = [1280, 720]
             }
+        }
+        def Xform "right_wrist_d405_optical_frame"
+        {
+            double3 xformOp:translate = (0, 0, -0.0235)
+            float3 xformOp:rotateXYZ = (180, 0, 0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
         }
     }
 }

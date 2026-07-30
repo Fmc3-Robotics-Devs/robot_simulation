@@ -10,9 +10,11 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+from importlib.metadata import version as package_version
 import json
 from datetime import datetime
 from pathlib import Path
+import subprocess
 import sys
 
 import numpy as np
@@ -25,22 +27,22 @@ CAMERAS = (
     (
         "head_d435",
         "/WheelBotBoxTransfer/WheelBot/head_d435_Link/"
-        "head_d435_optical_frame/camera",
+        "head_d435_camera_mount/camera",
     ),
     (
         "chest_d435",
         "/WheelBotBoxTransfer/WheelBot/body_d435_Link/"
-        "chest_d435_optical_frame/camera",
+        "chest_d435_camera_mount/camera",
     ),
     (
         "left_wrist_d405",
         "/WheelBotBoxTransfer/WheelBot/left_wrist_d405_Link/"
-        "left_wrist_d405_optical_frame/camera",
+        "left_wrist_d405_camera_mount/camera",
     ),
     (
         "right_wrist_d405",
         "/WheelBotBoxTransfer/WheelBot/right_wrist_d405_Link/"
-        "right_wrist_d405_optical_frame/camera",
+        "right_wrist_d405_camera_mount/camera",
     ),
 )
 PROJECT_SOURCE_FILES = (
@@ -54,6 +56,9 @@ PROJECT_SOURCE_FILES = (
     Path("usd/assets/props/packing_table.usda"),
     Path("usd/assets/props/blue_transport_box.usda"),
     Path("usd/assets/tags/apriltag_36h11.usda"),
+    Path("source/franzi_sim/franzi_sim/cameras.py"),
+    Path("source/franzi_sim/franzi_sim/scenarios/box_transfer.py"),
+    Path("scripts/capture_workcell_evidence.py"),
 )
 
 
@@ -97,6 +102,27 @@ def _project_source_hashes() -> tuple[dict[str, str], str]:
         aggregate.update(source_hash.encode("ascii"))
         aggregate.update(b"\n")
     return source_hashes, aggregate.hexdigest()
+
+
+def _git_state() -> dict[str, object]:
+    """Record the source revision and whether tracked project files were dirty."""
+
+    revision = subprocess.check_output(
+        ["git", "rev-parse", "HEAD"],
+        cwd=PROJECT_ROOT,
+        text=True,
+    ).strip()
+    dirty_result = subprocess.run(
+        ["git", "status", "--porcelain", "--untracked-files=no"],
+        cwd=PROJECT_ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return {
+        "revision": revision,
+        "tracked_files_dirty_at_capture": bool(dirty_result.stdout.strip()),
+    }
 
 
 def _detect_apriltag_ids(image_path: Path, cv2: object) -> list[int]:
@@ -301,6 +327,185 @@ def _save_review_board(
     canvas.save(output_path)
 
 
+def _apply_robot_review_pose() -> tuple[object, dict[str, object]]:
+    """Initialize the articulation and apply the deterministic pre-grasp pose."""
+
+    from isaacsim.core.api import World
+    from isaacsim.core.prims import SingleArticulation
+    from isaacsim.core.utils.types import ArticulationAction
+
+    from franzi_sim.scenarios import BOX_TRANSFER_CAMERA_REVIEW_POSE_RAD
+
+    world = World(
+        stage_units_in_meters=1.0,
+        physics_dt=1.0 / 120.0,
+        rendering_dt=1.0 / 60.0,
+    )
+    robot = world.scene.add(
+        SingleArticulation(
+            prim_path="/WheelBotBoxTransfer/WheelBot",
+            name="wheel_bot_camera_review_pose",
+            reset_xform_properties=False,
+        )
+    )
+    world.reset()
+    joint_names = [name for name, _position in BOX_TRANSFER_CAMERA_REVIEW_POSE_RAD]
+    joint_positions = np.asarray(
+        [position for _name, position in BOX_TRANSFER_CAMERA_REVIEW_POSE_RAD],
+        dtype=float,
+    )
+    joint_indices = np.asarray(
+        [robot.get_dof_index(name) for name in joint_names],
+        dtype=int,
+    )
+    dof_properties = robot.dof_properties
+    joint_limits = np.column_stack(
+        (
+            dof_properties["lower"][joint_indices],
+            dof_properties["upper"][joint_indices],
+        )
+    )
+    lower_violation = joint_positions < joint_limits[:, 0] - 1e-6
+    upper_violation = joint_positions > joint_limits[:, 1] + 1e-6
+    if np.any(lower_violation | upper_violation):
+        invalid = {
+            name: {
+                "position_rad": float(position),
+                "limits_rad": [float(lower), float(upper)],
+            }
+            for name, position, (lower, upper), violated in zip(
+                joint_names,
+                joint_positions,
+                joint_limits,
+                lower_violation | upper_violation,
+                strict=True,
+            )
+            if violated
+        }
+        raise RuntimeError(f"camera review pose exceeds joint limits: {invalid}")
+    limit_margins = np.minimum(
+        joint_positions - joint_limits[:, 0],
+        joint_limits[:, 1] - joint_positions,
+    )
+    robot.set_joint_positions(joint_positions, joint_indices)
+    robot.get_articulation_controller().apply_action(
+        ArticulationAction(
+            joint_positions=joint_positions,
+            joint_indices=joint_indices,
+        )
+    )
+    world.step(render=False)
+    # The first step initializes Fabric and drive targets.  Re-apply the exact
+    # review state so the evidence pose is deterministic rather than one
+    # integration step along the controller trajectory.
+    robot.set_joint_positions(joint_positions, joint_indices)
+    observed = np.asarray(robot.get_joint_positions(), dtype=float)[joint_indices]
+    maximum_error = float(np.max(np.abs(observed - joint_positions)))
+    if maximum_error > 1e-5:
+        raise RuntimeError(
+            f"camera review pose error is {maximum_error:.6f} rad"
+        )
+    return world, {
+        "name": "box_transfer_camera_review_seed",
+        "joint_positions_rad": dict(BOX_TRANSFER_CAMERA_REVIEW_POSE_RAD),
+        "minimum_joint_limit_margin_rad": float(np.min(limit_margins)),
+        "maximum_set_position_error_rad": maximum_error,
+    }
+
+
+def _measure_d405_review_alignment(stage: object) -> dict[str, object]:
+    """Measure task aim, roll, lens axis, and the distal task ray.
+
+    The imported wrist/bracket convex hull encloses the camera origin, so the
+    physics ray intentionally begins beyond that known hull.  It is not proof
+    that the complete optical ray is unobstructed; successful RTX Tag 0 decode
+    is the end-to-end visibility gate.
+    """
+
+    import carb
+    from omni.physx import get_physx_scene_query_interface
+    from pxr import Gf, Usd, UsdGeom
+
+    xform_cache = UsdGeom.XformCache(Usd.TimeCode.Default())
+    tag_prim = stage.GetPrimAtPath(
+        "/WheelBotBoxTransfer/BlueTransportBox/AprilTag_0/Face"
+    )
+    tag_position = xform_cache.GetLocalToWorldTransform(tag_prim).Transform(
+        Gf.Vec3d(0, 0, 0)
+    )
+    world_up = Gf.Vec3d(0, 0, 1)
+    measurements: dict[str, dict[str, object]] = {}
+    for name, camera_path in CAMERAS:
+        if not name.endswith("wrist_d405"):
+            continue
+        camera_prim = stage.GetPrimAtPath(camera_path)
+        housing_prim = camera_prim.GetParent().GetParent()
+        camera_matrix = xform_cache.GetLocalToWorldTransform(camera_prim)
+        housing_matrix = xform_cache.GetLocalToWorldTransform(housing_prim)
+        camera_position = camera_matrix.Transform(Gf.Vec3d(0, 0, 0))
+        forward = camera_matrix.TransformDir(Gf.Vec3d(0, 0, -1)).GetNormalized()
+        image_up = camera_matrix.TransformDir(Gf.Vec3d(0, 1, 0)).GetNormalized()
+        physical_lens_axis = housing_matrix.TransformDir(
+            Gf.Vec3d(0, 0, -1)
+        ).GetNormalized()
+        to_tag = (tag_position - camera_position).GetNormalized()
+        projected_world_up = (
+            world_up - forward * (forward * world_up)
+        ).GetNormalized()
+        # Imported wrist-roll/yaw collision hulls enclose the 134 mm fixed
+        # sensor bracket.  Start beyond that known local assembly so this ray
+        # measures task-line occlusion instead of a sensor-origin overlap.
+        distal_raycast_start_offset_m = 0.18
+        ray_origin = camera_position + forward * distal_raycast_start_offset_m
+        ray_to_tag = tag_position - ray_origin
+        distance_to_tag = float(ray_to_tag.GetLength())
+        ray_direction = ray_to_tag.GetNormalized()
+        raycast_hit = get_physx_scene_query_interface().raycast_closest(
+            carb.Float3(*[float(value) for value in ray_origin]),
+            carb.Float3(*[float(value) for value in ray_direction]),
+            distance_to_tag + 0.02,
+            True,
+        )
+        first_hit_collision = (
+            str(raycast_hit.get("collision", "")) if raycast_hit.get("hit") else ""
+        )
+        first_hit_distance_m = (
+            float(raycast_hit.get("distance", 0.0)) if raycast_hit.get("hit") else None
+        )
+        distal_raycast_reaches_box = first_hit_collision.startswith(
+            "/WheelBotBoxTransfer/BlueTransportBox/"
+        )
+        measurements[name] = {
+            "camera_position_m": [float(value) for value in camera_position],
+            "forward_world": [float(value) for value in forward],
+            "image_up_world": [float(value) for value in image_up],
+            "aim_to_apriltag_dot": float(forward * to_tag),
+            "image_up_to_projected_gravity_dot": float(
+                image_up * projected_world_up
+            ),
+            "forward_to_housing_minus_z_dot": float(
+                forward * physical_lens_axis
+            ),
+            "distal_raycast_start_offset_m": distal_raycast_start_offset_m,
+            "distal_raycast_first_hit": first_hit_collision,
+            "distal_raycast_first_hit_distance_m": first_hit_distance_m,
+            "distal_raycast_reaches_box_after_mount_hull": (
+                distal_raycast_reaches_box
+            ),
+        }
+
+    valid = all(
+        float(values["aim_to_apriltag_dot"]) >= 0.85
+        and float(values["image_up_to_projected_gravity_dot"]) >= 0.999
+        and float(values["forward_to_housing_minus_z_dot"]) >= 0.999
+        and bool(values["distal_raycast_reaches_box_after_mount_hull"])
+        for values in measurements.values()
+    )
+    if not valid or len(measurements) != 2:
+        raise RuntimeError(f"D405 task-pose alignment failed: {measurements}")
+    return {"valid": True, "cameras": measurements}
+
+
 def main() -> int:
     """Open the formal stage, render all review views, and write a manifest."""
 
@@ -317,6 +522,7 @@ def main() -> int:
     # is running so paths such as --output-dir are not treated as Kit options.
     script_argv = sys.argv
     sys.argv = [sys.argv[0]]
+    world = None
     try:
         from isaacsim import SimulationApp
 
@@ -325,6 +531,7 @@ def main() -> int:
                 "headless": args.headless,
                 "width": 1600,
                 "height": 900,
+                "renderer": "RaytracedLighting",
                 "fast_shutdown": True,
             }
         )
@@ -343,6 +550,33 @@ def main() -> int:
         for _ in range(40):
             app.update()
         stage = context.get_stage()
+        world, review_pose = _apply_robot_review_pose()
+        app.update()
+        d405_alignment = _measure_d405_review_alignment(stage)
+        from pxr import UsdGeom
+
+        stage_meters_per_unit = float(UsdGeom.GetStageMetersPerUnit(stage))
+        stage_up_axis = str(UsdGeom.GetStageUpAxis(stage))
+        camera_runtime_contract: dict[str, dict[str, object]] = {}
+        for camera_name, camera_path in CAMERAS:
+            camera_prim = stage.GetPrimAtPath(camera_path)
+            clipping = UsdGeom.Camera(camera_prim).GetClippingRangeAttr().Get()
+            clipping_values = [float(value) for value in clipping]
+            resolution = camera_prim.GetAttribute("render:resolution").Get()
+            resolution_values = [int(value) for value in resolution]
+            if (
+                not np.allclose(clipping_values, [0.05, 100.0], atol=1e-6)
+                or resolution_values != [1280, 720]
+            ):
+                raise RuntimeError(
+                    f"{camera_name} runtime camera contract drifted: "
+                    f"clipping={clipping_values}, resolution={resolution_values}"
+                )
+            camera_runtime_contract[camera_name] = {
+                "prim_path": camera_path,
+                "resolution": resolution_values,
+                "clipping_range_m": clipping_values,
+            }
         tag_path = (
             "/WheelBotBoxTransfer/BlueTransportBox/AprilTag_0/Face"
         )
@@ -425,6 +659,15 @@ def main() -> int:
                 "no robot-mounted camera decodes box-attached AprilTag 0; "
                 f"decoded IDs by view: {decoded_by_view}"
             )
+        d405_names = {
+            name for name, _path in CAMERAS if name.endswith("wrist_d405")
+        }
+        d405_tag_views = d405_names.intersection(robot_tag_views)
+        if d405_tag_views != d405_names:
+            raise RuntimeError(
+                "both D405 task-pose frames must decode box-attached AprilTag 0; "
+                f"decoded IDs by view: {decoded_by_view}"
+            )
 
         camera_paths = [
             (
@@ -453,13 +696,20 @@ def main() -> int:
         manifest = {
             "ok": True,
             "captured_at": datetime.now().astimezone().isoformat(timespec="seconds"),
-            "renderer": "Isaac Sim 5.1 RTX Real-Time",
+            "renderer": {
+                "isaac_sim_version": package_version("isaacsim"),
+                "mode": app.config["renderer"],
+                "rt_subframes": args.rt_subframes,
+            },
+            "git": _git_state(),
             "formal_scene": str(scene.relative_to(PROJECT_ROOT)),
             "formal_scene_sha256": _sha256(scene),
             "project_source_sha256": source_hashes,
             "project_source_bundle_sha256": source_bundle_hash,
-            "stage_meters_per_unit": 1.0,
-            "stage_up_axis": "Z",
+            "stage_meters_per_unit": stage_meters_per_unit,
+            "stage_up_axis": stage_up_axis,
+            "simulation_time_s": float(world.current_time),
+            "simulation_time_step_index": int(world.current_time_step_index),
             "apriltag": {
                 "family": "tag36h11",
                 "id": 0,
@@ -474,9 +724,12 @@ def main() -> int:
             "camera_contract": {
                 "required_cameras": [name for name, _path in CAMERAS],
                 "all_four_rgb_frames_valid": True,
-                "clipping_range_m": [0.05, 100.0],
                 "tag_0_detected_by_robot_camera": bool(robot_tag_views),
+                "both_d405_cameras_decode_tag_0": True,
+                "cameras": camera_runtime_contract,
             },
+            "robot_review_pose": review_pose,
+            "d405_alignment": d405_alignment,
             "review_board": review_board.name,
             "review_board_sha256": _sha256(review_board),
             "four_camera_contact_sheet": four_sheet.name,
@@ -489,7 +742,18 @@ def main() -> int:
         sys.__stdout__.write(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
         sys.__stdout__.flush()
         return 0
+    except Exception as error:
+        # SimulationApp shutdown can suppress the normal Python traceback on
+        # some Kit builds, so flush the actionable failure first.
+        sys.__stderr__.write(
+            f"capture_workcell_evidence failed: "
+            f"{type(error).__name__}: {error}\n"
+        )
+        sys.__stderr__.flush()
+        raise
     finally:
+        if world is not None:
+            world.stop()
         app.close()
 
 

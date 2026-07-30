@@ -46,7 +46,7 @@ robot_simulation/
 
 顶层入口保持为 `usd/scenes/warehouse_box_transfer.usda`。该层引用官方仓库环境并组合项目自有机器人、货箱和传感器层；所有路径必须相对项目根目录，不能写死个人机器的绝对资产路径。
 
-截至 2026-07-29，该入口已形成正式的 Unitree 式多工位 Warehouse 工位：Wheel Bot 位于主作业台，蓝色运输箱位于其前方，交付台与三处背景工位共同提供正常仓储语义。蓝箱正面附着项目自有 `tag36h11` **ID 0**，结构/层级验证为 `evidence/usd/2026-07-29/warehouse_workcell.json`，RTX 总览、标签近景和四相机截图为 `evidence/workcell/2026-07-29/final/`。蓝箱的重力、接触、Tag 跟随和 reset smoke 已通过，见 `evidence/physics/2026-07-29/box_gravity_contact_reset.json`。这仍不等同于搬箱闭环完成：固定底盘双臂执行器和 `≤0.01 rad` 跟踪门仍在 P3。
+截至 2026-07-30，该入口已形成正式的 Unitree 式多工位 Warehouse 工位：Wheel Bot 位于主作业台，蓝色运输箱位于其前方，交付台与三处背景工位共同提供正常仓储语义。蓝箱正面附着项目自有 `tag36h11` **ID 0**，结构、碰撞与四相机坐标验证为 `evidence/usd/2026-07-30/warehouse_workcell.json`，RTX 总览、标签近景和四相机截图为 `evidence/workcell/2026-07-30/final/`。蓝箱的重力、接触、Tag 跟随和 reset smoke 见 `evidence/physics/2026-07-30/box_gravity_contact_reset.json`。这仍不等同于搬箱闭环完成：固定底盘双臂执行器和 `≤0.01 rad` 跟踪门仍在 P3。
 
 ## 3. 目标场景与任务接口
 
@@ -95,19 +95,27 @@ robot_simulation/
 1. 预检脚本验证 `ISAAC_ASSET_ROOT=/home/fmc3/FermiBotNas/SIM_ASSETS/5.1.0/Assets/Isaac/5.1`，并创建 `vendor/isaac_assets` 相对挂载。
 2. 以官方 Warehouse 和可用官方周转箱为环境/基础资产；若官方箱体尺寸与提供 STL 不一致，以 STL 导入后的项目自有货箱 USD 为碰撞和可抓取对象的依据。
 3. 导入泡沫箱和手机时统一执行毫米到米的换算，分别生成可视层、简化碰撞层、物理属性层与组合入口；原始 STL 保持不修改。
-4. 机器人 URDF 负责 link、joint、碰撞和四个相机实体外壳 link/fixed joint；机器人 USD 在这些真实 link 下补充 optical-frame Xform、Camera prim、物理属性和场景组合。ROS TF optical-frame 链在 P2 由显式静态变换补齐并验证；三者的 link/frame 名称必须一一映射，并由测试检查。
+4. 机器人 URDF 负责 link、joint、碰撞和四个相机实体外壳 link/fixed joint；机器人 USD 在这些真实 link 下分别补充 USD `*_camera_mount/Camera` 与 ROS `*_optical_frame` sibling、物理属性和场景组合。ROS TF optical-frame 链在 P2 由显式静态变换补齐并验证；三者的 link/frame 名称必须一一映射，并由测试检查。
 
 当前机器人与四相机组合入口为 `usd/assets/robots/wheel_bot/wheel_bot_with_cameras.usda`。实际层级为：
 
 ```text
 /World/WheelBot
-├── head_d435_Link/head_d435_optical_frame/camera
-├── body_d435_Link/chest_d435_optical_frame/camera
-├── left_wrist_d405_Link/left_wrist_d405_optical_frame/camera
-└── right_wrist_d405_Link/right_wrist_d405_optical_frame/camera
+├── head_d435_Link
+│   ├── head_d435_camera_mount/camera
+│   └── head_d435_optical_frame
+├── body_d435_Link
+│   ├── chest_d435_camera_mount/camera
+│   └── chest_d435_optical_frame
+├── left_wrist_d405_Link
+│   ├── left_wrist_d405_camera_mount/camera
+│   └── left_wrist_d405_optical_frame
+└── right_wrist_d405_Link
+    ├── right_wrist_d405_camera_mount/camera
+    └── right_wrist_d405_optical_frame
 ```
 
-四路均为 1280×720 RGB；头/胸 D435 的校准旋转为 `(180°, 0°, -90°)`，左右腕 D405 为 `(-90°, 0°, 90°)`。该旋转满足 Isaac Camera 的局部 `-Z` 朝前、`+Y` 为图像上方，并已通过竖直彩色标记检查画面滚转方向。ROS 2 Bridge 为每路创建 `IsaacCreateRenderProduct`、`ROS2CameraHelper` 和 `ROS2CameraInfoHelper`，输出：
+四路均为 1280×720 RGB。头/胸 D435 的 USD Camera mount 为 `(180°,0°,-90°)`，对应 ROS optical 为 `(0°,0°,-90°)`；D405 STL 镜头面法向是 housing `-Z`，因此双腕 USD Camera mount 旋转为 identity，对应 ROS optical 为 `(180°,0°,0°)`。当前单一 RGB Camera 暂建模为两镜头之间、位于 STL 镜头面外 `0.5 mm` 的虚拟双目中点；正式机械图或内外参到位后再标定完整 XYZ 和内参，不把该中点误报为真实 RGB 光心。转换遵循 NVIDIA 官方的 USD `+Y up/-Z forward` 与 ROS optical `+Y down/+Z forward` 约定。ROS 2 Bridge 为每路创建 `IsaacCreateRenderProduct`、`ROS2CameraHelper` 和 `ROS2CameraInfoHelper`，输出：
 
 | 相机 | RGB topic | CameraInfo topic |
 |---|---|---|
@@ -116,9 +124,24 @@ robot_simulation/
 | 左腕 D405 | `/franzi/camera/left_wrist_d405/color/image_raw` | `/franzi/camera/left_wrist_d405/color/camera_info` |
 | 右腕 D405 | `/franzi/camera/right_wrist_d405/color/image_raw` | `/franzi/camera/right_wrist_d405/color/camera_info` |
 
-URDF 已提供四个相机外壳 link 和 fixed joint；USD 在对应真实 link 下添加 optical frame 与 Camera prim，不创建脱离刚体链的静态“假相机”。四路均明确设置 `clippingRange=(0.05, 100) m`，并在正式 Warehouse 工位取得有效 RTX 图像。`head_d435` 已在正式画面中解码蓝箱 Tag 0；胸部和双腕当前画面有效但尚未覆盖标签，属于抓取姿态阶段的视角覆盖工作。ROS 2 的 Image/CameraInfo 精确同时间戳验证器已经实现，但最新正式场景的 live ROS 2、TF 和 Tag 位姿闭环尚未重新采集；历史 `ros2_topics.json` 不能声称满足当前同步门。
+URDF 已提供四个相机外壳 link 和 fixed joint；USD 在对应真实 link 下添加独立渲染 frame、ROS optical frame 与 Camera prim，不创建脱离刚体链的静态“假相机”。四路均明确设置 `clippingRange=(0.05,100) m`，并在正式 Warehouse 工位取得有效 RTX 图像。证据脚本应用确定性、满足 URDF 限位的相机复核种子姿态；该姿态由脚本直接设置，只验证传感器视野，不冒充运动规划得到的预抓轨迹。数值要求双腕 `camera_forward·housing_-Z ≥ 0.999`、画面上方向与重力投影点积 `≥0.999`、朝 Tag 点积 `≥0.85`；物理射线从镜头前方 `0.18 m` 开始，以排除已知传感器支架 convex hull，仅验证远端路径先到箱体，不把它误报为完整中心视线无遮挡。左右 D405 的端到端可见性以各自正式 RTX 帧成功解码蓝箱 Tag 0 为门槛。ROS 2 的 Image/CameraInfo 精确同时间戳验证器已经实现，但最新正式场景的 live ROS 2、TF 和 Tag 位姿闭环尚未重新采集；历史 `ros2_topics.json` 不能声称满足当前同步门。
 
-### 4.2 相机验收要求
+### 4.2 碰撞与落地基线
+
+机器人 URDF 的 37 个显式 collision mesh 由 Isaac Lab 2.3.2 URDF converter 以 `convex_hull` 导入；`collision_from_visuals=false`、`self_collision=false`、`fix_base=true` 均在导入脚本和 `config.yaml` 中显式固定，不依赖版本默认值。正式 stage 必须用 `Usd.TraverseInstanceProxies()` 审计，否则会漏掉引用资产内的碰撞体。
+
+固定底盘基线不通过求解器“挤出”地面。零位姿最低轮面相对机器人根节点为 `-0.0872656 m`，正式场景将 root 放在 `z=0.0873 m`；当前三轮最低点为地面上约 `0.034 mm`，三轮高度差小于 `0.01 mm`，`base_link` 净空约 `34.7 mm`。自动验证门为：
+
+1. enabled robot collider 恰为 37 个，近似统计只能是 `{"convexHull":37}`；
+2. 左前、右前、后轮各一个有效碰撞体，三轮最低点差不超过 `0.1 mm`；
+3. 最低机器人碰撞点距 `z=0` 地面绝对值不超过 `0.5 mm`；
+4. `base_link` 最低碰撞点必须高于地面。
+
+全局切换 `convex_decomposition` 不是当前方案。P4 移动底盘优先把轮胎改为 cylinder/单凸包，把底座和手臂改为少量手工简化凸体；夹指等接触敏感处才局部采用多凸块或 convex decomposition。动态 articulation 不使用普通 triangle mesh 作为整机默认碰撞。
+
+蓝箱使用一个项目自有的 metre-scale Cube 碰撞代理，不叠加官方视觉资产内部碰撞。箱体中心位于 PickTable `x=1.20 m`，近侧留有约 `28 mm` 完整支撑余量；480 步重力/接触 smoke 的最终水平漂移约 `1.23e-7 m`。旧位置 `x=1.05 m` 曾悬出台面约 `124 mm`，已禁止回退。
+
+### 4.3 相机验收要求
 
 每次生成/修改机器人 USD 或 URDF 后，必须同时完成以下检查：
 
@@ -127,11 +150,11 @@ URDF 已提供四个相机外壳 link 和 fixed joint；USD 在对应真实 link
 3. **GUI/截图检查**：在 Isaac Sim GUI 逐路打开 viewport，或用同一 RTX 渲染链路批量保存四路截图；人工检查画面方向、遮挡、目标可见性和左右腕归属。修改安装位或旋转后必须重新截图，不能只依赖数值检查。
 4. **证据归档**：保存为 `evidence/cameras/YYYY-MM-DD/<run_id>/head_d435.png`、`chest_d435.png`、`left_wrist_d405.png`、`right_wrist_d405.png`，另存 `four_camera_contact_sheet.png` 和 `manifest.json`（场景 USD、提交版本、分辨率、仿真时间、相机路径）。汇报 PPT 仅复用四宫格结果图，不替代原始证据。
 
-截至 2026-07-29，正式 Warehouse 场景的四路 RTX 画面已归档到 `evidence/workcell/2026-07-29/final/` 并完成人工检查；`head_d435` 可解码 Tag 0。历史 ROS 2 采集不再作为通过依据；正式场景仍需用精确时间戳验证器重新采集 4 路 Image/CameraInfo，并完成 TF 与 Tag 位姿闭环。
+截至 2026-07-30，修正后的正式 Warehouse 场景四路 RTX 画面已归档到 `evidence/workcell/2026-07-30/final/` 并完成人工检查；左右 D405 均可解码 Tag 0。历史 ROS 2 采集不再作为通过依据；正式场景仍需用精确时间戳验证器重新采集 4 路 Image/CameraInfo，并完成 TF 与 Tag 位姿闭环。
 
 任何一路只有黑屏、错误相机视角、无 render product、未挂接真实 link，或无法留存截图，均不能通过相机验收。
 
-### 4.3 Hugging Face 数据采用流程
+### 4.4 Hugging Face 数据采用流程
 
 Hugging Face 候选及固定 commit 统一登记在 `docs/references.md`。当前优先评估 NVIDIA G1 locomanipulation 的“抓取—导航—放置”阶段与成功定义、SimReady Warehouse 的 OpenUSD 资产，以及 Isaac Lab Mimic/LeRobot 的示范与多相机数据结构。手机阶段可参考 Unitree 的 Object Placement 与 Camera Packaging 数据，但手机、泡沫箱、槽位和 Wheel Bot 动作仍以本项目模型与实测为准。
 
@@ -205,7 +228,7 @@ python3 scripts/verify_ros2_camera_topics.py \
 - 代码门：格式/静态检查（引入后）、无 Isaac 单测、必要的 Isaac 集成测试；新增公开接口有 docstring，关键状态、单位和安全逻辑有注释。
 - USD 门：`usdchecker`（或 Isaac 对应验证工具）检查、相对引用检查、GUI 打开检查、物理播放检查。
 - 可复现门：清理本地生成缓存后，按 README 的命令重新创建挂载并运行对应阶段。
-- 证据门：每项集成能力有运行日志和截图/录屏；相机能力必须满足第 4.2 节的四图证据。
+- 证据门：每项集成能力有运行日志和截图/录屏；相机能力必须满足第 4.3 节的四图证据。
 
 ## 6. subagent 驱动实施与审查制度
 
@@ -269,3 +292,4 @@ python3 scripts/verify_ros2_camera_topics.py \
 | 2026-07-29 | subagent 驱动升级为正式执行制度，环境配置优先由 Terra medium 并行完成，Sol ultra 审查阶段门 | 负责人明确要求 | 环境、实现、测试与验收 | 项目负责人 |
 | 2026-07-29 | 正式场景升级为多工位 Warehouse，蓝箱附 Tag 0；物理 smoke 和正式 RTX 证据归档 | 先建立可见、可验证的搬箱工位基线 | USD、相机、物理、PPT | 项目负责人 |
 | 2026-07-29 | 将 Hugging Face 固定版本数据加入第三层参考源，建立最小下载、许可证与兼容性门 | 负责人补充可用的 Isaac Lab/Isaac Sim 数据来源 | 资料、资产、数据结构与 subagent 调研 | 项目负责人 |
+| 2026-07-30 | D405 光轴改为 STL 镜头面 `-Z`，拆分 USD/ROS frame；机器人根节点按轮面抬高 87.3 mm，并显式审计 37 个 convex hull | RTX 截图发现腕相机轴向错误和固定底盘穿地 | 相机、TF、场景、碰撞、测试与证据 | 项目负责人 |

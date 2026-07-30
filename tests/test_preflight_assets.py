@@ -52,5 +52,19 @@ def test_box_scene_composes_portable_robot_and_project_crate_wrapper() -> None:
     assert "SM_Crate_A08_Blue_01.usd" in crate_wrapper
     assert "SM_Crate_A08_Blue_01_physics.usd" not in crate_wrapper
     assert 'scenario:status = "workcell_visual_validation"' in scene
+    assert "xformOp:translate = (0, 0, 0.0873)" in scene
+    assert 'physics:colliderPolicy = "37 explicit URDF meshes; convexHull"' in scene
     assert "/home/" not in scene
     assert "/home/" not in crate_wrapper
+
+
+def test_robot_import_policy_is_explicit_and_reproducible() -> None:
+    """Generated-asset provenance must not depend on converter defaults."""
+
+    config = Path("usd/assets/robots/wheel_bot/config.yaml").read_text(
+        encoding="utf-8"
+    )
+    assert "fix_base: true" in config
+    assert "collision_from_visuals: false" in config
+    assert "collider_type: convex_hull" in config
+    assert "self_collision: false" in config

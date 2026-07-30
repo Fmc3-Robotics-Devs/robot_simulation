@@ -183,7 +183,10 @@ def main() -> int:
         render_products: list[object] = []
         annotators: list[object] = []
         for camera in CAMERAS:
-            camera_path = f"/World/WheelBot/{camera.parent_link}/{camera.sensor_prim}/camera"
+            camera_path = (
+                f"/World/WheelBot/{camera.parent_link}/"
+                f"{camera.camera_mount_prim}/camera"
+            )
             render_product = rep.create.render_product(camera_path, (camera.width_px, camera.height_px))
             annotator = rep.AnnotatorRegistry.get_annotator("rgb")
             annotator.attach([render_product])
@@ -222,7 +225,10 @@ def main() -> int:
                     "name": camera.name,
                     "model": camera.model,
                     "parent_link": camera.parent_link,
-                    "prim_path": f"/World/WheelBot/{camera.parent_link}/{camera.sensor_prim}/camera",
+                    "prim_path": (
+                        f"/World/WheelBot/{camera.parent_link}/"
+                        f"{camera.camera_mount_prim}/camera"
+                    ),
                     "frame_id": camera.frame_id,
                     "topic": camera.topic,
                     "camera_info_topic": camera.camera_info_topic,
