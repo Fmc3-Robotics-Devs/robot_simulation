@@ -1,0 +1,273 @@
+{
+  "apriltag_pose": {
+    "origin_m": [
+      0.8959333999999999,
+      0.38,
+      1.0801469
+    ],
+    "visible_normal": [
+      -1.0,
+      0.0,
+      2.220446049250313e-16
+    ]
+  },
+  "apriltag_render_contract": {
+    "bound_material": "/WheelBotBoxTransfer/BlueTransportBox/AprilTag_0/AprilTagMaterial",
+    "double_sided": true,
+    "face_prim": "/WheelBotBoxTransfer/BlueTransportBox/AprilTag_0/Face",
+    "mdl_source_asset": "@../../../vendor/isaac_assets/Isaac/Materials/AprilTag/AprilTag.mdl@",
+    "mdl_sub_identifier": "AprilTag",
+    "mosaic_asset": "@../../../vendor/isaac_assets/Isaac/Materials/AprilTag/Textures/tag36h11.png@",
+    "shader_prim": "/WheelBotBoxTransfer/BlueTransportBox/AprilTag_0/AprilTagMaterial/Shader",
+    "texture_coordinate_count": 4
+  },
+  "bounds": {
+    "/WheelBotBoxTransfer/BlueTransportBox": {
+      "maximum_m": [
+        1.5025666427612303,
+        0.5825666236877441,
+        1.1652985191345215
+      ],
+      "minimum_m": [
+        0.8949333999525024,
+        0.17743337631225586,
+        0.995004741230805
+      ],
+      "size_m": [
+        0.6076332428087279,
+        0.4051332473754883,
+        0.17029377790371658
+      ]
+    },
+    "/WheelBotBoxTransfer/WheelBot": {
+      "maximum_m": [
+        0.24465815722942352,
+        0.31747499294523984,
+        1.8158231202840804
+      ],
+      "minimum_m": [
+        -0.3376596048474312,
+        -0.31747515946478655,
+        3.441910743713639e-05
+      ],
+      "size_m": [
+        0.5823177620768547,
+        0.6349501524100264,
+        1.8157887011766434
+      ]
+    },
+    "/WheelBotBoxTransfer/Workcell/DeliveryTable": {
+      "maximum_m": [
+        4.886823272705078,
+        -1.269000015258789,
+        0.9940513610839844
+      ],
+      "minimum_m": [
+        2.413176727294922,
+        -2.030999984741211,
+        0.0
+      ],
+      "size_m": [
+        2.4736465454101557,
+        0.7619999694824218,
+        0.9940513610839844
+      ]
+    },
+    "/WheelBotBoxTransfer/Workcell/PickTable": {
+      "maximum_m": [
+        1.630999984741211,
+        1.236823272705078,
+        0.9940513610839844
+      ],
+      "minimum_m": [
+        0.8690000152587889,
+        -1.236823272705078,
+        0.0
+      ],
+      "size_m": [
+        0.7619999694824222,
+        2.473646545410156,
+        0.9940513610839844
+      ]
+    }
+  },
+  "camera_failures": [],
+  "cameras": {
+    "chest_d435": {
+      "axes_valid": true,
+      "camera_prim": true,
+      "clipping_range_m": [
+        0.05000000074505806,
+        100.0
+      ],
+      "clipping_range_valid": true,
+      "d405_camera_forward_to_housing_lens_axis_dot": null,
+      "optical_frame_path": "/WheelBotBoxTransfer/WheelBot/body_d435_Link/chest_d435_optical_frame",
+      "optical_frame_prim": true,
+      "prim_path": "/WheelBotBoxTransfer/WheelBot/body_d435_Link/chest_d435_camera_mount/camera",
+      "usd_to_ros_axis_dots": {
+        "down": 0.9999999999999999,
+        "forward": 1.0000000000000002,
+        "right": 1.0000000000000002
+      }
+    },
+    "head_d435": {
+      "axes_valid": true,
+      "camera_prim": true,
+      "clipping_range_m": [
+        0.05000000074505806,
+        100.0
+      ],
+      "clipping_range_valid": true,
+      "d405_camera_forward_to_housing_lens_axis_dot": null,
+      "optical_frame_path": "/WheelBotBoxTransfer/WheelBot/head_d435_Link/head_d435_optical_frame",
+      "optical_frame_prim": true,
+      "prim_path": "/WheelBotBoxTransfer/WheelBot/head_d435_Link/head_d435_camera_mount/camera",
+      "usd_to_ros_axis_dots": {
+        "down": 1.0000000000000002,
+        "forward": 1.0000000000000002,
+        "right": 1.0
+      }
+    },
+    "left_wrist_d405": {
+      "axes_valid": true,
+      "camera_prim": true,
+      "clipping_range_m": [
+        0.05000000074505806,
+        100.0
+      ],
+      "clipping_range_valid": true,
+      "d405_camera_forward_to_housing_lens_axis_dot": 1.0000000000000002,
+      "optical_frame_path": "/WheelBotBoxTransfer/WheelBot/left_wrist_d405_Link/left_wrist_d405_optical_frame",
+      "optical_frame_prim": true,
+      "prim_path": "/WheelBotBoxTransfer/WheelBot/left_wrist_d405_Link/left_wrist_d405_camera_mount/camera",
+      "usd_to_ros_axis_dots": {
+        "down": 1.0000000000000002,
+        "forward": 1.0000000000000002,
+        "right": 1.0
+      }
+    },
+    "right_wrist_d405": {
+      "axes_valid": true,
+      "camera_prim": true,
+      "clipping_range_m": [
+        0.05000000074505806,
+        100.0
+      ],
+      "clipping_range_valid": true,
+      "d405_camera_forward_to_housing_lens_axis_dot": 1.0000000000000002,
+      "optical_frame_path": "/WheelBotBoxTransfer/WheelBot/right_wrist_d405_Link/right_wrist_d405_optical_frame",
+      "optical_frame_prim": true,
+      "prim_path": "/WheelBotBoxTransfer/WheelBot/right_wrist_d405_Link/right_wrist_d405_camera_mount/camera",
+      "usd_to_ros_axis_dots": {
+        "down": 1.0000000000000002,
+        "forward": 1.0000000000000002,
+        "right": 1.0
+      }
+    }
+  },
+  "default_prim": "/WheelBotBoxTransfer",
+  "metadata_failures": [],
+  "meters_per_unit": 1.0,
+  "missing_prims": [],
+  "ok": true,
+  "physics": {
+    "collision_api": true,
+    "dynamic_friction": 0.5,
+    "enabled_box_colliders": [
+      "/WheelBotBoxTransfer/BlueTransportBox/PhysicsCollision"
+    ],
+    "mass_api": true,
+    "mass_kg": 3.5,
+    "material_binding_targets": [
+      "/WheelBotBoxTransfer/PhysicsMaterials/BlueTransportBoxMaterial"
+    ],
+    "material_path": "/WheelBotBoxTransfer/PhysicsMaterials/BlueTransportBoxMaterial",
+    "physics_scene": true,
+    "restitution": 0.05000000074505806,
+    "rigid_body_api": true,
+    "single_box_collider": true,
+    "static_friction": 0.6499999761581421
+  },
+  "physics_failures": [],
+  "required_prims": [
+    "/WheelBotBoxTransfer",
+    "/WheelBotBoxTransfer/WheelBot",
+    "/WheelBotBoxTransfer/BlueTransportBox",
+    "/WheelBotBoxTransfer/DropZone",
+    "/WheelBotBoxTransfer/PhysicsScene",
+    "/WheelBotBoxTransfer/BlueTransportBox/PhysicsCollision"
+  ],
+  "robot_collision_failures": [],
+  "robot_collisions": {
+    "approximation_counts": {
+      "convexHull": 37
+    },
+    "base_clearance_m": 0.03470015268325806,
+    "box_collision_maximum_m": [
+      1.50256665,
+      0.5825666,
+      1.1652938
+    ],
+    "box_collision_minimum_m": [
+      0.89743335,
+      0.1774334,
+      0.9949999999999999
+    ],
+    "collider_paths": [
+      "/WheelBotBoxTransfer/WheelBot/base_link/collisions/base_link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/MID360_Link/collisions/MID360_Link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/calf_Link/collisions/calf_Link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/thigh_Link/collisions/thigh_Link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/waist_Link/collisions/waist_Link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/torso_Link/collisions/torso_Link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/body_d435_Link/collisions/body_d435_Link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/head_yaw_Link/collisions/head_yaw_Link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/head_pitch_Link/collisions/head_pitch_Link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/head_d435_Link/collisions/head_d435_Link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/left_shoulder_pitch_Link/collisions/left_shoulder_pitch_Link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/left_shoulder_roll_Link/collisions/left_shoulder_roll_Link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/left_shoulder_yaw_Link/collisions/left_shoulder_yaw_Link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/left_elbow_pitch_Link/collisions/left_elbow_pitch_Link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/left_wrist_yaw_Link/collisions/left_wrist_yaw_Link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/left_wrist_pitch_Link/collisions/left_wrist_pitch_Link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/left_wrist_roll_Link/collisions/left_wrist_roll_Link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/left_wrist_d405_Link/collisions/left_wrist_d405_Link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/leftfinger1_Link/collisions/leftfinger1_Link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/leftfinger2_Link/collisions/leftfinger2_Link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/right_shoulder_pitch_Link/collisions/right_shoulder_pitch_Link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/right_shoulder_roll_Link/collisions/right_shoulder_roll_Link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/right_shoulder_yaw_Link/collisions/right_shoulder_yaw_Link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/right_elbow_pitch_Link/collisions/right_elbow_pitch_Link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/right_wrist_yaw_Link/collisions/right_wrist_yaw_Link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/right_wrist_pitch_Link/collisions/right_wrist_pitch_Link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/right_wrist_roll_Link/collisions/right_wrist_roll_Link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/right_wrist_d405_Link/collisions/right_wrist_d405_Link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/rightfinger1_Link/collisions/rightfinger1_Link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/rightfinger2_Link/collisions/rightfinger2_Link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/left_front_steering_Link/collisions/left_front_steering_Link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/left_front_wheel_Link/collisions/left_front_wheel_Link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/lidar_2d_Link/collisions/lidar_2d_Link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/rear_steering_Link/collisions/rear_steering_Link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/rear_wheel_Link/collisions/rear_wheel_Link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/right_front_steering_Link/collisions/right_front_steering_Link/node_STL_BINARY_",
+      "/WheelBotBoxTransfer/WheelBot/right_front_wheel_Link/collisions/right_front_wheel_Link/node_STL_BINARY_"
+    ],
+    "enabled_collider_count": 37,
+    "expected_collider_count": 37,
+    "ground_clearance_m": 3.441910743713639e-05,
+    "ground_z_m": 0.0,
+    "minimum_collider_z_m": 3.441910743713639e-05,
+    "robot_box_aabb_candidates": [],
+    "wheel_collider_count": 3,
+    "wheel_height_spread_m": 5.982816219329834e-06,
+    "wheel_minimum_z_m": [
+      3.520886898041031e-05,
+      4.040192365646622e-05,
+      3.441910743713639e-05
+    ]
+  },
+  "scale_failures": [],
+  "up_axis": "Z",
+  "usd": "usd/scenes/warehouse_box_transfer.usda"
+}
