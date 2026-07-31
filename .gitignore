@@ -5,3 +5,8 @@ Rviz/log/
 
 **/__pycache__/
 *.py[cod]
+
+# Nested colcon runs inside a package directory (built by accident).
+Rviz/src/*/build/
+Rviz/src/*/install/
+Rviz/src/*/log/

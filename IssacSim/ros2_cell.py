@@ -283,6 +283,8 @@ class Mirror:
         self._positions = robot.data.default_joint_pos.clone()
         self._velocities = robot.data.default_joint_vel.clone() * 0.0
         self._warned = set()
+        # Latest mirrored chassis pose (x, y, yaw); the follow camera reads it.
+        self.base_pose = None
         self._bodies = XFormPrim(
             [f"/World/Robot/{name}" for name in robot.body_names],
             reset_xform_properties=False,
@@ -291,13 +293,15 @@ class Mirror:
         # The workpiece is scenery with no physics: the ROS side owns where it
         # is (resting, or riding the gripper) and this just moves the prop.
         self._workpiece_op = None
+        self._workpiece_orient_op = None
         stage = omni.usd.get_context().get_stage()
         prim = stage.GetPrimAtPath("/World/workpiece")
         if prim.IsValid():
             for op in UsdGeom.Xformable(prim).GetOrderedXformOps():
                 if op.GetOpType() == UsdGeom.XformOp.TypeTranslate:
                     self._workpiece_op = op
-                    break
+                elif op.GetOpType() == UsdGeom.XformOp.TypeOrient:
+                    self._workpiece_orient_op = op
 
     def write_back_to_stage(self):
         self._bodies.set_world_poses(
@@ -338,11 +342,20 @@ class Mirror:
             return
         if qw == 0.0 and qx == 0.0 and qy == 0.0 and qz == 0.0:
             return  # nothing received yet
+        self.base_pose = (px, py, 2.0 * math.atan2(qz, qw))
         root = self._robot.data.default_root_state.clone()
         root[0, 0:3] = torch.tensor([px, py, pz])
         root[0, 3:7] = torch.tensor([qw, qx, qy, qz])
         self._robot.write_root_pose_to_sim(root[:, :7])
         self._robot.write_root_velocity_to_sim(root[:, 7:] * 0.0)
+
+    def _set_orient(self, op, w, x, y, z):
+        from pxr import Gf, UsdGeom
+
+        if op.GetPrecision() == UsdGeom.XformOp.PrecisionDouble:
+            op.Set(Gf.Quatd(w, x, y, z))
+        else:
+            op.Set(Gf.Quatf(w, x, y, z))
 
     def _apply_workpiece(self):
         """Place the workpiece prop.
@@ -379,14 +392,26 @@ class Mirror:
             import numpy as np
 
             link_pos = self._robot.data.body_pos_w[0, index].cpu().numpy()
-            link_rot = quaternion_matrix(
-                self._robot.data.body_quat_w[0, index].cpu().numpy()
-            )
+            link_quat = self._robot.data.body_quat_w[0, index].cpu().numpy()
+            link_rot = quaternion_matrix(link_quat)
             rel = np.array([float(wx), float(wy), float(wz)])
             world = link_pos + link_rot @ rel
             self._workpiece_op.Set(Gf.Vec3d(*[float(v) for v in world]))
+            if self._workpiece_orient_op is not None:
+                # World orientation = link (w,x,y,z) times relative (x,y,z,w).
+                lw, lx, ly, lz = (float(v) for v in link_quat)
+                rx, ry, rz, rw = float(qx), float(qy), float(qz), float(qw)
+                ww = lw * rw - lx * rx - ly * ry - lz * rz
+                wx_ = lw * rx + lx * rw + ly * rz - lz * ry
+                wy_ = lw * ry - lx * rz + ly * rw + lz * rx
+                wz_ = lw * rz + lx * ry - ly * rx + lz * rw
+                self._set_orient(self._workpiece_orient_op, ww, wx_, wy_, wz_)
         else:
             self._workpiece_op.Set(Gf.Vec3d(float(wx), float(wy), float(wz)))
+            if self._workpiece_orient_op is not None:
+                self._set_orient(
+                    self._workpiece_orient_op, float(qw), float(qx), float(qy), float(qz)
+                )
 
     def _index_of_body(self, name):
         if not hasattr(self, "_body_index_cache"):
@@ -398,6 +423,103 @@ class Mirror:
                 print(f"mirror: no body '{name}' for the held workpiece", flush=True)
                 self._body_index_cache[name] = None
         return self._body_index_cache[name]
+
+
+def _look_at_quaternion(eye, target):
+    """gluLookAt-style orientation for a USD camera at eye facing target."""
+    import numpy as np
+
+    forward = np.array(target, float) - np.array(eye, float)
+    forward /= max(1e-9, float(np.linalg.norm(forward)))
+    up = np.array([0.0, 0.0, 1.0])
+    x_axis = np.cross(forward, up)
+    n = float(np.linalg.norm(x_axis))
+    x_axis = np.array([1.0, 0.0, 0.0]) if n < 1e-6 else x_axis / n
+    y_axis = np.cross(x_axis, forward)
+    m = np.column_stack([x_axis, y_axis, -forward])
+    w = math.sqrt(max(1e-12, 1.0 + float(np.trace(m)))) / 2.0
+    return (
+        float(w),
+        float((m[2, 1] - m[1, 2]) / (4 * w)),
+        float((m[0, 2] - m[2, 0]) / (4 * w)),
+        float((m[1, 0] - m[0, 1]) / (4 * w)),
+    )
+
+
+class FollowCamera:
+    """A third-person chase camera: behind the chassis, obstacle-aware.
+
+    The wanted pose hangs behind and above the robot along its heading. Before
+    it is applied, the position is pushed out of every obstacle box (benches,
+    the hall's furniture) with a fixed clearance, then low-pass filtered so
+    that the corrections and the robot's own turns read as smooth camera work
+    instead of teleports. Publishing goes through the same camera graph as
+    every other camera, on `/follow/color/image_raw`.
+    """
+
+    def __init__(self, stage, obstacles, back=3.2, height=2.4, clearance=0.7):
+        from pxr import UsdGeom
+
+        self._obstacles = obstacles
+        self._back = back
+        self._height = height
+        self._clearance = clearance
+        self._eye = None
+
+        camera = UsdGeom.Camera.Define(stage, "/World/follow")
+        camera.CreateFocalLengthAttr(1.7)
+        camera.CreateHorizontalApertureAttr(2.652)
+        camera.CreateVerticalApertureAttr(2.652 * 720.0 / 1280.0)
+        camera.CreateClippingRangeAttr((0.05, 200.0))
+        xform = UsdGeom.Xformable(camera)
+        self._translate = xform.AddTranslateOp()
+        self._orient = xform.AddOrientOp()
+        self._translate.Set((0.0, -12.0, 3.0))
+        w, qx, qy, qz = _look_at_quaternion((0.0, -12.0, 3.0), (0.0, 0.0, 1.0))
+        from pxr import Gf
+
+        self._orient.Set(Gf.Quatf(w, qx, qy, qz))
+
+    def _pushed_clear(self, point):
+        p = list(point)
+        for _ in range(3):
+            for low, high in self._obstacles:
+                nearest = [min(max(p[i], low[i]), high[i]) for i in range(3)]
+                d = math.dist(p, nearest)
+                if d >= self._clearance:
+                    continue
+                if d < 1e-6:
+                    p[2] = high[2] + self._clearance  # inside: lift out the top
+                else:
+                    p = [
+                        nearest[i] + (p[i] - nearest[i]) / d * self._clearance
+                        for i in range(3)
+                    ]
+        return tuple(p)
+
+    def update(self, base_pose):
+        from pxr import Gf
+
+        x, y, yaw = base_pose
+        wanted = self._pushed_clear(
+            (
+                x - math.cos(yaw) * self._back,
+                y - math.sin(yaw) * self._back,
+                self._height,
+            )
+        )
+        if self._eye is None:
+            self._eye = wanted
+        else:
+            alpha = 0.10
+            self._eye = tuple(
+                self._eye[i] + (wanted[i] - self._eye[i]) * alpha for i in range(3)
+            )
+        eye = self._pushed_clear(self._eye)
+        look = (x + math.cos(yaw) * 0.4, y + math.sin(yaw) * 0.4, 1.0)
+        self._translate.Set(Gf.Vec3d(*eye))
+        w, qx, qy, qz = _look_at_quaternion(eye, look)
+        self._orient.Set(Gf.Quatf(w, qx, qy, qz))
 
 
 def optical_transform(stage, link_path, camera_path):
@@ -470,12 +592,36 @@ def main():
         help="Which cameras to render and publish. Each one costs frame time.",
     )
     parser.add_argument(
-        "--no-warehouse", action="store_true", help="Bare ground plane instead."
+        "--scene",
+        default="warehouse",
+        choices=["center", "warehouse", "none"],
+        help="World: the original warehouse cell (default), the 智能制造中心 "
+        "shopfloor converted from the customer's STEP, or a bare ground plane.",
+    )
+    parser.add_argument(
+        "--no-warehouse",
+        action="store_true",
+        help="Deprecated alias for --scene none.",
     )
     parser.add_argument(
         "--check",
         action="store_true",
         help="Bring the stage up, print diagnostics for a few seconds, exit.",
+    )
+    parser.add_argument(
+        "--capture",
+        choices=["full", "dataset"],
+        default="full",
+        help="dataset: 所有相机(含 observer)按数据集分辨率 640x360 渲染,"
+        "像素少 4 倍换帧率——LeRobot 采集专用;full: 原分辨率。",
+    )
+    parser.add_argument(
+        "--physics-episode",
+        type=int,
+        default=None,
+        help="LeRobot 采集:按 lerobot/physics_collection.json 用 "
+        "base_seed+index 确定性采样八项物理量,把工件质量/摩擦/恢复系数"
+        "写进 stage(镜像阶段其余各项仅记录,见数据集 meta)。",
     )
     args = parser.parse_args()
 
@@ -513,12 +659,67 @@ def main():
     # ROS odom frame, whose origin is base_link. Everything static comes from
     # scenery.build so all three entry points show the same cell.
     stage = omni.usd.get_context().get_stage()
+    scene = "none" if args.no_warehouse else args.scene
     warehouse_path = None
-    if not args.no_warehouse:
+    center_path = None
+    if scene == "warehouse":
         from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR
 
         warehouse_path = f"{ISAAC_NUCLEUS_DIR}/{WAREHOUSE_USD.split('Isaac/', 1)[1]}"
-    scenery.build(stage, sim_utils, cell, TEXTURES, warehouse_path)
+    elif scene == "center":
+        center_path = REPO / "IssacSim" / "usd" / "machining_center.usd"
+        if not center_path.exists():
+            raise SystemExit(
+                f"{center_path} is missing; convert the STEP first or use --scene warehouse"
+            )
+    scenery.build(
+        stage, sim_utils, cell, TEXTURES, warehouse_path, machining_center_usd=center_path
+    )
+
+    if args.physics_episode is not None:
+        # 与 collect_episode.py 用同一确定性采样(base_seed+index),两侧
+        # 无需传文件即得到一致的值。镜像阶段只有工件的质量/材料是可作用
+        # 的授权项;刚度/阻尼/力矩/重力等到动力学阶段才有意义,由采集器
+        # 记入元数据。
+        import json as _json
+        import sys as _sys
+
+        _sys.path.insert(0, str(REPO / "IssacSim" / "lerobot"))
+        from sample_physics_params import sample_parameters
+
+        from pxr import UsdPhysics, UsdShade
+
+        sample = sample_parameters(
+            _json.loads(
+                (REPO / "IssacSim" / "lerobot" / "physics_collection.json")
+                .read_text()
+            ),
+            args.physics_episode,
+        )
+        values = {k: v["value"] for k, v in sample["parameters"].items()}
+        workpiece = stage.GetPrimAtPath("/World/workpiece")
+        if not workpiece.IsValid():
+            raise SystemExit("/World/workpiece 不存在,无法施加物理参数")
+        mass_api = UsdPhysics.MassAPI.Apply(workpiece)
+        mass_api.CreateMassAttr(float(values["workpiece_mass_kg"]))
+        material = UsdShade.Material.Define(
+            stage, "/World/Looks/workpiece_physics"
+        )
+        material_api = UsdPhysics.MaterialAPI.Apply(material.GetPrim())
+        material_api.CreateStaticFrictionAttr(float(values["static_friction"]))
+        material_api.CreateDynamicFrictionAttr(
+            float(values["dynamic_friction"])
+        )
+        material_api.CreateRestitutionAttr(float(values["restitution"]))
+        UsdShade.MaterialBindingAPI.Apply(workpiece).Bind(
+            material, materialPurpose="physics"
+        )
+        print(
+            "[physics] episode "
+            f"{args.physics_episode} seed {sample['episode_seed']}: "
+            + ", ".join(f"{k}={v:.4f}" for k, v in values.items()),
+            flush=True,
+        )
 
     dock_x, dock_y, _ = cell.dock_pose(args.dock)
     robot = Articulation(
@@ -557,6 +758,14 @@ def main():
     # cross-check.
     from pxr import UsdGeom
 
+    if args.capture == "dataset":
+        # head_d435 保持原生分辨率:它是 apriltag 检测/精停靠的感知输入,
+        # 降到 640x360 后 tag 像素跌破解码下限,DETECT_MATERIAL 直接失败
+        # (2026-07-30 实测)。其余相机只进数据集,按 640x360 渲染换帧率。
+        for _cam, (_link, _intr, _res) in CAMERAS.items():
+            if _cam != "head_d435":
+                CAMERAS[_cam] = (_link, _intr, (640, 360))
+
     cameras = {}
     for name in args.cameras:
         link, intrinsics, (width, height) = CAMERAS[name]
@@ -574,18 +783,37 @@ def main():
         xform.AddRotateXOp().Set(180.0)
         cameras[name] = prim_path
 
-    # A fixed observer camera looking across all three stations, published so
-    # the ROS side can record the run (there is no GUI in headless mode).
+    # A CCTV camera on a pole: fixed plant-monitoring hardware the real cell
+    # can copy one-to-one - a mast bolted to the floor clear of every aisle,
+    # camera head at 3 m, angled across the three stations. Deliberately not
+    # a floating god view: if it cannot be mounted, it cannot be filmed.
     observer = UsdGeom.Camera.Define(stage, "/World/observer")
-    observer.CreateFocalLengthAttr(1.6)
+    observer.CreateFocalLengthAttr(1.4)
     observer.CreateHorizontalApertureAttr(2.652)
     observer.CreateVerticalApertureAttr(2.652 * 720 / 1280)
     observer.CreateClippingRangeAttr((0.05, 50.0))
-    # High diagonal vantage from the feeder side: the machine grew into a
-    # full enclosure, and the old ground-level spot behind it filmed nothing
-    # but its back panel for the whole cycle.
-    eye = (-6.0, -9.8, 6.2)
-    target = (1.2, 0.4, 0.4)
+    eye = (-4.2, -6.4, 2.95)
+    target = (1.6, -0.6, 0.7)
+
+    mast = sim_utils.CylinderCfg(
+        radius=0.045,
+        height=2.9,
+        visual_material=sim_utils.PreviewSurfaceCfg(
+            diffuse_color=(0.35, 0.37, 0.40), roughness=0.6
+        ),
+    )
+    mast.func("/World/cctv_mast", mast, translation=(eye[0], eye[1], 1.45))
+    head_box = sim_utils.CuboidCfg(
+        size=(0.16, 0.09, 0.09),
+        visual_material=sim_utils.PreviewSurfaceCfg(
+            diffuse_color=(0.9, 0.9, 0.92), roughness=0.4
+        ),
+    )
+    # Housing sits behind the lens point, not on it, or it films itself.
+    direction = tuple(t - e for t, e in zip(target, eye))
+    length = math.sqrt(sum(c * c for c in direction))
+    housing = tuple(e - 0.14 * c / length for e, c in zip(eye, direction))
+    head_box.func("/World/cctv_head", head_box, translation=housing)
     import numpy as np
 
     view = np.array(eye) - np.array(target)  # USD camera looks along -z
@@ -627,7 +855,24 @@ def main():
     robot.reset()
 
     # The ROS graphs only exist after reset, when the stage is final.
-    build_camera_graph("observer", "/World/observer", 1280, 720, "observer")
+    observer_res = (640, 360) if args.capture == "dataset" else (1280, 720)
+    build_camera_graph(
+        "observer", "/World/observer", observer_res[0], observer_res[1],
+        "observer",
+    )
+
+    # Third-person chase camera. Obstacle boxes: the three benches from the
+    # cell layout, plus the shopfloor furniture around the aisle (harmless in
+    # the warehouse scene - those regions are open floor there).
+    def bench_box(station):
+        centre_x, centre_y = cell.bench_centre(station)
+        sx, sy = cell["bench.size_xy"]
+        return (
+            (centre_x - sx / 2 - 0.05, centre_y - sy / 2 - 0.05, 0.0),
+            (centre_x + sx / 2 + 0.05, centre_y + sy / 2 + 0.05, 1.0),
+        )
+
+
     for name, prim_path in cameras.items():
         link, _, (width, height) = CAMERAS[name]
         build_camera_graph(name, prim_path, width, height, f"{name}_optical")

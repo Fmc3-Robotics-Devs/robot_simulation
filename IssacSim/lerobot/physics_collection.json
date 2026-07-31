@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "base_seed": 12345678,
+  "runtime": {
+    "physics_engine": "PhysX",
+    "device": "cuda:0",
+    "num_envs": 4,
+    "physics_hz": 120,
+    "control_hz": 15,
+    "render_hz": 15,
+    "solver_type": "TGS",
+    "gpu_dynamics": true,
+    "gravity_m_s2": [
+      0.0,
+      0.0,
+      -9.81
+    ]
+  },
+  "dataset": {
+    "format": "LeRobot v3.0",
+    "repo_id": "local/franzi_machine_tending_physx_v3",
+    "fps": 8,
+    "task": "Complete one engraving-machine tending cycle: navigate from home to the feeder, pick up a raw aluminum workpiece, load it into the machine fixture, wait for machining, unload the finished part, place it in the next empty outfeed slot, and return home."
+  },
+  "cameras": [
+    {
+      "name": "overhead",
+      "mount": "world",
+      "width": 640,
+      "height": 360
+    },
+    {
+      "name": "head_d435",
+      "mount": "robot",
+      "width": 640,
+      "height": 360
+    },
+    {
+      "name": "left_wrist_d405",
+      "mount": "robot",
+      "width": 640,
+      "height": 360
+    },
+    {
+      "name": "right_wrist_d405",
+      "mount": "robot",
+      "width": 640,
+      "height": 360
+    }
+  ],
+  "physics_randomization": {
+    "workpiece_mass_kg": {
+      "distribution": "uniform",
+      "low": 0.45,
+      "high": 0.62,
+      "unit": "kg"
+    },
+    "static_friction": {
+      "distribution": "uniform",
+      "low": 0.35,
+      "high": 0.8,
+      "unit": "coefficient"
+    },
+    "dynamic_friction": {
+      "distribution": "uniform",
+      "low": 0.25,
+      "high": 0.65,
+      "unit": "coefficient"
+    },
+    "restitution": {
+      "distribution": "uniform",
+      "low": 0.0,
+      "high": 0.08,
+      "unit": "coefficient"
+    },
+    "joint_stiffness_scale": {
+      "distribution": "uniform",
+      "low": 0.9,
+      "high": 1.1,
+      "unit": "scale"
+    },
+    "joint_damping_scale": {
+      "distribution": "uniform",
+      "low": 0.85,
+      "high": 1.15,
+      "unit": "scale"
+    },
+    "actuator_effort_scale": {
+      "distribution": "uniform",
+      "low": 0.9,
+      "high": 1.1,
+      "unit": "scale"
+    },
+    "gravity_magnitude_m_s2": {
+      "distribution": "uniform",
+      "low": 9.78,
+      "high": 9.83,
+      "unit": "m/s^2"
+    }
+  }
+}
