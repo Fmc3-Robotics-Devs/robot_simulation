@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<mujoco model="franzi_scene">
+  <include file="franzi.xml"/>
+
+  <visual>
+    <headlight ambient="0.4 0.4 0.4" diffuse="0.6 0.6 0.6"/>
+    <global offwidth="1920" offheight="1080"/>
+  </visual>
+
+  <asset>
+    <texture name="floor" type="2d" builtin="checker" rgb1="0.32 0.35 0.4"
+             rgb2="0.38 0.41 0.46" width="256" height="256"/>
+    <material name="floor" texture="floor" texrepeat="8 8" reflectance="0.1"/>
+  </asset>
+
+  <worldbody>
+    <light pos="1 1 3" dir="-0.3 -0.3 -1" diffuse="0.7 0.7 0.7"/>
+    <geom name="floor" type="plane" size="10 10 0.1" material="floor"/>
+  </worldbody>
+</mujoco>
