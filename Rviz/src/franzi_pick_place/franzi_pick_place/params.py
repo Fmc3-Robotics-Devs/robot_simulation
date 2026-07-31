@@ -73,6 +73,9 @@ DEFAULTS = {
     "bench.leg_size": 0.05,
     "bench.leg_inset": 0.03,
     "workpiece.size": [0.07, 0.07, 0.04],
+    # Scenery truth only - how the blank lies on the feeder. Nothing in the
+    # control stack may read it; the vision detector has to measure the yaw.
+    "workpiece.spawn_yaw_deg": 18.0,
     "pocket.clearance": 0.012,
     "pocket.wall_thickness": 0.015,
     "pocket.wall_height": 0.015,

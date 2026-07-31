@@ -54,9 +54,15 @@ class Recorder(Node):
     def _write(self, frame):
         if self._writer is None:
             height, width = frame.shape[:2]
+            # AVI/MJPG for .avi outputs: the container stays readable even if
+            # the recorder is killed before release() - an mp4's moov atom
+            # only exists once the writer closes cleanly, and `ros2 run`
+            # forwards shutdown as SIGTERM, which Python does not turn into a
+            # finally block by itself.
+            fourcc = "MJPG" if self._path.endswith(".avi") else "mp4v"
             self._writer = cv2.VideoWriter(
                 self._path,
-                cv2.VideoWriter_fourcc(*"mp4v"),
+                cv2.VideoWriter_fourcc(*fourcc),
                 self._fps,
                 (width, height),
             )
@@ -88,6 +94,15 @@ def main():
         "recordings share a timeline and can be composed side by side.",
     )
     args = parser.parse_args()
+
+    # `ros2 run` forwards shutdown as SIGTERM; route it through the same
+    # KeyboardInterrupt path so the writer's release() always runs.
+    import signal
+
+    def _terminate(*_args):
+        raise KeyboardInterrupt
+
+    signal.signal(signal.SIGTERM, _terminate)
 
     rclpy.init()
     recorder = Recorder(args.topic, args.output, args.fps, clocked=args.clocked)

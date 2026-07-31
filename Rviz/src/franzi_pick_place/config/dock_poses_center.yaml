@@ -1,0 +1,22 @@
+# Docking poses for the 智能制造中心 shopfloor scene (--scene center).
+# Frame: odom. Same three station docks as the warehouse cell - the stations
+# themselves do not move between scenes - but the standby point differs: the
+# warehouse wall corner sits inside this hall's machine row, so home is the
+# south end of the bench aisle instead.
+docks:
+  home:
+    x: 0.0
+    y: -6.8
+    yaw: 0.67
+  feeder:
+    x: 1.76
+    y: -4.16
+    yaw: 0.0
+  machine:
+    x: 1.76
+    y: -0.16
+    yaw: 0.0
+  outfeed:
+    x: 1.76
+    y: 3.84
+    yaw: 0.0

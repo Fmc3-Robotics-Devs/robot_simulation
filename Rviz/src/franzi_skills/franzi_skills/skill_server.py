@@ -44,7 +44,7 @@ from franzi_pick_place.motion import PlanningFailure
 from franzi_pick_place.params import build_moveit, declare_cell_parameters
 from franzi_pick_place.transforms import from_pose, from_rpy, invert, yaw_of
 
-from .dock_controller import DockGains, DockLoop
+from .dock_controller import DockGains, DockLoop, shortest_angle
 from .slots import SlotBook, TrayFull
 from .tending import SkillFailure, TendingCell
 
@@ -64,6 +64,26 @@ SKILL_DEFAULTS = {
     # How long the loaded part may take to register on the machine's presence
     # sensor (plan section 12.6).
     "material_wait": 3.0,
+    # How the loose part is located: "vision" measures it in the head
+    # camera's depth image; "tag" infers it from the station tag plus the
+    # surveyed offset (the only option for the imageless RViz backend).
+    "material_detection.mode": "tag",
+    # Vertical focal length of the depth channel when it differs from the RGB
+    # camera_info (bench-plane calibration; 0 trusts camera_info). Isaac's
+    # renderer resolves the vertical aperture differently from the published
+    # intrinsics, measured at fy = 803.7 against the info's 931.5.
+    "material_detection.depth_fy": 0.0,
+    # Sensing path for the vision mode: "rgb" (ray-on-plane, plan section
+    # 5.4) or "depth" (height-band clustering; better on hardware).
+    "material_detection.source": "rgb",
+    # Systematic residual of the vision chain, calibrated once against a part
+    # on the surveyed reference point - the same residual-compensation step a
+    # hand-eye calibration ends with on hardware (plan section 7).
+    "material_detection.bias_xy": [0.0, 0.0],
+    # Where to write annotated detection frames (empty disables). Each
+    # detection attempt saves one image with every bright region boxed and
+    # labelled with its verdict - the run's perception evidence.
+    "material_detection.debug_dir": "/tmp/franzi_detect_debug",
     "dock.position_tolerance": 0.008,
     "dock.yaw_tolerance_deg": 0.8,
     # Each observation costs a settle period, so "frames" are slow here; the
@@ -75,6 +95,9 @@ SKILL_DEFAULTS = {
     "dock.lost_tolerance": 2,
     "dock.retreat_step": 0.08,
     "dock.max_retreats": 3,
+    # Straight-back distance that clears a bench's inflation before Nav2
+    # takes over (robot_radius 0.35 + inflation 0.40 - dock gap 0.32).
+    "nav.undock_retreat": 0.6,
     "dock.max_iterations": 60,
     "dock.approach_speed": 0.08,
     "dock.observe_timeout": 1.5,
@@ -167,18 +190,39 @@ class Skills:
         # bridge's MachineIO instead.
         self._material = node.create_publisher(Bool, "machine/sim/material_present", 1)
 
+        # Docking and undocking drive the base the way hardware will: velocity
+        # commands on /cmd_vel, closed on odometry. Nothing below this layer
+        # can tell the simulator from a real base driver.
+        from geometry_msgs.msg import Twist
+
+        self._twist_type = Twist
+        self._cmd_vel = node.create_publisher(Twist, "cmd_vel", 10)
+
         # Where the real workpiece is, for the Isaac stage to move its prop.
         # Simulation-only, like the material seam: hardware has a real part.
         self._workpiece_publisher = node.create_publisher(PoseStamped, "workpiece/pose", 10)
         node.create_timer(0.1, self._publish_workpiece, callback_group=self._group)
 
         self._nav2 = None
+        self._nav2_managers = {}
         if node.get("use_nav2"):
             from nav2_msgs.action import NavigateToPose
+            from nav2_msgs.srv import ManageLifecycleNodes
 
             self._nav2 = ActionClient(
                 node, NavigateToPose, "navigate_to_pose", callback_group=self._group
             )
+            # Nav2's lifecycle bringup fails sporadically on this machine and
+            # its manager does not retry on its own; these let the navigate
+            # skill kick a dead stack back up instead of failing the cycle.
+            self._nav2_managers = {
+                name: node.create_client(
+                    ManageLifecycleNodes,
+                    f"{name}/manage_nodes",
+                    callback_group=self._group,
+                )
+                for name in ("lifecycle_manager_map", "lifecycle_manager_navigation")
+            }
 
         self._servers = [
             self._serve("navigate_to_station", PreciseDock, self._navigate),
@@ -287,17 +331,110 @@ class Skills:
         if handle.is_cancel_requested:
             raise SkillCancelled()
         if self._nav2 is not None:
+            self._undock_if_docked(station)
             self._navigate_nav2(handle, station, pose)
         else:
             self._base.drive_to(*pose, label=f"navigate to {station}")
         self._cell.sync_base()
         self._report_dock(handle, DockStatus.DOCKED, station)
 
+    def _servo_to(self, target, speed, label="", yaw_rate=0.5, tolerance=0.004,
+                  yaw_tolerance=math.radians(0.25), cancel_check=None):
+        """Velocity-servo the base to a world pose - the hardware drive path.
+
+        A proportional controller over the odometry pose, published as body
+        frame velocities on /cmd_vel at 20 Hz, with the plan's section 8.4
+        trimmings: saturation at ``speed``, a floor so the P term cannot crawl
+        forever, and a hard time budget. Returns True on arrival. This is the
+        exact loop a real holonomic base runs; the simulator integrates the
+        same commands the hardware would.
+        """
+        target_x, target_y, target_yaw = target
+        x, y, yaw = self._base.pose
+        budget = (math.hypot(target_x - x, target_y - y) / max(speed, 0.02)) * 4.0 + 5.0
+        deadline = time.monotonic() + budget
+        floor = 0.012
+
+        def clamp(value, limit):
+            scaled = 2.5 * value
+            if abs(scaled) < 1e-4:
+                return 0.0
+            magnitude = min(max(abs(scaled), floor), limit)
+            return math.copysign(magnitude, scaled)
+
+        arrived = False
+        while time.monotonic() < deadline:
+            if cancel_check is not None and cancel_check():
+                break
+            x, y, yaw = self._base.pose
+            error_x = target_x - x
+            error_y = target_y - y
+            error_yaw = shortest_angle(target_yaw, yaw)
+            if math.hypot(error_x, error_y) < tolerance and abs(error_yaw) < yaw_tolerance:
+                arrived = True
+                break
+            world_vx = clamp(error_x, speed)
+            world_vy = clamp(error_y, speed)
+            twist = self._twist_type()
+            cos_yaw, sin_yaw = math.cos(yaw), math.sin(yaw)
+            twist.linear.x = cos_yaw * world_vx + sin_yaw * world_vy
+            twist.linear.y = -sin_yaw * world_vx + cos_yaw * world_vy
+            twist.angular.z = clamp(error_yaw, yaw_rate)
+            self._cmd_vel.publish(twist)
+            time.sleep(0.05)
+
+        stop = self._twist_type()
+        for _ in range(3):
+            self._cmd_vel.publish(stop)
+            time.sleep(0.02)
+        if not arrived and label:
+            self._logger.warning(f"{label}: servo ran out of time short of the goal")
+        return arrived
+
+    def _undock_if_docked(self, next_station):
+        """Back straight out of a dock before handing the base to Nav2.
+
+        A dock pose stands inside the bench's inflation - by design, that is
+        what docking means - and MPPI cannot sample a valid trajectory from
+        inside it, nor can the spin/backup recoveries turn there. Departure
+        therefore mirrors approach: the same odometry-driven straight line,
+        backwards, until the base is in free space. On hardware this is the
+        taught undock move every AGV performs before releasing to the planner.
+        """
+        x, y, yaw = self._base.pose
+        for station in self._cell.docks.stations:
+            dock_x, dock_y, dock_yaw = self._cell.taught_dock(station)
+            near = math.hypot(x - dock_x, y - dock_y) < 0.3
+            if not near or self._cell.layout.tag_ids.get(station) is None:
+                continue
+            retreat = self._node.get("nav.undock_retreat")
+            self._logger.info(
+                f"backing {retreat:.2f} m out of the {station} dock before "
+                f"navigating to {next_station}"
+            )
+            self._servo_to(
+                (
+                    x - math.cos(dock_yaw) * retreat,
+                    y - math.sin(dock_yaw) * retreat,
+                    yaw,
+                ),
+                self._node.get("dock.approach_speed"),
+                label=f"undock from {station}",
+            )
+            return
+
     def _navigate_nav2(self, handle, station, pose):
         # A goal can bounce off a stack that is technically active but still
         # warming up - a planner mid-activation, a TF tree one frame short.
         # Those are seconds-scale conditions, so absorb them here instead of
         # failing the whole cycle over a launch race.
+        # Idempotent pre-flight: every Nav2 node gets walked to `active` if it
+        # is not there already. A half-dead stack fails in shapes that are
+        # expensive to tell apart downstream (rejected goals, plans of zero
+        # poses, a controller starving on a static layer with no map), and
+        # this one check up front covers all of them for five quick service
+        # calls when everything is healthy.
+        self._kick_nav2_lifecycle()
         last = None
         for attempt in range(4):
             if handle.is_cancel_requested:
@@ -310,8 +447,71 @@ class Skills:
                     f"navigate to {station} attempt {attempt + 1} failed "
                     f"({error.error_code}); retrying"
                 )
+                self._kick_nav2_lifecycle()
                 time.sleep(3.0)
         raise last
+
+    NAV2_NODES = (
+        "map_server",
+        "amcl",
+        "planner_server",
+        "controller_server",
+        "behavior_server",
+        "bt_navigator",
+    )
+
+    def _call(self, client, request, timeout=15.0):
+        if not client.wait_for_service(timeout_sec=1.5):
+            return None
+        future = client.call_async(request)
+        deadline = time.monotonic() + timeout
+        while not future.done() and time.monotonic() < deadline:
+            time.sleep(0.05)
+        return future.result() if future.done() else None
+
+    def _kick_nav2_lifecycle(self):
+        """Walk every Nav2 node to `active`, one lifecycle step at a time.
+
+        The lifecycle manager's STARTUP replays the whole sequence and aborts
+        the moment it meets a node that is already active - which is exactly
+        the state a half-failed bringup leaves behind. Going node by node is
+        idempotent: active nodes are left alone, stuck ones get configure
+        and/or activate as needed.
+        """
+        from lifecycle_msgs.msg import Transition
+        from lifecycle_msgs.srv import ChangeState, GetState
+
+        for name in self.NAV2_NODES:
+            state_client = self._node.create_client(
+                GetState, f"{name}/get_state", callback_group=self._group
+            )
+            change_client = self._node.create_client(
+                ChangeState, f"{name}/change_state", callback_group=self._group
+            )
+            try:
+                result = self._call(state_client, GetState.Request(), timeout=5.0)
+                if result is None:
+                    self._logger.warning(f"lifecycle kick: {name} is not answering")
+                    continue
+                label = result.current_state.label
+                if label == "active":
+                    continue
+                if label == "unconfigured":
+                    request = ChangeState.Request()
+                    request.transition.id = Transition.TRANSITION_CONFIGURE
+                    if not self._call(change_client, request, timeout=30.0):
+                        self._logger.warning(f"lifecycle kick: {name} configure failed")
+                        continue
+                request = ChangeState.Request()
+                request.transition.id = Transition.TRANSITION_ACTIVATE
+                outcome = self._call(change_client, request, timeout=30.0)
+                self._logger.warning(
+                    f"lifecycle kick: {name} {label} -> "
+                    f"{'active' if outcome and outcome.success else 'STILL STUCK'}"
+                )
+            finally:
+                self._node.destroy_client(state_client)
+                self._node.destroy_client(change_client)
 
     def _navigate_nav2_once(self, handle, station, pose):
         from action_msgs.msg import GoalStatus
@@ -410,7 +610,12 @@ class Skills:
         # first; the visual loop then only has the odometry residual to fix,
         # which is its actual job.
         x, y, yaw = self._cell.taught_dock(station)
-        self._base.drive_to(x, y, yaw, label=f"{station} final approach")
+        self._servo_to(
+            (x, y, yaw),
+            self._node.get("base.linear_speed"),
+            label=f"{station} final approach",
+            cancel_check=lambda: handle.is_cancel_requested,
+        )
 
         self._cell.look_at_bench()
         while True:
@@ -467,24 +672,23 @@ class Skills:
 
             if decision.retreat:
                 x, y, yaw = self._base.pose
-                self._base.drive_to(
-                    x - math.cos(yaw) * decision.retreat,
-                    y - math.sin(yaw) * decision.retreat,
-                    yaw,
+                self._servo_to(
+                    (
+                        x - math.cos(yaw) * decision.retreat,
+                        y - math.sin(yaw) * decision.retreat,
+                        yaw,
+                    ),
+                    speed,
                     label=f"{station} dock retreat",
-                    exact=True,
-                    speed=speed,
+                    cancel_check=lambda: handle.is_cancel_requested,
                 )
             elif decision.step:
                 x, y, yaw = self._base.pose
                 step_x, step_y, step_yaw = decision.step
-                self._base.drive_to(
-                    x + step_x,
-                    y + step_y,
-                    yaw + step_yaw,
-                    label=None,
-                    exact=True,
-                    speed=speed,
+                self._servo_to(
+                    (x + step_x, y + step_y, yaw + step_yaw),
+                    speed,
+                    cancel_check=lambda: handle.is_cancel_requested,
                 )
 
     # -- perception --------------------------------------------------------
@@ -493,7 +697,7 @@ class Skills:
         report = self._phase_reporter(handle, DetectMaterial.Feedback())
         station = handle.request.station or "feeder"
         report(f"observing {station}")
-        pose, deviation = self._cell.observe_part(station)
+        pose, deviation = self._cell.observe_material(station)
         self._cell.track_workpiece(pose)
         result.grasp_pose.header.frame_id = self._cell.layout.frame_id
         result.grasp_pose.header.stamp = self._node.get_clock().now().to_msg()
@@ -516,7 +720,7 @@ class Skills:
             pose = given.pose
         else:
             report(f"re-observing {station}")
-            pose, _ = self._cell.observe_part(station)
+            pose, _ = self._cell.observe_material(station)
             self._cell.track_workpiece(pose)
         self._cell.pick(station, pose, phase=report)
         result.holding = self._cell.holding
@@ -550,6 +754,10 @@ class Skills:
 
         report("checking interlocks")
         self._watch.require_entry_permission()
+        # The finished part sits where the fixture put it: located through
+        # the tag like the fixture itself, because a clamp's whole point is
+        # that the part's position is structural (plan section 11). Vision
+        # detection is for loose material, whose position nothing guarantees.
         report("locating finished part")
         pose, _ = self._cell.observe_part(station)
         self._cell.track_workpiece(pose)

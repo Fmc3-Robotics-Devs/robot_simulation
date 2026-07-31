@@ -117,6 +117,9 @@ pick_place_task:
     # stock. Every dimension fits inside the 85 mm gripper opening.
     workpiece:
       size: [0.07, 0.07, 0.04]
+      # How the blank happens to lie on the feeder (scenery truth, degrees).
+      # The robot never reads this: the vision detector has to measure it.
+      spawn_yaw_deg: 18.0
 
     pocket:
       # Half-gap between the workpiece and each wall. Tight tolerances belong

@@ -100,6 +100,7 @@ def spawn_stock(stage, sim_utils, cell):
 # segments (home -> docks -> stations), because today's base drives blind.
 RACKS = [((-2.6, -2.6), 90.0), ((-2.8, 1.8), 0.0), ((0.6, 6.0), 0.0), ((4.6, -2.4), 0.0)]
 
+
 CARDBOARD = ((0.72, 0.58, 0.40), 0.8, 0.0)
 RACK_STEEL = ((0.30, 0.34, 0.40), 0.55, 0.3)
 
@@ -139,15 +140,50 @@ def spawn_rack(stage, sim_utils, name, centre, yaw_degrees):
         place(box, f"box_{index}", 0.0, dy, z + size / 2.0)
 
 
-def build(stage, sim_utils, cell, textures, warehouse_usd=None):
-    """Everything except the robot and the cameras."""
+def spawn_machining_center(sim_utils, cell, usd_path):
+    """The real 智能制造中心 shopfloor (converted from the customer's STEP).
+
+    The CAD is millimetres with its main aisle running along its own x; a
+    quarter turn lays that aisle along the cell's y axis, and the translation
+    puts the cell's three stations inside it. The surveyed station poses do
+    not move - the hall contributes walls, the office, and the machine row
+    (DMG, EMAG, MAG, ...) as real geometry around them, which is exactly what
+    the lidar and Nav2 should be seeing instead of invented clutter.
+
+    In world coordinates after this transform: the machine row stands west of
+    x = -2.5, the nearest workstation (M14) reaches x = -0.8 just south-west
+    of the robot's home, the east wall runs at x = 3.8 with its doorway at
+    y in [-4.2, 1.2], and the north wall sits at y = 9.6.
+    """
+    cfg = sim_utils.UsdFileCfg(usd_path=str(usd_path), scale=(0.001, 0.001, 0.001))
+    cfg.func(
+        "/World/machining_center",
+        cfg,
+        translation=(6.3, -20.0, cell["ground_z"]),
+        orientation=(0.7071068, 0.0, 0.0, 0.7071068),
+    )
+
+
+def build(stage, sim_utils, cell, textures, warehouse_usd=None, machining_center_usd=None):
+    """Everything except the robot and the cameras.
+
+    Two worlds share this entry point. The original warehouse cell dresses
+    itself: hand-built engraving machine, racks, the stock pile. The CAD
+    shopfloor (智能制造中心) *is* a scene already - a surveyed hall with its
+    own machine row - so it gets only what the task itself requires: three
+    benches, their tags, the workpiece. Nothing invented is added on top of a
+    customer's real layout.
+    """
     import apriltags
     import machine
     from cell import STATIONS
     from render_cell import spawn_textured_quad
 
     floor_z = cell["ground_z"]
-    if warehouse_usd:
+    if machining_center_usd:
+        # The hall brings its own floor, walls and machines.
+        spawn_machining_center(sim_utils, cell, machining_center_usd)
+    elif warehouse_usd:
         cfg = sim_utils.UsdFileCfg(usd_path=warehouse_usd)
         cfg.func("/World/warehouse", cfg, translation=(0.0, 0.0, floor_z))
     else:
@@ -156,7 +192,7 @@ def build(stage, sim_utils, cell, textures, warehouse_usd=None):
     spawn_lights(sim_utils, cell)
 
     for station in STATIONS:
-        if station == "machine":
+        if station == "machine" and not machining_center_usd:
             machine.spawn_machine(stage, sim_utils, cell)
         else:
             spawn_bench(stage, sim_utils, cell, station)
@@ -173,14 +209,20 @@ def build(stage, sim_utils, cell, textures, warehouse_usd=None):
             yaw_degrees=180.0,
         )
 
-    for index, (centre, yaw) in enumerate(RACKS):
-        spawn_rack(stage, sim_utils, f"rack_{index}", centre, yaw)
-
-    spawn_stock(stage, sim_utils, cell)
+    if not machining_center_usd:
+        for index, (centre, yaw) in enumerate(RACKS):
+            spawn_rack(stage, sim_utils, f"rack_{index}", centre, yaw)
+        spawn_stock(stage, sim_utils, cell)
     workpiece = sim_utils.CuboidCfg(
         size=tuple(cell["workpiece.size"]),
         visual_material=_surface(sim_utils, ALU_BLOCK),
     )
+    # The blank lies at whatever angle it happens to lie (scenery truth from
+    # task.yaml); the robot's vision has to measure it, never look it up.
+    spawn_yaw = math.radians(cell["workpiece.spawn_yaw_deg"])
     workpiece.func(
-        "/World/workpiece", workpiece, translation=cell.part_position("feeder")
+        "/World/workpiece",
+        workpiece,
+        translation=cell.part_position("feeder"),
+        orientation=(math.cos(spawn_yaw / 2.0), 0.0, 0.0, math.sin(spawn_yaw / 2.0)),
     )

@@ -91,6 +91,19 @@ def generate_launch_description():
             ],
             condition=LaunchConfigurationEquals("backend", "isaac"),
         ),
+        # apriltag pairs image and camera_info by exact stamp; Isaac's bridge
+        # stamps them from two separate graph nodes, so the relay re-stamps
+        # the (static) intrinsics with each image's own time. A real camera
+        # driver stamps both together and needs neither the relay nor the
+        # remap below.
+        Node(
+            package="franzi_skills",
+            executable="camera_stamp_relay",
+            name="camera_stamp_relay",
+            output="log",
+            parameters=[{"camera": "head_d435"}],
+            condition=LaunchConfigurationEquals("backend", "isaac"),
+        ),
         Node(
             package="apriltag_ros",
             executable="apriltag_node",
@@ -98,7 +111,7 @@ def generate_launch_description():
             output="log",
             remappings=[
                 ("image_rect", "/head_d435/color/image_raw"),
-                ("camera_info", "/head_d435/color/camera_info"),
+                ("camera_info", "/head_d435/color/synced_camera_info"),
             ],
             parameters=[apriltag_parameters],
             condition=LaunchConfigurationEquals("backend", "isaac"),
@@ -115,31 +128,105 @@ def generate_launch_description():
                 "the Isaac camera stream (run IssacSim/run_ros2_cell.sh too).",
             ),
             DeclareLaunchArgument(
+                "localization",
+                default_value="amcl",
+                description="amcl: lidar localization against the map, the "
+                "hardware pipeline. static: identity map->odom for debugging.",
+            ),
+            DeclareLaunchArgument(
+                "scene",
+                default_value="warehouse",
+                description="Which world the cell stands in: the original "
+                "warehouse, or the 智能制造中心 shopfloor (start Isaac with "
+                "--scene center to match). Selects the map and the taught "
+                "standby pose; the three station docks are identical.",
+            ),
+            DeclareLaunchArgument(
                 "nav",
                 default_value="false",
                 description="Coarse navigation through Nav2 on the built map "
                 "(map_server + AMCL + planner/controller) instead of the "
                 "kinematic base's direct drive.",
             ),
-            # Localization in this drift-free simulation is a static identity
-            # map -> odom: the kinematic odom *is* ground truth, and AMCL's
-            # scan-timing sensitivities added fragility without adding truth.
-            # On hardware this transform is AMCL's (or slam_toolbox
-            # localization's) job again - the map, the params and the taught
-            # poses all stay as they are.
+            # Localization exactly as the real cell runs it: AMCL closes
+            # map -> odom from the lidar against the built map. The kinematic
+            # odometry is simply a very good odom to it. `localization:=static`
+            # falls back to the identity transform for debugging runs where
+            # the particle filter itself is under suspicion.
             Node(
                 package="tf2_ros",
                 executable="static_transform_publisher",
                 name="map_odom_tf",
                 arguments=["--frame-id", "map", "--child-frame-id", "odom"],
-                condition=IfCondition(LaunchConfiguration("nav")),
+                condition=IfCondition(
+                    PythonExpression(
+                        [
+                            "'",
+                            LaunchConfiguration("nav"),
+                            "' == 'true' and '",
+                            LaunchConfiguration("localization"),
+                            "' == 'static'",
+                        ]
+                    )
+                ),
+            ),
+            Node(
+                package="nav2_amcl",
+                executable="amcl",
+                name="amcl",
+                output="log",
+                parameters=[
+                    str(skills_share / "config" / "nav2.yaml"),
+                    {
+                        # The taught standby pose of the active scene: where
+                        # skill_server wakes the base up.
+                        "initial_pose.x": ParameterValue(
+                            PythonExpression(
+                                ["0.0 if '", LaunchConfiguration("scene"), "' == 'center' else -7.0"]
+                            ),
+                            value_type=float,
+                        ),
+                        "initial_pose.y": ParameterValue(
+                            PythonExpression(
+                                ["-6.8 if '", LaunchConfiguration("scene"), "' == 'center' else -7.0"]
+                            ),
+                            value_type=float,
+                        ),
+                        "initial_pose.yaw": 0.67,
+                    },
+                ],
+                condition=IfCondition(
+                    PythonExpression(
+                        [
+                            "'",
+                            LaunchConfiguration("nav"),
+                            "' == 'true' and '",
+                            LaunchConfiguration("localization"),
+                            "' == 'amcl'",
+                        ]
+                    )
+                ),
             ),
             Node(
                 package="nav2_map_server",
                 executable="map_server",
                 name="map_server",
                 output="log",
-                parameters=[{"yaml_filename": str(skills_share / "maps" / "cell.yaml")}],
+                parameters=[
+                    {
+                        "yaml_filename": PythonExpression(
+                            [
+                                "'",
+                                str(skills_share / "maps"),
+                                "/center.yaml' if '",
+                                LaunchConfiguration("scene"),
+                                "' == 'center' else '",
+                                str(skills_share / "maps"),
+                                "/cell.yaml'",
+                            ]
+                        )
+                    }
+                ],
                 condition=IfCondition(LaunchConfiguration("nav")),
             ),
             Node(
@@ -174,24 +261,36 @@ def generate_launch_description():
                     ("nav2_bt_navigator", "bt_navigator", "bt_navigator"),
                 ]
             ],
-            Node(
-                package="nav2_lifecycle_manager",
-                executable="lifecycle_manager",
-                name="lifecycle_manager_navigation",
-                output="log",
-                parameters=[
-                    {
-                        "autostart": True,
-                        "bond_timeout": 20.0,
-                        "node_names": [
-                            "planner_server",
-                            "controller_server",
-                            "behavior_server",
-                            "bt_navigator",
+            # Delayed behind the map manager: the global costmap's static
+            # layer blocks its activation on /map, and on this machine that
+            # wait has been seen to outlast the manager's service timeout,
+            # aborting the whole bringup. Letting the map go active first
+            # removes the race; the skill layer's lifecycle kick (on
+            # NAV_REJECTED) remains as the second line of defence.
+            TimerAction(
+                period=4.0,
+                actions=[
+                    Node(
+                        package="nav2_lifecycle_manager",
+                        executable="lifecycle_manager",
+                        name="lifecycle_manager_navigation",
+                        output="log",
+                        parameters=[
+                            {
+                                "autostart": True,
+                                "bond_timeout": 20.0,
+                                "service_introspection_mode": "disabled",
+                                "node_names": [
+                                    "planner_server",
+                                    "controller_server",
+                                    "behavior_server",
+                                    "bt_navigator",
+                                ],
+                            }
                         ],
-                    }
+                        condition=IfCondition(LaunchConfiguration("nav")),
+                    )
                 ],
-                condition=IfCondition(LaunchConfiguration("nav")),
             ),
             DeclareLaunchArgument(
                 "autostart",
@@ -277,6 +376,38 @@ def generate_launch_description():
                                         ]
                                     ),
                                     value_type=float,
+                                ),
+                                # Loose material is measured in the depth
+                                # image when there are real images to measure
+                                # in; the RViz backend has none and infers
+                                # from the tag as before.
+                                "material_detection.mode": ParameterValue(
+                                    PythonExpression(
+                                        [
+                                            "'vision' if '",
+                                            LaunchConfiguration("backend"),
+                                            "' == 'isaac' else 'tag'",
+                                        ]
+                                    ),
+                                    value_type=str,
+                                ),
+                                # The shopfloor scene keeps its own standby
+                                # pose; empty falls back to the warehouse book.
+                                "dock_poses_file": ParameterValue(
+                                    PythonExpression(
+                                        [
+                                            "'",
+                                            str(
+                                                pick_place_share
+                                                / "config"
+                                                / "dock_poses_center.yaml"
+                                            ),
+                                            "' if '",
+                                            LaunchConfiguration("scene"),
+                                            "' == 'center' else ''",
+                                        ]
+                                    ),
+                                    value_type=str,
                                 ),
                             },
                         ],

@@ -90,6 +90,23 @@ ffmpeg -i in.mp4 -c:v libx264 -pix_fmt yuv420p -movflags +faststart out.mp4
 RViz 导航视图无头录屏:`Xvfb :77` + `rviz2 -d config/nav_view.rviz`
 (`LIBGL_ALWAYS_SOFTWARE=1`)+ `ffmpeg -f x11grab -i :77`。
 
+## 部署一致性(2026-07-29,无上帝视角)
+
+仿真链路与真机部署方案逐环对齐,任何控制/感知环节都不再依赖仿真特权信息:
+
+| 环节 | 实现(仿真=真机同款) |
+|---|---|
+| 定位 | **AMCL**(雷达 × 地图,`localization:=amcl` 默认;static 仅调试) |
+| 粗导航 | Nav2(NavigateToPose,cmd_vel 输出) |
+| 精停靠/undock | **cmd_vel 速度环**(P 控制 + 饱和 + 最低速 + 时间预算,`_servo_to`) |
+| 来料检测 | **RGB 视觉识别**(射线交已知台面,方案 §5.4;分割=大亮块且无黑格,与 tag 天然区分;残差经勘测基准标定 `material_detection.bias_xy`) |
+| 取成品 | 结构定位(tag→夹具,方案 §11:夹具的意义就是位置由结构保证) |
+| 观察视角 | 立柱 CCTV(场景里有真实的杆和相机盒)、机载相机、RViz —— 无悬浮/跟随机位 |
+
+实测(warehouse 场景):AMCL+cmd_vel 停靠 0.1–6.3 mm,RGB 视觉检出与勘测差 8–9 mm,连续多轮全周期 DONE。深度检测路线保留(`material_detection.source:=depth`,真机 RealSense 出厂深度标定可信时优先);Isaac 渲染的深度通道纵向内参与 camera_info 不符(实测 fy 803.7 vs 931.5),故仿真默认 RGB 路线。
+
+成片:`IssacSim/renders/deployment/`——`cctv.mp4`(立柱监控)、`onboard_quad.mp4`(机载四相机 2×2)、`rviz_nav.mp4`(地图+AMCL+路径+轨迹)。
+
 ## 测试
 
 ```bash
@@ -116,6 +133,37 @@ ros2 run nav2_map_server map_saver_cli -f src/franzi_skills/maps/cell
 # 带导航跑整周期
 ros2 launch franzi_skills tending_cell.launch.py backend:=isaac nav:=true
 ```
+
+## 场景:仓库 cell 与智能制造中心(客户 STEP)
+
+两个世界,同一套控制栈。默认是原来的仓库 cell(手搭雕刻机、货架、料堆);
+`scene:=center` 换成客户 `IssacSim/scene/智能制造中心.stp` 转换出的真实车间
+(`IssacSim/usd/machining_center.usd`,HOOPS 转换,mm→m)。车间本身就是场
+景 —— 厂房、办公区、DMG/EMAG/MAG 等设备排原样进入,工位只保留任务必需的
+三张桌台和 tag,不往客户布局里添加虚构装饰。
+
+```bash
+IssacSim/run_ros2_cell.sh --scene center        # Isaac 侧
+ros2 launch franzi_skills tending_cell.launch.py \
+  backend:=isaac nav:=true scene:=center        # ROS 侧
+```
+
+`scene:=center` 自动切换:地图(`maps/center.*` vs `maps/cell.*`)与待命点
+(`dock_poses_center.yaml`,旧 home 的墙角在车间里是设备区)。三个工位坐标
+两个场景完全一致,示教/检测/抓取零改动。建图:`mapping_drive --scene center`。
+车间在世界系中转了 90°,其主走廊沿三工位一列铺开;设备排在走廊西侧
+(x ≤ -0.8),东墙 x = 3.8(门洞 y ∈ [-4.2, 1.2]),北墙 y = 9.6。
+
+实测(2026-07,center 场景 + Nav2 + 真视觉):停靠 1.2–2.9 mm,检测偏差
+3.7–6.0 mm,完整周期 DONE。场景巡游视频:`IssacSim/renders/shopfloor_tour.mp4`。
+
+两个 Isaac 后端专用的接缝修复,真机上都不需要:
+- **undock**:停靠位本来就在工位桌的 inflation 里,MPPI 从那里起不了步,
+  导航技能起手先按里程计直线倒出 0.6 m(`nav.undock_retreat`)再交给
+  Nav2 —— 与"到位后按里程计补进"对称,真实 AGV 也这么做;
+- **camera_stamp_relay**:apriltag 按"时间戳完全相等"配对 image 与
+  camera_info,Isaac 的桥从两个节点分别打戳永远配不上;中继把(静态的)
+  内参改写成每帧图像自己的时间戳。真相机驱动两者同戳,无需此件。
 
 `nav:=true` 起 Nav2 四件套(NavFn 全局规划 + MPPI 控制 + behaviors +
 bt_navigator,controller 直出 /cmd_vel)+ map_server。仿真中定位是恒等

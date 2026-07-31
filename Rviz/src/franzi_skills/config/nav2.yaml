@@ -481,3 +481,30 @@ lifecycle_manager_navigation:
   ros__parameters:
     bond_timeout: 30.0
     attempt_respawn_reconnection: true
+
+amcl:
+  ros__parameters:
+    # Localization the way the real cell will run it: particle filter over
+    # the lidar against the built map. The kinematic simulator's odometry is
+    # drift-free, which AMCL simply experiences as a very good odom - the
+    # pipeline, frames and parameters are the hardware ones.
+    base_frame_id: moveit_root
+    odom_frame_id: odom
+    global_frame_id: map
+    scan_topic: scan
+    robot_model_type: nav2_amcl::OmniMotionModel
+    laser_model_type: likelihood_field
+    max_particles: 1500
+    min_particles: 300
+    update_min_d: 0.05
+    update_min_a: 0.05
+    resample_interval: 1
+    transform_tolerance: 0.5
+    always_reset_initial_pose: false
+    set_initial_pose: true
+    # Overridden by the launch file with the taught standby pose.
+    initial_pose:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      yaw: 0.0

@@ -24,6 +24,17 @@ apriltag_ros  ◀──────────────────── �
 布局单一真源是 `Rviz/src/franzi_pick_place/config/task.yaml`,`cell.py`
 直接读它,两个仿真器不会漂移。
 
+## 场景
+
+`ros2_cell.py --scene {warehouse,center,none}`:默认 warehouse(原 cell:
+手搭雕刻机 + 货架 + 料堆);`center` 加载客户 STEP 转换的智能制造中心
+(`usd/machining_center.usd`,scene/智能制造中心.stp 经 Isaac 的 HOOPS
+CAD converter 转换,毫米单位)。center 场景里车间本身就是世界 —— 只放
+任务必需的三张桌台和 tag,machine 工位也用桌台(CAD 的 DMG 在走廊对面
+作为真实背景),不 spawn 手搭机床/货架/料堆。变换:绕 z 转 90° +
+平移 (6.3, -20, ground_z),使车间主走廊沿三工位一列铺开;ROS 侧配套
+`scene:=center`(地图与待命点自动切换,见 franzi_skills/README.md)。
+
 ## 文件
 
 - `ros2_cell.py` — 主入口:建 cell、镜像、发布相机与雷达。

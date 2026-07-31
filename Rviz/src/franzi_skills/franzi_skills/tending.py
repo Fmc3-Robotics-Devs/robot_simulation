@@ -137,6 +137,25 @@ class TendingCell:
         )
         self._docks = DockBook.load(default_dock_poses_file(node))
 
+        # Vision path for loose material (plan section 5.4): the part's pose
+        # is measured from the head camera's depth image. Tag paths stay for
+        # docking and fixtures. "tag" mode keeps the old behaviour for the
+        # RViz backend, which has no images to offer.
+        self._material_detector = None
+        if node.get("material_detection.mode") == "vision":
+            from .block_detector import DepthBlockDetector
+
+            # The depth pixels live in the optical frame the images are
+            # stamped with - not the camera link, which sits a quarter turn
+            # rolled from it (see the head_optical_tf static transform).
+            self._material_detector = DepthBlockDetector(
+                node,
+                self._tf_buffer,
+                camera="head_d435",
+                camera_frame="head_d435_optical",
+                fy_override=node.get("material_detection.depth_fy"),
+            )
+
         self._holding = False
         self._workpiece_in_scene = False
         # Contact allowances left open after a placement, closed once the arm
@@ -215,13 +234,19 @@ class TendingCell:
         return tcp_to_tip(tcp_pose, self._tcp_offset)
 
     def _grasp_tcp(self, resting_pose):
+        # The rest pose's own yaw turns the jaws with the part: measured by
+        # the vision detector, near zero from the tag path. A square part
+        # grasped 45 degrees off is wider than the jaws open.
+        part_yaw = 2.0 * math.atan2(
+            resting_pose.orientation.z, resting_pose.orientation.w
+        )
         return make_pose(
             (
                 resting_pose.position.x,
                 resting_pose.position.y,
                 resting_pose.position.z + self._node.get("grasp_height_offset"),
             ),
-            self._grasp_orientation,
+            quaternion_from_rpy(0.0, 0.0, self._node.get("grasp_yaw") + part_yaw),
         )
 
     def _base_to_world(self, pose):
@@ -298,6 +323,65 @@ class TendingCell:
             )
         except RuntimeError as error:
             raise SkillFailure("TAG_NOT_VISIBLE", str(error)) from error
+
+    def observe_material(self, station):
+        """Where the loose part actually is - measured, not inferred.
+
+        With the vision detector on (Isaac and hardware), the part's pose
+        comes out of the depth image: pixels, not survey offsets. The tag
+        keeps two jobs it is genuinely better at - docking the base, and
+        locating *fixtures* (the pocket, the outfeed drop point), which are
+        structure, not material. Without the detector this falls back to the
+        tag-offset path, which is all the RViz backend can render.
+        """
+        if self._material_detector is None:
+            pose, deviation = self.observe_part(station)
+            return pose, deviation
+
+        self.look_at_bench()
+        self._node.get_clock().sleep_for(
+            Duration(seconds=self._node.get("tag_settle"))
+        )
+        truth = self._layout.part_pose(station)
+        found = self._material_detector.detect(
+            self._layout.bench_top_z,
+            (truth.position.x, truth.position.y),
+            part_height=self._layout.workpiece_size[2],
+            source=self._node.get("material_detection.source"),
+            timeout=self._node.get("tag_timeout"),
+            debug_dir=self._node.get("material_detection.debug_dir"),
+            label=station,
+        )
+        if found is None:
+            raise SkillFailure(
+                "MATERIAL_NOT_FOUND",
+                f"no part visible in the depth window at {station}",
+            )
+        x, y, yaw = found
+        bias = self._node.get("material_detection.bias_xy")
+        x -= bias[0]
+        y -= bias[1]
+        pose = make_pose(
+            (x, y, self._layout.bench_top_z + self._layout.workpiece_size[2] / 2.0),
+            quaternion_from_rpy(0.0, 0.0, yaw),
+        )
+        deviation = math.dist(
+            (x, y), (truth.position.x, truth.position.y)
+        )
+        self._logger.info(
+            f"{station}: depth detector sees the part at ({x:.3f}, {y:.3f}), "
+            f"yaw {math.degrees(yaw):.1f} deg, {deviation * 1000:.1f} mm from the survey"
+        )
+        limit = self._node.get("max_survey_deviation")
+        if deviation > limit:
+            raise SkillFailure(
+                "SURVEY_MISMATCH",
+                f"vision places the part {deviation * 1000:.0f} mm from the survey "
+                f"(limit {limit * 1000:.0f} mm)",
+            )
+        if not self._holding:
+            self._workpiece_rest = pose
+        return pose, deviation
 
     def observe_part(self, station):
         """Part rest pose from the tag, with its deviation from the survey.

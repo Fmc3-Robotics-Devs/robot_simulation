@@ -21,7 +21,7 @@ setup(
         ),
         (
             f"share/{package_name}/maps",
-            [str(path) for path in Path("maps").glob("cell.*")],
+            [str(path) for path in Path("maps").glob("*.*")],
         ),
     ],
     install_requires=["setuptools"],
@@ -34,6 +34,7 @@ setup(
         "console_scripts": [
             "skill_server = franzi_skills.skill_server:main",
             "camera_recorder = franzi_skills.camera_recorder:main",
+            "camera_stamp_relay = franzi_skills.camera_stamp_relay:main",
             "mapping_drive = franzi_skills.mapping_drive:main",
         ],
     },

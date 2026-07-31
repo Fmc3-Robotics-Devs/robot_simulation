@@ -70,6 +70,7 @@ states:
 
   MOVE_TRANSPORT_POSE:
     action: {kind: skill, skill: move_safe, posture: transport}
+    max_retry: 2
     timeout: 30.0
     error_code: ARM_FAILED
     failure_transition: RECOVERY
@@ -143,6 +144,7 @@ states:
     # robot_clear rises only when this state has actually succeeded.
     action: {kind: skill, skill: move_safe, posture: machine_safe}
     signals_on_success: {robot_clear: true}
+    max_retry: 2
     timeout: 30.0
     error_code: ARM_FAILED
     failure_transition: RECOVERY
@@ -238,6 +240,7 @@ states:
     # part, and only then may the base drive anywhere.
     action: {kind: skill, skill: move_safe, posture: machine_safe}
     signals_on_success: {robot_clear: true}
+    max_retry: 2
     timeout: 30.0
     error_code: ARM_FAILED
     failure_transition: RECOVERY
@@ -269,6 +272,7 @@ states:
 
   RETURN_HOME:
     action: {kind: skill, skill: move_safe, posture: transport}
+    max_retry: 2
     timeout: 30.0
     error_code: ARM_FAILED
     failure_transition: FAULT

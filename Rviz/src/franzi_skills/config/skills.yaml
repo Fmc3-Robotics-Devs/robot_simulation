@@ -18,6 +18,13 @@ skill_server:
     max_survey_deviation: 0.10
     # How long the machine's presence sensor may take to see a loaded part.
     material_wait: 3.0
+    # Depth-channel fy from the bench-plane calibration; Isaac's renderer
+    # resolves the vertical aperture differently from the published info.
+    material_detection.depth_fy: 803.7
+    # Vision-chain residual, calibrated against the surveyed reference:
+    # the renderer's vertical field of view differs slightly from the
+    # published intrinsics, which projects as a fixed forward offset.
+    material_detection.bias_xy: [0.0, 0.0]
 
     # Precise docking (plan sections 8.6 - 8.9 and the appendix defaults).
     dock.position_tolerance: 0.008
@@ -34,6 +41,9 @@ skill_server:
     dock.max_iterations: 60
     dock.approach_speed: 0.08
     dock.observe_timeout: 1.5
+    # Straight-back distance out of a dock before a Nav2 goal is sent: the
+    # dock pose sits inside the bench's inflation where MPPI cannot start.
+    nav.undock_retreat: 0.6
 
     # Outfeed tray (plan section 9.5).
     tray.rows: 1
