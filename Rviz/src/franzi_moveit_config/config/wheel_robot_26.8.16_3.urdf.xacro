@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="wheel_robot_4.0">
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="wheel_robot_26.8.16_3">
   <!-- Keep the source description unchanged and add a massless root only for
        KDL, which cannot represent inertia on the root link. -->
-  <xacro:include filename="$(find franzi_description)/urdf/wheel_robot_4.0.urdf"/>
+  <xacro:include filename="$(find franzi_description)/urdf/wheel_robot_26.8.16_3.urdf"/>
 
   <link name="moveit_root"/>
   <joint name="moveit_root_joint" type="fixed">

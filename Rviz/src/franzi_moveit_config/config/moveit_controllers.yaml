@@ -59,16 +59,16 @@ moveit_simple_controller_manager:
     action_ns: follow_joint_trajectory
     default: true
     joints:
-      - leftfinger1_joint
-      - leftfinger2_joint
+      - left_finger01_joint
+      - left_finger02_joint
 
   right_gripper_controller:
     type: FollowJointTrajectory
     action_ns: follow_joint_trajectory
     default: true
     joints:
-      - rightfinger1_joint
-      - rightfinger2_joint
+      - right_finger01_joint
+      - right_finger02_joint
 
 trajectory_execution:
   allowed_execution_duration_scaling: 1.2

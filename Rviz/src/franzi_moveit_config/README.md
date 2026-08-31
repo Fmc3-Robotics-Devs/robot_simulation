@@ -19,7 +19,15 @@ Configured planning groups:
 
 The gripper `open` / `closed` named states follow the finger geometry: the two
 finger joints sit 95 mm apart and travel towards each other, so joint zero is
-fully open and the travel limits (0.0475 / -0.0475) are fully closed.
+fully open and the travel limits (0.0475 / -0.0475) are fully closed. Which of
+the two signs closes differs per side — the export gives each finger the range
+that keeps it inside the gripper, so the left arm closes on
+`(-0.0475, +0.0475)` and the right on `(+0.0475, -0.0475)`.
+
+The chassis mesh and inertia live on `base_body_Link`, not on `base_link`:
+`franzi_description` puts a massless REP-103 `base_link` in front of the
+SolidWorks root to undo the export's frame convention. The collision matrix
+names `base_body_Link` for that reason; see that package's README.
 
 The demo includes virtual `FollowJointTrajectory` controllers, so planned
 motion is animated in RViz without sending commands to hardware. The virtual
@@ -33,6 +41,19 @@ Build, from the `Rviz/` workspace root:
 source /opt/ros/jazzy/setup.bash
 colcon build --symlink-install --packages-select franzi_description franzi_moveit_config
 ```
+
+## Validate
+
+After any URDF re-export, with the workspace sourced:
+
+```bash
+python3 src/franzi_moveit_config/scripts/check_moveit_config.py
+```
+
+This builds the MoveIt `RobotModel` from the xacro + SRDF and checks that every
+joint and link the SRDF names still exists in the URDF, and that every named
+group state (`work`, `look_down`, `open`, `closed`, …) is self-collision-free.
+Run `franzi_description`'s `check_description.py` first for the geometry checks.
 
 Launch the RViz demo with virtual trajectory execution:
 

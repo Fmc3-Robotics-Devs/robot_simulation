@@ -43,8 +43,8 @@ CONTROLLERS = {
         "right_wrist_pitch_joint",
         "right_wrist_roll_joint",
     ),
-    "left_gripper_controller": ("leftfinger1_joint", "leftfinger2_joint"),
-    "right_gripper_controller": ("rightfinger1_joint", "rightfinger2_joint"),
+    "left_gripper_controller": ("left_finger01_joint", "left_finger02_joint"),
+    "right_gripper_controller": ("right_finger01_joint", "right_finger02_joint"),
 }
 
 
@@ -63,7 +63,7 @@ def load_initial_joint_state(skip=()):
     urdf_path = (
         Path(get_package_share_directory("franzi_description"))
         / "urdf"
-        / "wheel_robot_4.0.urdf"
+        / "wheel_robot_26.8.16_3.urdf"
     )
     root = ElementTree.parse(urdf_path).getroot()
 

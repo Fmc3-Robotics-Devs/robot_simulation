@@ -10,7 +10,9 @@ install(
   PATTERN "__pycache__" EXCLUDE
 )
 install(
-  PROGRAMS scripts/demo_joint_state_publisher.py
+  PROGRAMS
+    scripts/demo_joint_state_publisher.py
+    scripts/check_moveit_config.py
   DESTINATION lib/${PROJECT_NAME}
 )
 install(FILES .setup_assistant README.md DESTINATION share/${PROJECT_NAME})

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<robot name="wheel_robot_4.0">
+<robot name="wheel_robot_26.8.16_3">
   <!-- Fixed-base configuration for RViz and manipulation planning. -->
   <!-- The chassis is a driven three-wheel omnidirectional platform, so the
        robot root floats in the plane. Its pose has to be supplied as an
@@ -41,12 +41,12 @@
   </group>
 
   <group name="left_gripper">
-    <joint name="leftfinger1_joint"/>
-    <joint name="leftfinger2_joint"/>
+    <joint name="left_finger01_joint"/>
+    <joint name="left_finger02_joint"/>
   </group>
   <group name="right_gripper">
-    <joint name="rightfinger1_joint"/>
-    <joint name="rightfinger2_joint"/>
+    <joint name="right_finger01_joint"/>
+    <joint name="right_finger02_joint"/>
   </group>
 
   <!-- Work posture: -28, 56, -28, 0 degrees. -->
@@ -88,24 +88,28 @@
     <joint name="right_wrist_pitch_joint" value="0"/>
     <joint name="right_wrist_roll_joint" value="0"/>
   </group_state>
-  <!-- The finger joint origins are 95 mm apart in x and both fingers travel
-       towards that midpoint, so joint zero is fully open and the travel limits
-       are fully closed:  gap = 0.095 - (finger1 - finger2). -->
+  <!-- The finger joint origins are 95 mm apart and both fingers travel towards
+       that midpoint, so joint zero is fully open and the travel limits are
+       fully closed:  gap = 0.095 - |finger01| - |finger02|.
+       The sign that closes differs per side, because this export gives each
+       finger the limit range that keeps it inside the gripper:  on the left
+       finger01 runs [-0.0475, 0] and finger02 [0, 0.0475], on the right the
+       two are the other way round. -->
   <group_state name="open" group="left_gripper">
-    <joint name="leftfinger1_joint" value="0"/>
-    <joint name="leftfinger2_joint" value="0"/>
+    <joint name="left_finger01_joint" value="0"/>
+    <joint name="left_finger02_joint" value="0"/>
   </group_state>
   <group_state name="closed" group="left_gripper">
-    <joint name="leftfinger1_joint" value="0.0475"/>
-    <joint name="leftfinger2_joint" value="-0.0475"/>
+    <joint name="left_finger01_joint" value="-0.0475"/>
+    <joint name="left_finger02_joint" value="0.0475"/>
   </group_state>
   <group_state name="open" group="right_gripper">
-    <joint name="rightfinger1_joint" value="0"/>
-    <joint name="rightfinger2_joint" value="0"/>
+    <joint name="right_finger01_joint" value="0"/>
+    <joint name="right_finger02_joint" value="0"/>
   </group_state>
   <group_state name="closed" group="right_gripper">
-    <joint name="rightfinger1_joint" value="0.0475"/>
-    <joint name="rightfinger2_joint" value="-0.0475"/>
+    <joint name="right_finger01_joint" value="0.0475"/>
+    <joint name="right_finger02_joint" value="-0.0475"/>
   </group_state>
 
   <end_effector name="left_gripper" parent_link="left_wrist_roll_Link"
@@ -113,9 +117,14 @@
   <end_effector name="right_gripper" parent_link="right_wrist_roll_Link"
                 group="right_gripper" parent_group="right_arm"/>
 
-  <!-- Only adjacent link pairs are disabled. This is conservative and avoids
-       trusting a low-density "never collides" sampling result. -->
-  <disable_collisions link1="base_link" link2="calf_Link" reason="Adjacent"/>
+  <!-- Adjacent link pairs, plus a few hand-picked pairs that always overlap
+       by construction (the wrist_roll/finger/D405 carry-overs and the two
+       fingers meeting when closed). No low-density "never collides" sampling
+       results are trusted.
+       base_link and moveit_root are massless frames with no geometry of their
+       own; the chassis mesh sits on base_body_Link. -->
+  <disable_collisions link1="base_body_Link" link2="calf_Link" reason="Adjacent"/>
+  <disable_collisions link1="base_link" link2="base_body_Link" reason="Adjacent"/>
   <disable_collisions link1="moveit_root" link2="base_link" reason="Adjacent"/>
   <disable_collisions link1="calf_Link" link2="thigh_Link" reason="Adjacent"/>
   <disable_collisions link1="thigh_Link" link2="waist_Link" reason="Adjacent"/>
@@ -124,35 +133,55 @@
   <disable_collisions link1="head_yaw_Link" link2="head_pitch_Link" reason="Adjacent"/>
   <disable_collisions link1="head_pitch_Link" link2="head_d435_Link" reason="Adjacent"/>
 
-  <disable_collisions link1="torso_Link" link2="left_shoulder_pitch_Link" reason="Adjacent"/>
+  <!-- This export inserts a fixed j0 link between the torso and each shoulder,
+       and mounts the fingers and the wrist D405 on a gripper link instead of
+       hanging them straight off wrist_roll. -->
+  <disable_collisions link1="torso_Link" link2="left_j0_Link" reason="Adjacent"/>
+  <disable_collisions link1="left_j0_Link" link2="left_shoulder_pitch_Link" reason="Adjacent"/>
   <disable_collisions link1="left_shoulder_pitch_Link" link2="left_shoulder_roll_Link" reason="Adjacent"/>
   <disable_collisions link1="left_shoulder_roll_Link" link2="left_shoulder_yaw_Link" reason="Adjacent"/>
   <disable_collisions link1="left_shoulder_yaw_Link" link2="left_elbow_pitch_Link" reason="Adjacent"/>
   <disable_collisions link1="left_elbow_pitch_Link" link2="left_wrist_yaw_Link" reason="Adjacent"/>
   <disable_collisions link1="left_wrist_yaw_Link" link2="left_wrist_pitch_Link" reason="Adjacent"/>
   <disable_collisions link1="left_wrist_pitch_Link" link2="left_wrist_roll_Link" reason="Adjacent"/>
-  <disable_collisions link1="left_wrist_roll_Link" link2="leftfinger1_Link" reason="Adjacent"/>
-  <disable_collisions link1="left_wrist_roll_Link" link2="leftfinger2_Link" reason="Adjacent"/>
-  <disable_collisions link1="left_wrist_roll_Link" link2="left_wrist_d405_Link" reason="Adjacent"/>
+  <disable_collisions link1="left_wrist_roll_Link" link2="left_gripper_link" reason="Adjacent"/>
+  <disable_collisions link1="left_gripper_link" link2="left_finger01_Link" reason="Adjacent"/>
+  <disable_collisions link1="left_gripper_link" link2="left_finger02_Link" reason="Adjacent"/>
+  <disable_collisions link1="left_gripper_link" link2="left_D405_Link" reason="Adjacent"/>
+  <!-- The two fingers are built to meet: the "closed" state drives them to a
+       0 mm gap where the fingertips touch. Nothing plans one finger against
+       the other, so this pair is disabled to keep "closed" collision-free. -->
+  <disable_collisions link1="left_finger01_Link" link2="left_finger02_Link" reason="User"/>
+  <!-- Carried over from the previous model, where these hung directly off
+       wrist_roll and were disabled as adjacent. -->
+  <disable_collisions link1="left_wrist_roll_Link" link2="left_finger01_Link" reason="Never"/>
+  <disable_collisions link1="left_wrist_roll_Link" link2="left_finger02_Link" reason="Never"/>
+  <disable_collisions link1="left_wrist_roll_Link" link2="left_D405_Link" reason="Never"/>
 
-  <disable_collisions link1="torso_Link" link2="right_shoulder_pitch_Link" reason="Adjacent"/>
+  <disable_collisions link1="torso_Link" link2="right_j0_Link" reason="Adjacent"/>
+  <disable_collisions link1="right_j0_Link" link2="right_shoulder_pitch_Link" reason="Adjacent"/>
   <disable_collisions link1="right_shoulder_pitch_Link" link2="right_shoulder_roll_Link" reason="Adjacent"/>
   <disable_collisions link1="right_shoulder_roll_Link" link2="right_shoulder_yaw_Link" reason="Adjacent"/>
   <disable_collisions link1="right_shoulder_yaw_Link" link2="right_elbow_pitch_Link" reason="Adjacent"/>
   <disable_collisions link1="right_elbow_pitch_Link" link2="right_wrist_yaw_Link" reason="Adjacent"/>
   <disable_collisions link1="right_wrist_yaw_Link" link2="right_wrist_pitch_Link" reason="Adjacent"/>
   <disable_collisions link1="right_wrist_pitch_Link" link2="right_wrist_roll_Link" reason="Adjacent"/>
-  <disable_collisions link1="right_wrist_roll_Link" link2="rightfinger1_Link" reason="Adjacent"/>
-  <disable_collisions link1="right_wrist_roll_Link" link2="rightfinger2_Link" reason="Adjacent"/>
-  <disable_collisions link1="right_wrist_roll_Link" link2="right_wrist_d405_Link" reason="Adjacent"/>
+  <disable_collisions link1="right_wrist_roll_Link" link2="right_gripper_Link" reason="Adjacent"/>
+  <disable_collisions link1="right_gripper_Link" link2="right_finger01_Link" reason="Adjacent"/>
+  <disable_collisions link1="right_gripper_Link" link2="right_finger02_Link" reason="Adjacent"/>
+  <disable_collisions link1="right_gripper_Link" link2="right_D405_Link" reason="Adjacent"/>
+  <disable_collisions link1="right_finger01_Link" link2="right_finger02_Link" reason="User"/>
+  <disable_collisions link1="right_wrist_roll_Link" link2="right_finger01_Link" reason="Never"/>
+  <disable_collisions link1="right_wrist_roll_Link" link2="right_finger02_Link" reason="Never"/>
+  <disable_collisions link1="right_wrist_roll_Link" link2="right_D405_Link" reason="Never"/>
 
   <disable_collisions link1="torso_Link" link2="body_d435_Link" reason="Adjacent"/>
-  <disable_collisions link1="base_link" link2="left_front_steering_Link" reason="Adjacent"/>
+  <disable_collisions link1="base_body_Link" link2="left_front_steering_Link" reason="Adjacent"/>
   <disable_collisions link1="left_front_steering_Link" link2="left_front_wheel_Link" reason="Adjacent"/>
-  <disable_collisions link1="base_link" link2="right_front_steering_Link" reason="Adjacent"/>
+  <disable_collisions link1="base_body_Link" link2="right_front_steering_Link" reason="Adjacent"/>
   <disable_collisions link1="right_front_steering_Link" link2="right_front_wheel_Link" reason="Adjacent"/>
-  <disable_collisions link1="base_link" link2="rear_steering_Link" reason="Adjacent"/>
+  <disable_collisions link1="base_body_Link" link2="rear_steering_Link" reason="Adjacent"/>
   <disable_collisions link1="rear_steering_Link" link2="rear_wheel_Link" reason="Adjacent"/>
-  <disable_collisions link1="base_link" link2="MID360_Link" reason="Adjacent"/>
-  <disable_collisions link1="base_link" link2="2Dlidar_Link" reason="Adjacent"/>
+  <disable_collisions link1="base_body_Link" link2="MID360_Link" reason="Adjacent"/>
+  <disable_collisions link1="base_body_Link" link2="2Dlidar_Link" reason="Adjacent"/>
 </robot>
