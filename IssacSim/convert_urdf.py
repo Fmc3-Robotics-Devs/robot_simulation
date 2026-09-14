@@ -16,7 +16,7 @@ Two things have to be got right here or the result is quietly useless:
 
 Run with the Isaac environment, not the ROS one:
 
-    conda run -n env_isaaclab python IssacSim/convert_urdf.py
+    conda run -n env_isaaclab_6 python IssacSim/convert_urdf.py
 """
 
 import argparse
@@ -90,7 +90,7 @@ def main():
     parser.add_argument(
         "--output",
         default=str(REPO / "IssacSim" / "usd" / "franzi.usd"),
-        help="Where to write the converted USD.",
+        help="Output directory for the converted USD (Isaac Sim 6 derives the final filename).",
     )
     parser.add_argument(
         "--fix-base",

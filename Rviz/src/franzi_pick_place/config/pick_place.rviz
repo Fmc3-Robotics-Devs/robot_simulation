@@ -4,10 +4,6 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /MotionPlanning1
-  - Class: rviz_common/Help
-    Name: Help
-  - Class: rviz_common/Views
-    Name: Views
 Visualization Manager:
   Displays:
     - Class: rviz_default_plugins/Grid

@@ -15,7 +15,12 @@ Simulation of the Franzi mobile manipulator for an engraving-machine tending cel
   *sensors and world only*: it mirrors `/joint_states` + `/base/pose` from the ROS stack
   and publishes rendered cameras (`/head_d435/color/…`) and RTX lidar (`/scan`,
   `/mid360/points`). It runs no control.
-- `Mujoco/` — placeholder, empty.
+- `Mujoco/` — standalone MuJoCo *physics* model of the robot (not yet bridged to ROS).
+  `convert_urdf.py` builds `model/` (gitignored) from the raw export in
+  `Mujoco/wheel_robot_26.8.16_3/`, applying the same REP-103 root fix as
+  `franzi_description`, so the MuJoCo world frame is `odom`. Runs in its own venv
+  (`Mujoco/.venv`, system Python 3.12); validate with
+  `MUJOCO_GL=egl Mujoco/.venv/bin/python Mujoco/check_model.py`. See `Mujoco/README.md`.
 
 ## Architecture (Rviz/src)
 

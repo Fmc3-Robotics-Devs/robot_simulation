@@ -40,7 +40,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from cell import LOOK_DOWN, STATIONS, WORK_POSTURE, Cell  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
-USD = REPO / "IssacSim" / "usd" / "franzi.usd"
+# Isaac Sim 6's URDF importer emits a directory named after the staged URDF.
+USD = REPO / "IssacSim" / "usd" / "wheel_robot_4.0.isaac" / "wheel_robot_4.0.isaac.usda"
 TEXTURES = REPO / "IssacSim" / "usd" / "textures"
 
 D435 = dict(focal_length=1.93, horizontal_aperture=2.652, clipping_range=(0.05, 20.0))
@@ -72,13 +73,45 @@ LIDARS = {
 }
 
 
+def set_targets(prim, attribute, target_prim_paths):
+    """Set a USD relationship target without the removed core.utils helper."""
+    prim.CreateRelationship(attribute).SetTargets(target_prim_paths)
+
+
+def robot_link_path(stage, link_name, root="/World/Robot"):
+    """Return the physical USD prim for a URDF link.
+
+    Isaac Sim 6 nests the imported URDF below ``Geometry`` rather than placing
+    links directly under the configured articulation root.  Physical links are
+    marked with ``IsaacLinkAPI``, which also distinguishes them from their
+    same-named visual instances.
+    """
+    from pxr import Usd
+
+    root_prim = stage.GetPrimAtPath(root)
+    if not root_prim.IsValid():
+        raise RuntimeError(f"missing robot root: {root}")
+    direct = stage.GetPrimAtPath(f"{root}/{link_name}")
+    if direct.IsValid():
+        return str(direct.GetPath())
+    candidates = [
+        prim
+        for prim in Usd.PrimRange(root_prim)
+        if prim.GetName() == link_name and "/Geometry/" in str(prim.GetPath())
+    ]
+    if candidates:
+        # The physical link is the outermost occurrence; its same-named child
+        # is the render instance, followed by mesh instances.
+        return str(min(candidates, key=lambda prim: len(str(prim.GetPath()))).GetPath())
+    raise RuntimeError(f"missing physical link {link_name} below {root}")
+
+
 def build_camera_graph(camera_name, camera_prim, width, height, frame_id):
     """Publish one camera's colour, depth and camera_info. Stamps use system
     time: the rest of the stack runs on wall clocks, and a sim-stamped
     detection would never share a timeline with it."""
     import omni.graph.core as og
     import omni.usd
-    from isaacsim.core.utils.prims import set_targets
 
     graph_path = f"/ROS2/{camera_name}"
     keys = og.Controller.Keys
@@ -136,7 +169,6 @@ def build_lidar_graph(name, lidar_prim_path, publish_type, topic, frame_id):
     the command was handed, and the helper refuses the outer Xform."""
     import omni.graph.core as og
     import omni.usd
-    from isaacsim.core.utils.prims import set_targets
 
     graph_path = f"/ROS2/{name}"
     keys = og.Controller.Keys
@@ -175,7 +207,6 @@ def build_robot_graph(robot_prim):
     """Standalone mode only: clock, joint states and the chassis transform."""
     import omni.graph.core as og
     import omni.usd
-    from isaacsim.core.utils.prims import set_targets
 
     keys = og.Controller.Keys
     og.Controller.edit(
@@ -186,12 +217,16 @@ def build_robot_graph(robot_prim):
                 ("Context", "isaacsim.ros2.bridge.ROS2Context"),
                 ("SimTime", "isaacsim.core.nodes.IsaacReadSimulationTime"),
                 ("Clock", "isaacsim.ros2.bridge.ROS2PublishClock"),
+                # Isaac Sim 6 publishes pre-computed articulation data rather
+                # than resolving a target prim inside the ROS publisher.
+                ("JointStateSource", "isaacsim.sensors.physics.nodes.IsaacReadJointState"),
                 ("JointState", "isaacsim.ros2.bridge.ROS2PublishJointState"),
                 ("Odom", "isaacsim.ros2.bridge.ROS2PublishRawTransformTree"),
             ],
             keys.CONNECT: [
                 ("Tick.outputs:tick", "Clock.inputs:execIn"),
-                ("Tick.outputs:tick", "JointState.inputs:execIn"),
+                ("Tick.outputs:tick", "JointStateSource.inputs:execIn"),
+                ("JointStateSource.outputs:execOut", "JointState.inputs:execIn"),
                 ("Tick.outputs:tick", "Odom.inputs:execIn"),
                 ("Context.outputs:context", "Clock.inputs:context"),
                 ("Context.outputs:context", "JointState.inputs:context"),
@@ -199,6 +234,13 @@ def build_robot_graph(robot_prim):
                 ("SimTime.outputs:simulationTime", "Clock.inputs:timeStamp"),
                 ("SimTime.outputs:simulationTime", "JointState.inputs:timeStamp"),
                 ("SimTime.outputs:simulationTime", "Odom.inputs:timeStamp"),
+                ("JointStateSource.outputs:jointNames", "JointState.inputs:jointNames"),
+                ("JointStateSource.outputs:jointPositions", "JointState.inputs:jointPositions"),
+                ("JointStateSource.outputs:jointVelocities", "JointState.inputs:jointVelocities"),
+                ("JointStateSource.outputs:jointEfforts", "JointState.inputs:jointEfforts"),
+                ("JointStateSource.outputs:jointDofTypes", "JointState.inputs:jointDofTypes"),
+                ("JointStateSource.outputs:stageMetersPerUnit", "JointState.inputs:stageMetersPerUnit"),
+                ("JointStateSource.outputs:sensorTime", "JointState.inputs:sensorTime"),
             ],
             keys.SET_VALUES: [
                 ("Clock.inputs:topicName", "clock"),
@@ -211,8 +253,8 @@ def build_robot_graph(robot_prim):
     )
     stage = omni.usd.get_context().get_stage()
     set_targets(
-        prim=stage.GetPrimAtPath("/ROS2/robot/JointState"),
-        attribute="inputs:targetPrim",
+        prim=stage.GetPrimAtPath("/ROS2/robot/JointStateSource"),
+        attribute="inputs:prim",
         target_prim_paths=[robot_prim],
     )
 
@@ -274,7 +316,6 @@ class Mirror:
     def __init__(self, robot):
         import omni.graph.core as og
         import omni.usd
-        from isaacsim.core.prims import XFormPrim
         from pxr import UsdGeom
 
         self._og = og
@@ -283,10 +324,7 @@ class Mirror:
         self._positions = robot.data.default_joint_pos.clone()
         self._velocities = robot.data.default_joint_vel.clone() * 0.0
         self._warned = set()
-        self._bodies = XFormPrim(
-            [f"/World/Robot/{name}" for name in robot.body_names],
-            reset_xform_properties=False,
-        )
+        self._bodies = None
 
         # The workpiece is scenery with no physics: the ROS side owns where it
         # is (resting, or riding the gripper) and this just moves the prop.
@@ -300,9 +338,9 @@ class Mirror:
                     break
 
     def write_back_to_stage(self):
-        self._bodies.set_world_poses(
-            self._robot.data.body_pos_w[0], self._robot.data.body_quat_w[0]
-        )
+        # XFormPrim was removed from the Sim 6 runtime. With use_fabric=False
+        # PhysX updates the authored stage, so no legacy wrapper is required.
+        return
 
     def _get(self, attribute):
         return self._og.Controller.get(self._og.Controller.attribute(attribute))
@@ -481,12 +519,20 @@ def main():
 
     from isaaclab.app import AppLauncher
 
-    launcher = AppLauncher(headless=not args.gui, enable_cameras=True)
+    # Isaac Lab 3 requires explicit visualizer intent.  ``headless=False``
+    # alone is overridden to headless when no Kit visualizer is requested.
+    launcher = AppLauncher(
+        headless=not args.gui,
+        enable_cameras=True,
+        visualizer="kit" if args.gui else None,
+        visualizer_explicit=args.gui,
+    )
     simulation_app = launcher.app
 
-    from isaacsim.core.utils.extensions import enable_extension
+    import omni.kit.app
 
-    enable_extension("isaacsim.ros2.bridge")
+    extension_manager = omni.kit.app.get_app().get_extension_manager()
+    extension_manager.set_extension_enabled_immediate("isaacsim.ros2.bridge", True)
     simulation_app.update()
 
     import omni.usd
@@ -536,6 +582,21 @@ def main():
             },
         )
     )
+
+    # Force USD references to compose before inspecting the imported link
+    # hierarchy. Do this before the first physics reset: adding child prims
+    # after a tensor view exists invalidates that view in Isaac Sim 6.
+    simulation_app.update()
+    link_paths = {
+        link: robot_link_path(stage, link)
+        for link, _, _ in CAMERAS.values()
+    }
+    link_paths.update(
+        {
+            link: robot_link_path(stage, link)
+            for link, _, _, _, _ in LIDARS.values()
+        }
+    )
     paint.paint_robot(stage)
     paint.spawn_logo(stage)
 
@@ -560,7 +621,7 @@ def main():
     cameras = {}
     for name in args.cameras:
         link, intrinsics, (width, height) = CAMERAS[name]
-        prim_path = f"/World/Robot/{link}/{name}"
+        prim_path = f"{link_paths[link]}/{name}"
         camera = UsdGeom.Camera.Define(stage, prim_path)
         camera.CreateFocalLengthAttr(intrinsics["focal_length"])
         camera.CreateHorizontalApertureAttr(intrinsics["horizontal_aperture"])
@@ -610,7 +671,7 @@ def main():
         ok, sensor = omni.kit.commands.execute(
             "IsaacSensorCreateRtxLidar",
             path=name,
-            parent=f"/World/Robot/{link}",
+            parent=link_paths[link],
             config=config,
             translation=(0.0, 0.0, 0.0),
         )
@@ -632,7 +693,7 @@ def main():
         link, _, (width, height) = CAMERAS[name]
         build_camera_graph(name, prim_path, width, height, f"{name}_optical")
         translation, quaternion = optical_transform(
-            stage, f"/World/Robot/{link}", prim_path
+            stage, link_paths[link], prim_path
         )
         print(
             f"static tf {link} -> {name}_optical: "

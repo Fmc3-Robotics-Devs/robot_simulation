@@ -48,21 +48,72 @@ def _material(stage, path, rgb, roughness, metallic):
     return material
 
 
+def _link_and_visuals(stage, root, link_name):
+    """Find a physical link and its visual scope below an imported robot.
+
+    Isaac Sim 5 imported the links immediately below ``root``.  Isaac Sim 6
+    preserves the URDF articulation hierarchy below a ``Geometry`` scope and
+    puts each link's renderable geometry in a same-named child instance.  The
+    returned link is the physical parent, while the second return value is
+    the renderable child used for bounds and material binding.
+    """
+    from pxr import Usd
+
+    root_prim = stage.GetPrimAtPath(root)
+    if not root_prim.IsValid():
+        return None, None
+
+    # Keep the old path first: this also supports USDs created by Isaac Sim 5.
+    candidates = [stage.GetPrimAtPath(f"{root}/{link_name}")]
+    candidates.extend(
+        prim for prim in Usd.PrimRange(root_prim) if prim.GetName() == link_name
+    )
+    seen = set()
+    for link in candidates:
+        if not link.IsValid() or link.GetPath() in seen:
+            continue
+        seen.add(link.GetPath())
+        visuals = stage.GetPrimAtPath(f"{link.GetPath()}/visuals")
+        if visuals.IsValid():
+            return link, visuals
+        # Isaac Sim 6: physical link -> same-named render instance.  Its
+        # meshes arrive through a USD reference rather than a ``visuals``
+        # scope, so bind and measure the instance itself.
+        renderable = stage.GetPrimAtPath(f"{link.GetPath()}/{link_name}")
+        if renderable.IsValid():
+            return link, renderable
+    return None, None
+
+
 def paint_robot(stage, root="/World/Robot", looks="/World/Looks"):
     """Bind the palette to every link under ``root``. Idempotent."""
-    from pxr import UsdShade
+    from pxr import Usd, UsdShade
 
     materials = {}
-    for link in stage.GetPrimAtPath(root).GetChildren():
+    bound_visuals = set()
+    root_prim = stage.GetPrimAtPath(root)
+    if not root_prim.IsValid():
+        print(f"robot paint skipped: missing root {root}")
+        return
+    for link in Usd.PrimRange(root_prim):
         visuals = stage.GetPrimAtPath(f"{link.GetPath()}/visuals")
         if not visuals.IsValid():
+            visuals = stage.GetPrimAtPath(f"{link.GetPath()}/{link.GetName()}")
+        if not visuals.IsValid():
             continue
+        visual_path = str(visuals.GetPath())
+        if visual_path in bound_visuals:
+            continue
+        bound_visuals.add(visual_path)
         style = _style(link.GetName())
         if style not in materials:
             materials[style] = _material(
                 stage, f"{looks}/franzi_{len(materials)}", *style
             )
-        api = UsdShade.MaterialBindingAPI.Apply(visuals)
+        # Sim 6's imported mesh is an instance proxy, which USD deliberately
+        # forbids authoring into. Bind on its physical link instead; material
+        # binding inherits to the render instance and its meshes.
+        api = UsdShade.MaterialBindingAPI.Apply(link)
         api.Bind(
             materials[style], bindingStrength=UsdShade.Tokens.strongerThanDescendants
         )
@@ -174,9 +225,11 @@ def spawn_logo(stage, torso="/World/Robot/torso_Link", size=0.16, height=0.60):
     cache = UsdGeom.BBoxCache(
         Usd.TimeCode.Default(), [UsdGeom.Tokens.default_, UsdGeom.Tokens.render]
     )
-    box = cache.ComputeUntransformedBound(
-        stage.GetPrimAtPath(f"{torso}/visuals")
-    ).ComputeAlignedBox()
+    requested_torso = Path(torso).name
+    link, visuals = _link_and_visuals(stage, str(Path(torso).parent), requested_torso)
+    if link is None:
+        raise RuntimeError(f"could not find torso link {requested_torso} below {torso}")
+    box = cache.ComputeUntransformedBound(visuals).ComputeAlignedBox()
     low, high = box.GetMin(), box.GetMax()
     position = (
         high[0] + 0.002,
@@ -184,11 +237,11 @@ def spawn_logo(stage, torso="/World/Robot/torso_Link", size=0.16, height=0.60):
         low[2] + height * (high[2] - low[2]),
     )
     quad = spawn_textured_quad(
-        stage, f"{torso}/logo", size, write_logo(), position, yaw_degrees=90.0
+        stage, f"{link.GetPath()}/logo", size, write_logo(), position, yaw_degrees=90.0
     )
     # The quad is authored facing +z in the xy plane; the extra x-rotation
     # (applied first, before the yaw) stands it upright facing the link's +x
     # with the text unmirrored to someone standing in front of the robot.
     UsdGeom.Xformable(quad).AddRotateXOp().Set(90.0)
-    print(f"logo decal at {tuple(round(v, 3) for v in position)} on {torso}")
+    print(f"logo decal at {tuple(round(v, 3) for v in position)} on {link.GetPath()}")
     return quad
