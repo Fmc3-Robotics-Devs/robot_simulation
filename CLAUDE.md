@@ -16,9 +16,15 @@ Simulation of the Franzi mobile manipulator for an engraving-machine tending cel
   and publishes rendered cameras (`/head_d435/color/…`) and RTX lidar (`/scan`,
   `/mid360/points`). It runs no control.
 - `Mujoco/` — standalone MuJoCo *physics* model of the robot (not yet bridged to ROS).
-  `convert_urdf.py` builds `model/` (gitignored) from the raw export in
-  `Mujoco/wheel_robot_26.8.16_3/`, applying the same REP-103 root fix as
-  `franzi_description`, so the MuJoCo world frame is `odom`. Runs in its own venv
+  Its reference URDF is `Mujoco/franzi_merged/`, which `merge_urdf.py` assembles from two
+  SolidWorks exports: chassis to elbows from `wheel_robot_26.8.16_3/`, wrists and grippers
+  from `wheel_robot_7.24/` (the 26.8.16_3 wrists don't match the real robot), with the same
+  REP-103 root fix as `franzi_description`, so the MuJoCo world frame is `odom`. Its
+  wrist_yaw / wrist_pitch turn the opposite way to `franzi_description`'s.
+  `convert_urdf.py` builds `model/` (gitignored) from it; `pem_cell.py` adds the PEM
+  stacking-cell scene (`model/pem_scene.xml`) from `pem_cell.yaml`, the measured layout in
+  `Mujoco/PEM Project/`, and `pem_demo.py` moves the electrode stacks into its trays with
+  fork carriers, by physics. Runs in its own venv
   (`Mujoco/.venv`, system Python 3.12); validate with
   `MUJOCO_GL=egl Mujoco/.venv/bin/python Mujoco/check_model.py`. See `Mujoco/README.md`.
 

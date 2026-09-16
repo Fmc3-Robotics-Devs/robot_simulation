@@ -1,0 +1,121 @@
+# PEM stacking cell for the MuJoCo scene (pem_cell.py). All lengths in mm,
+# angles in degrees, as on the drawings.
+#
+# Cell frame, as in "PEM Project/20260906 Measurements.pdf": x along the
+# frame's base beam from the anode tray to the cathode tray, y towards the back
+# (away from the side the robot works from), z up. Origin on the floor, midway
+# between the inner edges of the anode and cathode trays, on the beam's
+# centreline (which the anode and cathode trays are centred on).
+#
+# MEASURED marks a number from the drawings; everything else is an assumption
+# to be replaced when it is measured.
+
+# Where the cell stands in the MuJoCo world (= odom; the robot starts at the
+# origin facing +x). yaw -90: cell +x runs to the robot's right, so the robot
+# faces the front of the cell with the anode tray on its left.
+placement:
+  x: 800
+  y: 0
+  yaw: -90
+
+# The frame: 50 x 50 aluminium profile - a base beam on the floor and one
+# post under each tray, centred under it (as drawn).
+profile: 50
+slot: 10               # T-slot opening, drawn as dark lines (visual only)
+
+trays:
+  inner_gap_anode_cathode: 1175    # MEASURED
+  inner_gap_anode_assembly: 420    # MEASURED
+  inner_gap_assembly_cathode: 550  # MEASURED
+  # The three gaps are kept exact, so the assembly tray is
+  # 1175 - 420 - 550 = 205 mm wide (the drawing's footprint note says 200).
+  # Floor to the tray's underside (= the post's top). MEASURED; which point of
+  # the tray was measured is not stated - the tray floor is 3 mm higher.
+  height_anode: 1061
+  height_cathode: 1061
+  height_assembly: 956
+  # The top view has the assembly tray behind the line of the anode and
+  # cathode trays; the drawing's note gives ~27 mm (for its rear stop). Used
+  # as the offset of its centreline.
+  assembly_centre_offset: 27
+  assembly_depth: 192              # t, MEASURED
+  assembly_thickness: 10           # not measured: drawn as a plain plate
+  # Anode and cathode trays: 205 x 137 x 45, base plate with four L-shaped
+  # corner guides; its long side along x (the drawing shows all three trays
+  # about as wide).
+  mesh: "PEM Project/tray.stl"
+
+# Electrode sheets, from the Solith drawings (MEASURED except density).
+# The tab sits on a long edge, tab_offset from the body's left edge.
+# Density: whole-sheet average of the coated foil - assumed (graphite on
+# 10 um Cu ~1.7 g/cm3, NMC on 15 um Al ~3.2 g/cm3). The tab is bare foil;
+# its stack gets the foil's share of that (assumed).
+sheets:
+  anode:     # Anodensheet.pdf, drawing 0268671, "ANODE PUNCHED"
+    body: [182, 119]
+    tab: [65, 30]
+    tab_offset: 13.5
+    thickness: 0.41
+    density: 1700
+    tab_density: 220
+  cathode:   # Kathodensheet.pdf, drawing 0268672, "CATHODE PUNCHED"
+    body: [178, 115]
+    tab: [65, 30]
+    tab_offset: 13.5
+    thickness: 0.42
+    density: 3200
+    tab_density: 100
+
+# Stacks of sheets, anode and cathode separate, each held in its own carrier
+# on the side table: body towards the robot, tabs to the back, as they go into
+# the trays. Two per tray: 2 x 40 sheets is 33 mm, inside the trays' 38 mm of
+# guide height.
+stacks:
+  sheets: 40
+  count: {anode: 2, cathode: 2}
+  pitch: 250          # carrier to carrier along the table
+  front_margin: 40    # stack body's front edge to the table's front edge
+
+# Fork carrier, one per stack (all assumed). A tine under the stack and a pad
+# on top clamp it; a spine at the +x end joins them to an arm above, with the
+# handle for the gripper on top. The pad is driven by the
+# carrier's own actuator (a pneumatic / electric clamp). In a tray the stack
+# is lowered between the corner guides, the pad opens, and the tine slides out
+# along x through the 47 mm gap between the guides at the tray's short end.
+carrier:
+  width: 40           # y width of tine, spine, arm and pad (the tray gap is 47)
+  tine: 3             # thickness (steel, low-friction coated)
+  tine_margin: 2      # tine end short of the stack's far end
+  spine: 12           # thickness along x
+  spine_clearance: 5  # spine's inner face beyond the tray's end, stack centred
+  pad: [80, 6]        # length (x), thickness
+  travel: 22          # pad opening
+  arm: 10             # thickness
+  handle: [20, 50, 30]  # x (the gripper closes across it: ~75 N grip), y, z; it
+                        # stands over the loaded carrier's centre of mass, so a held
+                        # carrier hangs level
+  clamp_force: 40     # N
+
+# Side table left of the anode post (all assumed).
+table:
+  size: [1000, 500]   # x, y
+  height: 900         # floor to the top surface
+  thickness: 30
+  leg: 50
+  leg_inset: 30
+  gap: 150            # table's right edge to the anode post's outer face
+  front: -150         # y of the table's front edge
+
+# Where the robot parks to work at a tray or carrier: base_link a standoff in
+# front (cell -y) of the target centre, facing the back of the cell, with the
+# target to its left (the left arm's side) by an arm offset. At a tray the
+# carrier comes in from `entry_offset` on the tray's +x side and leaves the
+# same way; 320 / 200 keep that whole path clear of the arm's joint limits
+# (and the chassis nose 53 mm off the beam). At the table 350 keeps the
+# chassis clear of the table legs.
+dock:
+  tray_standoff: 320
+  tray_arm_offset: 200
+  table_standoff: 350
+  table_arm_offset: 160
+  entry_offset: 210

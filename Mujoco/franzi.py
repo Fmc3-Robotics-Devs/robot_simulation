@@ -1,7 +1,7 @@
 """Python interface to the Franzi MuJoCo model.
 
 One object wraps the model and its data and speaks the robot's vocabulary:
-SRDF named postures, gripper gap in metres, a body-frame base twist, TCP poses
+SRDF named postures, gripper gap in metres, a body-frame base twist, tool poses
 and IK, camera images and a 2D scan. Everything here drives the simulation
 through its actuators - nothing writes joint positions behind the physics'
 back, so what a script sees is what the servos, contacts and friction did.
@@ -15,7 +15,9 @@ back, so what a script sees is what the servos, contacts and friction did.
 
 Frames: the MuJoCo world frame is the ROS ``odom`` frame (the floor sits at
 ``task.yaml``'s ``ground_z``), so poses read here compare directly with the
-ROS stack's.
+ROS stack's. Each hand has two tool frames (see merge_urdf.py): ``grasp``, the
+centre between the finger pads, which IK and ``move_tcp`` steer by default,
+and ``tcp``, the SDK's TCP 273.5 mm off the flange (below the fingertips).
 """
 
 import math
@@ -36,9 +38,9 @@ ARM_JOINTS = ("shoulder_pitch", "shoulder_roll", "shoulder_yaw", "elbow_pitch",
               "wrist_yaw", "wrist_pitch", "wrist_roll")
 SWERVE = ("left_front", "right_front", "rear")
 # The finger joint origins are 95 mm apart and both travel inwards, so joint
-# zero is fully open. Which sign closes differs per side (see the SRDF).
+# zero is fully open. Which sign closes is read off finger01's range.
 GRIPPER_GAP = 0.095
-CLOSING_SIGN = {"left": -1.0, "right": 1.0}  # of finger01
+TOOL = "grasp"  # the tool frame IK steers: "{side}_grasp" (or "tcp", the SDK's)
 
 
 def normalise(angle):
@@ -51,8 +53,8 @@ def min_jerk(alpha):
 
 
 def top_down(yaw=0.0):
-    """TCP orientation for a vertical grasp: approach (TCP +x) straight down,
-    fingers closing (TCP +z) along the horizontal direction ``yaw``."""
+    """Grasp-frame orientation for a vertical grasp: approach (+x) straight
+    down, finger01 closing (+z) along the horizontal direction ``yaw``."""
     closing = np.array([math.cos(yaw), math.sin(yaw), 0.0])
     approach = np.array([0.0, 0.0, -1.0])
     return np.column_stack([approach, np.cross(closing, approach), closing])
@@ -81,6 +83,8 @@ class Franzi:
         for a in range(m.nu):
             joint = m.joint(m.actuator_trnid[a, 0]).name
             self._actuator[joint] = a
+        self._closing = {side: 1.0 if m.joint(f"{side}_finger01_joint").range[1] > 0 else -1.0
+                         for side in ("left", "right")}
         self._base_act = [m.actuator(n).id for n in ("base_x", "base_y", "base_yaw")]
         self._base_qpos = [m.jnt_qposadr[m.joint(n).id] for n in ("base_x", "base_y", "base_yaw")]
 
@@ -140,12 +144,19 @@ class Franzi:
 
     def set_posture(self, group, state):
         """Command an SRDF named state, e.g. ("head", "look_down")."""
-        self.set_targets(self._states[(group, state)])
+        targets = self._states[(group, state)]
+        for joint, value in targets.items():
+            # The SRDF is written against franzi_description, whose wrist and
+            # finger signs differ from this model's; do not clip silently.
+            low, high = self.model.joint(joint).range
+            if not low - 1e-9 <= value <= high + 1e-9:
+                raise ValueError(f"SRDF {group}/{state}: {joint}={value} outside [{low}, {high}]")
+        self.set_targets(targets)
 
     def set_gripper(self, side, gap):
         """Command the jaw gap in metres, 0 (closed) to 0.095 (open)."""
         stroke = (GRIPPER_GAP - min(max(gap, 0.0), GRIPPER_GAP)) / 2
-        self.data.ctrl[self._actuator[f"{side}_finger01_joint"]] = CLOSING_SIGN[side] * stroke
+        self.data.ctrl[self._actuator[f"{side}_finger01_joint"]] = self._closing[side] * stroke
 
     def gripper_gap(self, side):
         return GRIPPER_GAP - abs(self.joint(f"{side}_finger01_joint")) - abs(
@@ -249,12 +260,13 @@ class Franzi:
         s = self.data.site(site)
         return s.xpos.copy(), s.xmat.reshape(3, 3).copy()
 
-    def tcp_pose(self, side):
-        return self.site_pose(f"{side}_tcp")
+    def tcp_pose(self, side, frame=TOOL):
+        """World pose of a hand's tool frame, ``{side}_grasp`` by default."""
+        return self.site_pose(f"{side}_{frame}")
 
     def solve_ik(self, side, position, rotation=None, seed=None, iterations=200,
-                 restarts=20, tolerance=(5e-4, 5e-3)):
-        """Arm joints putting ``{side}_tcp`` at a world pose.
+                 restarts=20, tolerance=(5e-4, 5e-3), frame=TOOL):
+        """Arm joints putting the tool frame ``{side}_{frame}`` at a world pose.
 
         Damped least squares on a scratch copy of the current state (base,
         body and the other arm stay where they are), clamped to the joint
@@ -275,7 +287,7 @@ class Franzi:
         dadr = np.array([m.jnt_dofadr[j] for j in jid])
         lower, upper = m.jnt_range[jid].T
         span = upper - lower
-        site = m.site(f"{side}_tcp").id
+        site = m.site(f"{side}_{frame}").id
         jacp, jacr = np.zeros((3, m.nv)), np.zeros((3, m.nv))
         target_quat = np.zeros(4)
         if rotation is not None:
@@ -338,26 +350,40 @@ class Franzi:
         jid = [self.model.joint(j).id for j in solution]
         return self._margin_fn(jid)(np.array(list(solution.values())))
 
-    def move_tcp(self, side, position, rotation, duration, waypoints=20, callback=None):
-        """Straight-line TCP motion through IK waypoints.
+    def plan_line(self, side, start, goal, rotation, seed, waypoints=20, frame=TOOL):
+        """IK waypoints for a straight tool-frame line from ``start`` to
+        ``goal`` with the arm starting at ``seed`` (joint values), without
+        moving anything. Returns the list of {joint: value}, or None where
+        the line would leave the IK branch.
 
         Each waypoint is solved from the previous one with no random
         restarts, and a waypoint that would jump the arm onto another IK
         branch is refused: swinging through a branch change mid-motion is
         what flings a held part across the room.
         """
-        start, _ = self.tcp_pose(side)
+        start, goal = np.asarray(start, float), np.asarray(goal, float)
         joints = self.arm_joints(side)
-        seed = self.joints(joints)
+        seed = np.asarray(seed, float)
         path = []
         for k in range(1, waypoints + 1):
-            point = start + (np.asarray(position) - start) * min_jerk(k / waypoints)
-            solution, ok = self.solve_ik(side, point, rotation, seed=seed, restarts=0)
+            point = start + (goal - start) * min_jerk(k / waypoints)
+            solution, ok = self.solve_ik(side, point, rotation, seed=seed, restarts=0,
+                                         frame=frame)
             q = np.array([solution[j] for j in joints])
             if not ok or np.abs(q - seed).max() > 0.3:
-                raise RuntimeError(f"{side} arm: no continuous IK path through {np.round(point, 3)}")
+                return None
             seed = q
             path.append(solution)
+        return path
+
+    def move_tcp(self, side, position, rotation, duration, waypoints=20, callback=None,
+                 frame=TOOL):
+        """Straight-line motion of the tool frame (see ``plan_line``)."""
+        start, _ = self.tcp_pose(side, frame)
+        path = self.plan_line(side, start, position, rotation, self.joints(self.arm_joints(side)),
+                              waypoints, frame)
+        if path is None:
+            raise RuntimeError(f"{side} arm: no continuous IK path to {np.round(position, 3)}")
         for solution in path:
             self.move_joints(solution, duration / waypoints, callback=callback)
 

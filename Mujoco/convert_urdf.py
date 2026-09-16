@@ -9,16 +9,16 @@ Writes two files next to each other:
   and a workpiece laid out from ``task.yaml``, plus the SRDF named postures as
   keyframes.
 
-Either the raw SolidWorks export (``wheel_robot_26.8.16_3/``, the default) or
-the corrected ``franzi_description`` URDF can be the input; both produce the
-same model. What has to be got right, and why:
+The input is ``franzi_merged/urdf/franzi_merged.urdf``, which
+``merge_urdf.py`` assembles from the two SolidWorks exports (chassis to elbows
+from ``wheel_robot_26.8.16_3``, wrists and grippers from ``wheel_robot_7.24``)
+with a REP-103 ``base_link`` root and the tool frames already in it. What has
+to be got right here, and why:
 
-* **The export's root is not REP-103.** It stands the robot along +X. When the
-  root link carries the chassis mesh it is renamed ``base_body_Link`` and a
-  massless ``base_link`` is put in front of it with the same fixed transform
-  ``franzi_description`` appends (see its README). ``base_link`` then keeps the
-  origin ``task.yaml`` heights are measured against, so the MuJoCo world frame
-  *is* the ``odom`` frame and the floor sits at ``ground_z``.
+* **The root frame is ``odom``.** ``base_link`` is the massless REP-103 frame
+  ``task.yaml`` heights are measured against, so the MuJoCo world frame *is*
+  the ``odom`` frame and the floor sits at ``ground_z``. A URDF whose root
+  carries a body (a raw export) is refused.
 * **The base is holonomic, not wheeled.** Like the SRDF's planar
   ``world_joint``, ``base_link`` rides on x / y / yaw joints driven by
   integrated-velocity actuators. The steering and wheel joints are kept and
@@ -48,24 +48,12 @@ import yaml
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parent
-DEFAULT_URDF = HERE / "wheel_robot_26.8.16_3" / "urdf" / "wheel_robot_26.8.16_3.urdf"
+DEFAULT_URDF = HERE / "franzi_merged" / "urdf" / "franzi_merged.urdf"
 DEFAULT_SRDF = (
     REPO / "Rviz" / "src" / "franzi_moveit_config" / "config" / "wheel_robot_26.8.16_3.srdf"
 )
 DEFAULT_TASK = REPO / "Rviz" / "src" / "franzi_pick_place" / "config" / "task.yaml"
 DEFAULT_OUT = HERE / "model"
-
-# franzi_description's correction block, applied when the input is the raw
-# export (its root still carries the chassis mesh).
-ROOT_CORRECTION = ((0.0, 0.0, 0.24785), (0.0, -math.pi / 2, -math.pi / 2))
-# SDK flange = wrist_roll_Link itself; TCP 273.5 mm along flange +x, rolled
-# -90 deg (left) / +90 deg (right) about x.
-TOOL_FRAMES = {
-    "left_flange": ("left_wrist_roll_Link", (0, 0, 0), (0, 0, 0)),
-    "left_tcp": ("left_wrist_roll_Link", (0.2735, 0, 0), (-math.pi / 2, 0, 0)),
-    "right_flange": ("right_wrist_roll_Link", (0, 0, 0), (0, 0, 0)),
-    "right_tcp": ("right_wrist_roll_Link", (0.2735, 0, 0), (math.pi / 2, 0, 0)),
-}
 
 # Robot palette, after IssacSim/paint.py (the export paints every link white).
 # First regex that matches the link name wins: (rgba, specular, shininess).
@@ -92,14 +80,16 @@ PALETTE = [
 #     right and the floor at the bottom. (wheel_robot_4.0 needed Rz(-90 deg) -
 #     the export re-rolled the camera links; check_model.py "cameras" tests
 #     the images are upright.)
-#   * D405s: Rz(+90 deg), which puts the gripper fingers at the bottom edge
-#     of the picture, the usual wrist-camera view.
+#   * D405s (7.24's, both exported with the same orientation although they
+#     sit mirrored on the two wrists): none on the left and a half turn on the
+#     right put the gripper fingers at the bottom edge of the picture, the
+#     usual wrist-camera view. The real mounting is still to be confirmed.
 # A MuJoCo camera looks down its own -z with +y up: the extra x half-turn.
 CAMERAS = {
     "head_d435": ("head_d435_Link", 1.93, 2.652, (1280, 720), math.pi),
     "body_d435": ("body_d435_Link", 1.93, 2.652, (640, 480), math.pi),
-    "left_wrist_d405": ("left_D405_Link", 1.88, 2.782, (640, 480), math.pi / 2),
-    "right_wrist_d405": ("right_D405_Link", 1.88, 2.782, (640, 480), math.pi / 2),
+    "left_wrist_d405": ("left_D405_Link", 1.88, 2.782, (640, 480), 0.0),
+    "right_wrist_d405": ("right_D405_Link", 1.88, 2.782, (640, 480), math.pi),
 }
 
 # Position-servo gains per joint group: (kp, kv, armature, damping). Sized
@@ -116,8 +106,7 @@ GAINS = [
     (r"head|steering", (100.0, 3.0, 0.01, 0.5)),
 ]
 # Parallel gripper: one servo per hand on finger01, finger02 mirrored by an
-# equality constraint. 100 N is the left export's finger effort; the right
-# side exports 0 for effort and velocity, an exporter default.
+# equality constraint. 100 N is the export's finger effort.
 GRIPPER = (2000.0, 40.0, 100.0)  # kp, kv, force limit
 # Every joint in the export carries effort="100" velocity="3.14" - exporter
 # placeholders, not actuator specs. For the arms 100 N m is ample (worst
@@ -274,7 +263,6 @@ def build_robot(urdf, meshdir_rel):
 
     meshes = {}
     worldbody = ET.SubElement(mujoco, "worldbody")
-    sites_needed = dict(TOOL_FRAMES)
 
     def add_geoms(body, link):
         # Visual and collision reference the same STL in this export.
@@ -283,7 +271,7 @@ def build_robot(urdf, meshdir_rel):
             return
         if not mesh.exists():
             raise SystemExit(f"{link}: mesh not found: {mesh}")
-        name = mesh.stem if mesh.stem != "base_link" else "base_body_Link"
+        name = mesh.stem
         if name not in meshes:
             meshes[name] = mesh.name
             ET.SubElement(asset, "mesh", name=name, file=mesh.name)
@@ -360,7 +348,6 @@ def build_robot(urdf, meshdir_rel):
         """A frame link becomes a site; frames hanging off it compose onto it."""
         ET.SubElement(parent, "site", {"name": link, "group": "4", "size": "0.01",
                                        **placement(xyz, rot)})
-        sites_needed.pop(link, None)
         for child in urdf.children.get(link, []):
             if not urdf.is_frame(child):
                 raise SystemExit(f"{child} hangs off the frame {link} but has a body")
@@ -394,30 +381,12 @@ def build_robot(urdf, meshdir_rel):
     ET.SubElement(base, "camera", name="chase", mode="trackcom", pos="-2.6 -1.6 1.6",
                   xyaxes="0.52 -0.85 0 0.3 0.18 0.94")
 
-    if urdf.is_frame(urdf.root):  # franzi_description: already corrected
-        for child in urdf.children.get(urdf.root, []):
-            xyz, rot = origin_of(urdf.joints[child])
-            if child != "base_body_Link":
-                raise SystemExit(f"unexpected child of base_link: {child}")
-            add_link(base, child, xyz, rot)
-    else:  # raw export: its root is the chassis
-        urdf.links["base_body_Link"] = urdf.links.pop(urdf.root)
-        urdf.children["base_body_Link"] = urdf.children.pop(urdf.root)
-        urdf.root = "base_body_Link"
-        xyz, rpy = ROOT_CORRECTION
-        body = ET.SubElement(base, "body", {"name": "base_body_Link", "gravcomp": "1",
-                                            **placement(np.array(xyz), rpy_matrix(*rpy))})
-        add_inertial(body, "base_body_Link")
-        add_geoms(body, "base_body_Link")
-        for child in urdf.children["base_body_Link"]:
-            xyz_c, rot_c = origin_of(urdf.joints[child])
-            add_link(body, child, xyz_c, rot_c)
-
-    # Tool frames the raw export does not have.
-    for name, (parent, xyz, rpy) in sites_needed.items():
-        body = worldbody.find(f".//body[@name='{parent}']")
-        ET.SubElement(body, "site", {"name": name, "group": "4", "size": "0.01",
-                                     **placement(np.array(xyz, float), rpy_matrix(*rpy))})
+    if urdf.root != "base_link" or not urdf.is_frame(urdf.root):
+        raise SystemExit(f"{urdf.path}: the root must be a massless REP-103 base_link, not "
+                         f"{urdf.root!r} (build the input with merge_urdf.py)")
+    for child in urdf.children.get(urdf.root, []):
+        xyz, rot = origin_of(urdf.joints[child])
+        add_link(base, child, xyz, rot)
 
     # Cameras.
     for name, (link, focal, width, (px, py), roll) in CAMERAS.items():
@@ -508,17 +477,15 @@ KEYFRAMES = {
 }
 
 
-def build_scene(task, keyframes):
-    p = task["pick_place_task"]["ros__parameters"]
-    ground_z = p["ground_z"]
-    bench, part = p["bench"], p["workpiece"]
-    dock_x, dock_y = p["dock"]["offset"]
-
-    mujoco = ET.Element("mujoco", model="franzi_scene")
+def environment(name, ground_z, center=(0.3, 0, 0.5), extent=SCENE_EXTENT, **options):
+    """A scene around the robot: franzi.xml, physics options (``options``
+    added to them), lights, sky and the floor at ``ground_z``. Returns the
+    (mujoco, asset, worldbody) elements for the caller to add its cell to."""
+    mujoco = ET.Element("mujoco", model=name)
     ET.SubElement(mujoco, "include", file="franzi.xml")
     ET.SubElement(mujoco, "option", timestep="0.002", integrator="implicitfast",
-                  cone="elliptic", impratio="10")
-    ET.SubElement(mujoco, "statistic", center="0.3 0 0.5", extent=fmt(SCENE_EXTENT))
+                  cone="elliptic", impratio="10", **options)
+    ET.SubElement(mujoco, "statistic", center=fmt(center), extent=fmt(extent))
     visual = ET.SubElement(mujoco, "visual")
     ET.SubElement(visual, "headlight", diffuse="0.5 0.5 0.5", ambient="0.35 0.35 0.35",
                   specular="0 0 0")
@@ -528,7 +495,7 @@ def build_scene(task, keyframes):
     # 5 cm near clip, the D435's minimum range (and Isaac's clipping_range).
     # The head camera sits behind the visor shell, 2-3 cm in front of the lens
     # where the real robot has a window; a closer plane renders its inside.
-    ET.SubElement(visual, "map", znear=fmt(0.05 / SCENE_EXTENT, 4))
+    ET.SubElement(visual, "map", znear=fmt(0.05 / extent, 4))
 
     asset = ET.SubElement(mujoco, "asset")
     ET.SubElement(asset, "texture", type="skybox", builtin="gradient", rgb1="0.35 0.4 0.45",
@@ -550,6 +517,21 @@ def build_scene(task, keyframes):
     # The floor is where the wheels touch: task.yaml's ground_z in odom.
     ET.SubElement(world, "geom", name="floor", type="plane", size="0 0 0.05",
                   pos=fmt([0, 0, ground_z]), material="floor")
+    return mujoco, asset, world
+
+
+def add_keyframes(mujoco, keyframes):
+    keyframe = ET.SubElement(mujoco, "keyframe")
+    for name, (qpos, ctrl) in keyframes.items():
+        ET.SubElement(keyframe, "key", name=name, qpos=fmt(qpos, 6), ctrl=fmt(ctrl, 6))
+
+
+def build_scene(task, keyframes):
+    p = task["pick_place_task"]["ros__parameters"]
+    ground_z = p["ground_z"]
+    bench, part = p["bench"], p["workpiece"]
+    dock_x, dock_y = p["dock"]["offset"]
+    mujoco, asset, world = environment("franzi_scene", ground_z)
 
     # One bench at the dock offset, near edge part_inset in front of the part:
     # the posture the robot parks in at every station.
@@ -579,10 +561,7 @@ def build_scene(task, keyframes):
 
     # Observer camera across the aisle, framing the start pose and the bench.
     ET.SubElement(world, "camera", name="overview", **look_at((2.3, -2.9, 2.1), (-0.25, 0.0, 0.6)))
-
-    keyframe = ET.SubElement(mujoco, "keyframe")
-    for name, (qpos, ctrl) in keyframes.items():
-        ET.SubElement(keyframe, "key", name=name, qpos=fmt(qpos, 6), ctrl=fmt(ctrl, 6))
+    add_keyframes(mujoco, keyframes)
     return mujoco
 
 
@@ -599,6 +578,13 @@ def keyframe_vectors(scene_path, states):
         for key in parts:
             values.update(states[key])
         for joint, value in values.items():
+            # The SRDF is the ROS stack's, written against franzi_description;
+            # the wrists here follow 7.24's joint signs. A value outside this
+            # model's range means the conventions differ for that joint.
+            low, high = model.jnt_range[model.joint(joint).id]
+            if not low - 1e-9 <= value <= high + 1e-9:
+                raise SystemExit(f"keyframe {name}: SRDF {joint}={value} is outside this "
+                                 f"model's range [{low}, {high}]")
             data.qpos[model.jnt_qposadr[model.joint(joint).id]] = value
         for joint in values:
             if "finger02" in joint:
@@ -611,16 +597,16 @@ def keyframe_vectors(scene_path, states):
     return out
 
 
-def write(element, path):
+def write(element, path, generator="convert_urdf.py"):
     text = minidom.parseString(ET.tostring(element)).toprettyxml(indent="  ")
-    header = "<!-- Generated by Mujoco/convert_urdf.py - edit the converter, not this file. -->\n"
+    header = f"<!-- Generated by Mujoco/{generator} - edit the generator, not this file. -->\n"
     path.write_text(header + "\n".join(text.splitlines()[1:]) + "\n")
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("--urdf", type=Path, default=DEFAULT_URDF,
-                        help="raw export or franzi_description URDF")
+                        help="REP-103-rooted URDF (default: merge_urdf.py's output)")
     parser.add_argument("--srdf", type=Path, default=DEFAULT_SRDF, help="named postures")
     parser.add_argument("--task", type=Path, default=DEFAULT_TASK, help="cell layout")
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT, help="output directory")
